@@ -15,6 +15,7 @@
 
     <!-- Scripts -->
     @vite(['resources/sass/app.sass', 'resources/js/app.js'])
+    {!! htmlScriptTagJsApi() !!}
 </head>
 <body>
 <div id="app">

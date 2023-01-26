@@ -14,6 +14,13 @@ return [
     |
     */
 
+    'sendgrid' => [
+        'api_key' => env('SENDGRID_API_KEY'),
+        'templates' => [
+            'dynamic_template_id' => env('SENDGRID_DYNAMIC_TEMPLATE_ID')
+        ]
+    ],
+
     'mailgun' => [
         'domain' => env('MAILGUN_DOMAIN'),
         'secret' => env('MAILGUN_SECRET'),

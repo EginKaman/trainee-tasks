@@ -16,3 +16,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+Route::get('/feedback', [\App\Http\Controllers\FeedbackController::class, 'index'])
+    ->name('feedback');
+Route::post('/feedback', [\App\Http\Controllers\FeedbackController::class, 'store']);
+Route::post('/sendgrid/webhook', [\App\Http\Controllers\Sendgrid\WebhookController::class, 'update']);
