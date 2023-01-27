@@ -1,0 +1,41 @@
+image: ubuntu:22.04
+
+definitions:
+  steps:
+    - step: &npmDev
+        name: Build Development Assets
+        image: node:18
+        caches:
+          - node
+        script:
+          - npm install
+          - npm run build
+        artifacts:
+          - build/**
+          - node_modules/**
+          - public/**
+    - step: &composer
+        name: Install composer packages
+        image: composer:2.0
+        caches:
+          - composer
+        script:
+          - composer install
+    - step: &deploy
+        name: Deploy React Application to the Development server
+        deployment: Development
+        script:
+          - apt-get update && apt-get install -y zip git ssh rsync
+          - mkdir -p ~/.ssh
+          - cat my_known_hosts >> ~/.ssh/known_hosts
+          - (umask  077 ; echo $SSH_VARIABLE | base64 --decode > ~/.ssh/id_rsa)
+          - bash deploy.sh
+
+pipelines:
+  default:
+    - parallel:
+        - step: *npmDev
+        - step: *composer
+  branches:
+    develop:
+      - step: *deploy
