@@ -16,11 +16,13 @@ definitions:
           - public/**
     - step: &composer
         name: Install composer packages
-        image: composer:2.0
+        image: php:8.1
+        script:
+          - apt-get update && apt-get install -y libfreetype6-dev libjpeg62-turbo-dev libpng-dev
+          - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+          - composer install --optimize-autoloader --no-dev
         caches:
           - composer
-        script:
-          - composer install
     - step: &deploy
         name: Deploy React Application to the Development server
         deployment: Development
@@ -30,6 +32,7 @@ definitions:
           - cat my_known_hosts >> ~/.ssh/known_hosts
           - (umask  077 ; echo $SSH_VARIABLE | base64 --decode > ~/.ssh/id_rsa)
           - bash deploy.sh
+          -
 
 pipelines:
   default:
