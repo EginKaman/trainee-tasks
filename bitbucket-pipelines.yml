@@ -18,22 +18,23 @@ definitions:
         name: Install composer packages
         image: php:8.1
         script:
-          - apt-get update && apt-get install -y libfreetype6-dev libjpeg62-turbo-dev libpng-dev git
+          - apt-get update && apt-get install -y libfreetype6-dev libjpeg62-turbo-dev libpng-dev git php-zip zip
           - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
           - composer install --optimize-autoloader --no-dev
         caches:
           - composer
+        artifacts:
+          - vendor/**
     - step: &deploy
-        name: Deploy React Application to the Development server
+        name: Deploy Application to the Development server
         deployment: Staging
         script:
           - apt-get update && apt-get install -y zip git ssh rsync
           - mkdir -p ~/.ssh
-          - cat my_known_hosts >> ~/.ssh/known_hosts
-          - (umask  077 ; echo $SSH_VARIABLE | base64 --decode > ~/.ssh/id_rsa)
+          - ssh-keyscan -t rsa
+          - #cat my_known_hosts >> ~/.ssh/known_hosts
+          - (umask  077 ; echo $BITBUCKET_SSH_KEY_FILE > ~/.ssh/id_rsa)
           - bash deploy.sh
-          -
-
 pipelines:
   branches:
     develop:
