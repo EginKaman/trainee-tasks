@@ -27,7 +27,8 @@ SHARED_FILES=(
   ".env"
 )
 CUSTOM_COMMANDS=(
-
+  "php artisan migrate"
+  "php artisan optimize"
 )
 AFTER_LINK_COMMANDS=(
   "sudo systemctl restart supervisord"

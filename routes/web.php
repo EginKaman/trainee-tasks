@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('feedback');
 });
 Route::get('/feedback', [\App\Http\Controllers\FeedbackController::class, 'index'])
     ->name('feedback');
