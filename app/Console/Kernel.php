@@ -18,8 +18,7 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         $schedule->job(new EmailReport())
-//            ->daily()
-            ->everyMinute()
+            ->daily()
             ->timezone('Europe/Kyiv');
     }
 
