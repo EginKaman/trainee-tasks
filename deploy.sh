@@ -21,10 +21,10 @@ RSYNC_EXCLUDE=(
   "deploy.sh"
 )
 SHARED_DIRS=(
-
+  "storage"
 )
 SHARED_FILES=(
-
+  ".env"
 )
 CUSTOM_COMMANDS=(
 
