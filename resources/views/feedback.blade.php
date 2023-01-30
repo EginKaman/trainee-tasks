@@ -34,7 +34,7 @@
                                 <div class="col-md-6">
                                     <input id="name" type="text"
                                            class="form-control @error('name') is-invalid @enderror" name="name"
-                                           data-cy=“nameField”
+                                           data-cy="nameField"
                                            placeholder="Enter your name"
                                            required="required"
                                            value="{{ old('name') }}" required autocomplete="name" autofocus>
@@ -54,7 +54,7 @@
                                 <div class="col-md-6">
                                     <input id="email" type="email"
                                            class="form-control @error('email') is-invalid @enderror" name="email"
-                                           data-cy=“emailField”
+                                           data-cy="emailField"
                                            placeholder="Enter your email address"
                                            required="required"
                                            value="{{ old('email') }}" required autocomplete="email">
@@ -72,7 +72,7 @@
                                        class="col-md-4 col-form-label text-md-end">{{ __('Message') }}</label>
 
                                 <div class="col-md-6">
-                                    <textarea id="text" data-cy=“messageTextarea”
+                                    <textarea id="text" data-cy="messageTextarea"
                                               required="required"
                                               placeholder="Enter your message"
                                               class="form-control @error('text') is-invalid @enderror" name="text"
@@ -90,7 +90,7 @@
                                 <div class="col-md-6">
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio" name="method"
-                                               data-cy=“smtp”
+                                               data-cy="smtp"
                                                value="smtp"
                                                id="send_method_1" @checked(old('method') === 'smtp' || old('method') === null)>
                                         <label class="form-check-label" for="send_method_1">
@@ -122,7 +122,7 @@
                             <div class="row mb-0">
                                 <div class="col-md-6 offset-md-4">
                                     <button type="submit" class="btn btn-primary"
-                                            data-cy=“sendButton”
+                                            data-cy="sendButton"
                                             class="g-recaptcha"
                                             data-sitekey="{{ config('recaptcha.site_key') }}"
                                             data-callback="onSubmit"
