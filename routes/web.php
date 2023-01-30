@@ -20,3 +20,7 @@ Route::get('/feedback', [\App\Http\Controllers\FeedbackController::class, 'index
     ->name('feedback');
 Route::post('/feedback', [\App\Http\Controllers\FeedbackController::class, 'store']);
 Route::post('/sendgrid/webhook', [\App\Http\Controllers\Sendgrid\WebhookController::class, 'update']);
+
+Route::get('/convertor', [\App\Http\Controllers\ConvertorController::class, 'index'])
+    ->name('convertor');
+Route::post('/convertor', [\App\Http\Controllers\ConvertorController::class, 'store']);
