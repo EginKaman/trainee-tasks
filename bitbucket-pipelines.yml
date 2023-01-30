@@ -31,8 +31,7 @@ definitions:
         script:
           - apt-get update && apt-get install -y zip git ssh rsync
           - mkdir -p ~/.ssh
-          - ssh-keyscan -t rsa
-          - #cat my_known_hosts >> ~/.ssh/known_hosts
+          - ssh-keyscan -t rsa $SERVER_IP > ~/.ssh/known_hosts
           - (umask  077 ; echo $BITBUCKET_SSH_KEY_FILE > ~/.ssh/id_rsa)
           - bash deploy.sh
 pipelines:
