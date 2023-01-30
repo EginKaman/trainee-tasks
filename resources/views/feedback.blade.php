@@ -18,6 +18,14 @@
                                 {{ __('Something went wrong. Please, try again later.') }}
                             </div>
                         @endif
+                        @if ($errors->any())
+                            <div class="alert alert-danger" role="alert" data-cy=“errorAlert”>
+                                {{ __('Please, correct the mistakes in the fields:') }}
+                                @foreach($errors->getMessages() as $key => $message)
+                                    <li>{{ $key }}</li>
+                                @endforeach
+                            </div>
+                        @endif
                         <form method="POST" action="{{ route('feedback') }}" id="feedback-form">
                             @csrf
                             <div class="row mb-3">
@@ -27,6 +35,7 @@
                                     <input id="name" type="text"
                                            class="form-control @error('name') is-invalid @enderror" name="name"
                                            data-cy=“nameField”
+                                           placeholder="Enter your name"
                                            required="required"
                                            value="{{ old('name') }}" required autocomplete="name" autofocus>
 
@@ -46,6 +55,7 @@
                                     <input id="email" type="email"
                                            class="form-control @error('email') is-invalid @enderror" name="email"
                                            data-cy=“emailField”
+                                           placeholder="Enter your email address"
                                            required="required"
                                            value="{{ old('email') }}" required autocomplete="email">
 
@@ -64,6 +74,7 @@
                                 <div class="col-md-6">
                                     <textarea id="text" data-cy=“messageTextarea”
                                               required="required"
+                                              placeholder="Enter your message"
                                               class="form-control @error('text') is-invalid @enderror" name="text"
                                               required autocomplete="new-password">{{ old('text') }}</textarea>
 
