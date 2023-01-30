@@ -9,17 +9,17 @@
 
                     <div class="card-body">
                         @if (session('success'))
-                            <div class="alert alert-success" role="alert" data-cy=“successAlert”>
+                            <div class="alert alert-success" role="alert" data-cy="successAlert">
                                 {{ __('Your feedback was sent successful.') }}
                             </div>
                         @endif
                         @if (session('failure'))
-                            <div class="alert alert-danger" role="alert" data-cy=“errorAlert”>
+                            <div class="alert alert-danger" role="alert" data-cy="errorAlert">
                                 {{ __('Something went wrong. Please, try again later.') }}
                             </div>
                         @endif
                         @if ($errors->any())
-                            <div class="alert alert-danger" role="alert" data-cy=“errorAlert”>
+                            <div class="alert alert-danger" role="alert" data-cy="errorAlert">
                                 {{ __('Please, correct the mistakes in the fields:') }}
                                 @foreach($errors->getMessages() as $key => $message)
                                     <li>{{ $key }}</li>
@@ -40,7 +40,7 @@
                                            value="{{ old('name') }}" required autocomplete="name" autofocus>
 
                                     @error('name')
-                                    <span class="invalid-feedback" role="alert" data-cy=“errorMessage”>
+                                    <span class="invalid-feedback" role="alert" data-cy="errorMessage">
                                         <strong>{{ $message }}</strong>
                                     </span>
                                     @enderror
@@ -60,7 +60,7 @@
                                            value="{{ old('email') }}" required autocomplete="email">
 
                                     @error('email')
-                                    <span class="invalid-feedback" role="alert" data-cy=“errorMessage”>
+                                    <span class="invalid-feedback" role="alert" data-cy="errorMessage">
                                         <strong>{{ $message }}</strong>
                                     </span>
                                     @enderror
@@ -79,7 +79,7 @@
                                               required autocomplete="new-password">{{ old('text') }}</textarea>
 
                                     @error('text')
-                                    <span class="invalid-feedback" role="alert" data-cy=“errorMessage”>
+                                    <span class="invalid-feedback" role="alert" data-cy="errorMessage">
                                         <strong>{{ $message }}</strong>
                                     </span>
                                     @enderror
@@ -100,7 +100,7 @@
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio" name="method"
                                                value="sendgrid"
-                                               data-cy=“sendgrid”
+                                               data-cy="sendgrid"
                                                id="send_method_2" @checked(old('method') === 'sendgrid')>
                                         <label class="form-check-label" for="send_method_2">
                                             Sendgrid
@@ -108,14 +108,14 @@
                                     </div>
 
                                     @error('method')
-                                    <span class="invalid-feedback" role="alert" data-cy=“errorMessage”>
+                                    <span class="invalid-feedback" role="alert" data-cy="errorMessage">
                                         <strong>{{ $message }}</strong>
                                     </span>
                                     @enderror
                                 </div>
                             </div>
                             @error('g-recaptcha-response')
-                            <span class="invalid-feedback" role="alert" data-cy=“errorMessage”>
+                            <span class="invalid-feedback" role="alert" data-cy="errorMessage">
                                         <strong>{{ $message }}</strong>
                                     </span>
                             @enderror
