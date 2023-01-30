@@ -29,17 +29,19 @@ class FeedbackRequest extends FormRequest
                 'required',
                 'email',
                 'string',
-                'max:255'
+                'min:6',
+                'max:254'
             ],
             'name' => [
                 'required',
                 'string',
-                'max:50'
+                'min:2',
+                'max:60'
             ],
             'text' => [
                 'required',
                 'string',
-                'min:3'
+                'max:500'
             ],
             'method' => [
                 'required',

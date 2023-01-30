@@ -14,7 +14,7 @@
                             </div>
                         @endif
                         @if (session('failure'))
-                            <div class="alert alert-success" role="alert" data-cy=“errorAlert”>
+                            <div class="alert alert-danger" role="alert" data-cy=“errorAlert”>
                                 {{ __('Something went wrong. Please, try again later.') }}
                             </div>
                         @endif
@@ -27,6 +27,7 @@
                                     <input id="name" type="text"
                                            class="form-control @error('name') is-invalid @enderror" name="name"
                                            data-cy=“nameField”
+                                           required="required"
                                            value="{{ old('name') }}" required autocomplete="name" autofocus>
 
                                     @error('name')
@@ -45,6 +46,7 @@
                                     <input id="email" type="email"
                                            class="form-control @error('email') is-invalid @enderror" name="email"
                                            data-cy=“emailField”
+                                           required="required"
                                            value="{{ old('email') }}" required autocomplete="email">
 
                                     @error('email')
@@ -61,6 +63,7 @@
 
                                 <div class="col-md-6">
                                     <textarea id="text" data-cy=“messageTextarea”
+                                              required="required"
                                               class="form-control @error('text') is-invalid @enderror" name="text"
                                               required autocomplete="new-password">{{ old('text') }}</textarea>
 
@@ -78,7 +81,7 @@
                                         <input class="form-check-input" type="radio" name="method"
                                                data-cy=“smtp”
                                                value="smtp"
-                                               id="send_method_1">
+                                               id="send_method_1" @checked(old('method') === 'smtp' || old('method') === null)>
                                         <label class="form-check-label" for="send_method_1">
                                             SMTP
                                         </label>
@@ -87,7 +90,7 @@
                                         <input class="form-check-input" type="radio" name="method"
                                                value="sendgrid"
                                                data-cy=“sendgrid”
-                                               id="send_method_2" checked>
+                                               id="send_method_2" @checked(old('method') === 'sendgrid')>
                                         <label class="form-check-label" for="send_method_2">
                                             Sendgrid
                                         </label>
@@ -100,7 +103,11 @@
                                     @enderror
                                 </div>
                             </div>
-
+                            @error('g-recaptcha-response')
+                            <span class="invalid-feedback" role="alert" data-cy=“errorMessage”>
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                            @enderror
                             <div class="row mb-0">
                                 <div class="col-md-6 offset-md-4">
                                     <button type="submit" class="btn btn-primary"
