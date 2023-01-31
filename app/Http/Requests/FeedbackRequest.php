@@ -35,6 +35,7 @@ class FeedbackRequest extends FormRequest
             'name' => [
                 'required',
                 'string',
+                'regex:/^[a-zA-Z][a-zA-Z0-9- ]+$/',
                 'min:2',
                 'max:60'
             ],

@@ -36,8 +36,7 @@
                                            class="form-control @error('name') is-invalid @enderror" name="name"
                                            data-cy="nameField"
                                            placeholder="Enter your name"
-                                           required="required"
-                                           value="{{ old('name') }}" required autocomplete="name" autofocus>
+                                           value="{{ old('name') }}" autocomplete="name" autofocus>
 
                                     @error('name')
                                     <span class="invalid-feedback" role="alert" data-cy="errorMessage">
@@ -52,12 +51,11 @@
                                        class="col-md-4 col-form-label text-md-end">{{ __('Email Address') }}</label>
 
                                 <div class="col-md-6">
-                                    <input id="email" type="email"
+                                    <input id="email" type="text"
                                            class="form-control @error('email') is-invalid @enderror" name="email"
                                            data-cy="emailField"
                                            placeholder="Enter your email address"
-                                           required="required"
-                                           value="{{ old('email') }}" required autocomplete="email">
+                                           value="{{ old('email') }}" autocomplete="email">
 
                                     @error('email')
                                     <span class="invalid-feedback" role="alert" data-cy="errorMessage">
@@ -73,10 +71,9 @@
 
                                 <div class="col-md-6">
                                     <textarea id="text" data-cy="messageTextarea"
-                                              required="required"
                                               placeholder="Enter your message"
                                               class="form-control @error('text') is-invalid @enderror" name="text"
-                                              required autocomplete="new-password">{{ old('text') }}</textarea>
+                                              autocomplete="new-password">{{ old('text') }}</textarea>
 
                                     @error('text')
                                     <span class="invalid-feedback" role="alert" data-cy="errorMessage">
