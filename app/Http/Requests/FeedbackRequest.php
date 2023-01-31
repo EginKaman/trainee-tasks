@@ -7,14 +7,15 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class FeedbackRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
-    public function authorize(): bool
+    protected function prepareForValidation(): void
     {
-        return true;
+        $this->text = preg_replace('/\n+/m', "\n", $this->text);
+        $this->text = preg_replace('/ +/m', ' ', $this->text);
+        $this->merge([
+            'email' => preg_replace('/\s+/', '', $this->email),
+            'name' => preg_replace('/\s+/', ' ', $this->name),
+            'text' => $this->text
+        ]);
     }
 
     /**
