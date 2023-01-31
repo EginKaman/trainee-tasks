@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Request;
+use App\Exceptions\UnknownProcessingException;
+use App\Http\Requests\ConverterRequest;
+use App\Services\Processing;
 
 class ConvertorController extends Controller
 {
@@ -11,8 +13,19 @@ class ConvertorController extends Controller
         return view('convertor');
     }
 
-    public function store(Request $request)
+    public function store(ConverterRequest $request, Processing $processing)
     {
-        return redirect()->route('convertor');
+        $file = $request->file('file');
+        try {
+            $processing->setMimeType($file->getMimeType());
+        } catch (UnknownProcessingException $exception) {
+            return redirect()->route('convertor')->with('failed', true);
+        }
+        $validateFile = $processing->validate($file);
+        $fileErrors = [];
+        if ($validateFile !== true) {
+            $fileErrors = $validateFile;
+        }
+        return view('convertor', compact('fileErrors'));
     }
 }

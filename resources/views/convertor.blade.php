@@ -34,7 +34,8 @@
                                             {{ __('Something went wrong. Please, try again later.') }}
                                         </div>
                                     @endif
-                                    <form method="POST" action="{{ route('convertor') }}" id="feedback-form">
+                                    <form method="POST" action="{{ route('convertor') }}" id="feedback-form"
+                                          enctype="multipart/form-data">
                                         @csrf
                                         <div class="row mb-3">
                                             <label for="file"
@@ -43,12 +44,41 @@
                                             </label>
 
                                             <div class="col-md-6">
-                                                <input class="form-control" type="file" id="file"
+                                                <input class="form-control" type="file" id="file" name="file"
+                                                       onchange="isXML()"
                                                        accept=".xml,.csv,.json">
                                                 <div id="passwordHelpBlock" class="form-text">
                                                     Select file up to 1 Mb and formats: xml, csv, json
                                                 </div>
                                                 @error('file')
+                                                <span class="invalid-feedback" role="alert" data-cy=“errorMessage”>
+                                                    <strong>{{ $message }}</strong>
+                                                </span>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                        <div class="row mb-0" id="xml-processing" style="display:none;">
+                                            <label for="method"
+                                                   class="col-md-4 col-form-label text-md-end">
+                                                {{ __('Choose the method of processing XML') }}
+                                            </label>
+
+                                            <div class="col-md-6">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="method"
+                                                           id="method-1" value="xmlreader" checked>
+                                                    <label class="form-check-label" for="method-1">
+                                                        XMLReader
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="method"
+                                                           id="method-2" value="simplexml">
+                                                    <label class="form-check-label" for="method-2">
+                                                        SimpleXML
+                                                    </label>
+                                                </div>
+                                                @error('method')
                                                 <span class="invalid-feedback" role="alert" data-cy=“errorMessage”>
                                                     <strong>{{ $message }}</strong>
                                                 </span>
@@ -64,6 +94,28 @@
                                             </div>
                                         </div>
                                     </form>
+                                    @if(!empty($fileErrors))
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <h3>The following errors were found in the "someone" file</h3>
+                                                <small class="text-muted">
+                                                    For a success conversion, upload the file without errors
+                                                </small>
+                                                <p class="text-start">
+                                                <table class="table">
+                                                    <tbody>
+                                                    @foreach($fileErrors as $fileError)
+                                                        <td>
+                                                            <tr>Line {{ $fileError->line }}</tr>
+                                                            <tr>{{ $fileError->$message }}</tr>
+                                                        </td>
+                                                    @endforeach
+                                                    </tbody>
+                                                </table>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                             <div class="tab-pane fade" id="nav-test" role="tabpanel"
@@ -123,4 +175,16 @@
             </div>
         </div>
     </div>
+    <script>
+        function isXML() {
+            let type = document.getElementById('file').files[0].type;
+            let splittedType = type.split('/');
+            let radios = document.getElementById('xml-processing')
+            if (splittedType[1] === 'xml') {
+                radios.removeAttribute('style')
+            } else {
+                radios.style['display'] = 'none';
+            }
+        }
+    </script>
 @endsection
