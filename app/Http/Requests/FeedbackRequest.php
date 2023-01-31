@@ -50,7 +50,7 @@ class FeedbackRequest extends FormRequest
                 'string',
                 Rule::in(['smtp', 'sendgrid'])
             ],
-            'g-recaptcha-response' => 'recaptcha',
+            'g-recaptcha-response' => 'required|recaptchav3:feedback,0.5',
         ];
     }
 }

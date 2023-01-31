@@ -18,7 +18,12 @@
                                 {{ __('Something went wrong. Please, try again later.') }}
                             </div>
                         @endif
-                        @if ($errors->any())
+                        @error('g-recaptcha-response')
+                            <div class="alert alert-danger" role="alert" data-cy="errorAlert">
+                                <strong>{{ __('Couldn\'t verify recaptcha. Please, try again') }}</strong>
+                            </div>
+                        @enderror
+                        @if ($errors->any() && (!$errors->count() === 1 && $errors->has('g-recaptcha-response')))
                             <div class="alert alert-danger" role="alert" data-cy="errorAlert">
                                 {{ __('Please, correct the mistakes in the fields:') }}
                                 @foreach($errors->getMessages() as $key => $message)
@@ -28,6 +33,7 @@
                         @endif
                         <form method="POST" action="{{ route('feedback') }}" id="feedback-form">
                             @csrf
+                            {!! RecaptchaV3::field('feedback') !!}
                             <div class="row mb-3">
                                 <label for="name" class="col-md-4 col-form-label text-md-end">{{ __('Name') }}</label>
 
@@ -112,7 +118,7 @@
                                 </div>
                             </div>
                             @error('g-recaptcha-response')
-                            <span class="invalid-feedback" role="alert" data-cy="errorMessage">
+                                    <span class="invalid-feedback" role="alert" data-cy="errorMessage">
                                         <strong>{{ $message }}</strong>
                                     </span>
                             @enderror
@@ -134,4 +140,9 @@
             </div>
         </div>
     </div>
+    <script>
+        function onSubmit(token) {
+            document.getElementById("feedback-form").append('g-recaptcha-response', token).submit();
+        }
+    </script>
 @endsection

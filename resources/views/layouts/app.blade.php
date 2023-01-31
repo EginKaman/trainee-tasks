@@ -17,7 +17,7 @@
 
     <!-- Scripts -->
     @vite(['resources/sass/app.sass', 'resources/js/app.js'])
-    {!! htmlScriptTagJsApi() !!}
+    {!! RecaptchaV3::initJs() !!}
 </head>
 <body>
 <div id="app">
