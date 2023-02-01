@@ -23,10 +23,13 @@
                                 <strong>{{ __('Couldn\'t verify recaptcha. Please, try again') }}</strong>
                             </div>
                         @enderror
-                        @if ($errors->any() && (!$errors->count() === 1 && $errors->has('g-recaptcha-response')))
+                        @if ($errors->any() && !($errors->count() === 1 && $errors->has('g-recaptcha-response')))
                             <div class="alert alert-danger" role="alert" data-cy="errorAlert">
                                 {{ __('Please, correct the mistakes in the fields:') }}
                                 @foreach($errors->getMessages() as $key => $message)
+                                    @if($key === 'g-recaptcha-response')
+                                        @continue
+                                    @endif
                                     <li>{{ $key }}</li>
                                 @endforeach
                             </div>
@@ -117,11 +120,6 @@
                                     @enderror
                                 </div>
                             </div>
-                            @error('g-recaptcha-response')
-                                    <span class="invalid-feedback" role="alert" data-cy="errorMessage">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                            @enderror
                             <div class="row mb-0">
                                 <div class="col-md-6 offset-md-4">
                                     <button type="submit" class="btn btn-primary"
