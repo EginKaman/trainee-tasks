@@ -2,16 +2,17 @@
 
 namespace App\Services\Processing;
 
-use Illuminate\Http\UploadedFile;
-
 interface ProcessingInterface
 {
     /**
-     * @param UploadedFile $file
-     * @param $schema
+     * @param string $path
      * @return bool|array
      */
-    public function validate(UploadedFile $file, $schema): bool|array;
+    public function validate(string $path): bool|array;
 
-    public function read($file);
+    /**
+     * @param string $path
+     * @return mixed
+     */
+    public function read(string $path);
 }

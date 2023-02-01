@@ -5,45 +5,45 @@ namespace App\Services;
 use App\Exceptions\UnknownProcessingException;
 use App\Services\Processing\CsvProcessing;
 use App\Services\Processing\JsonProcessing;
+use App\Services\Processing\ProcessingInterface;
 use App\Services\Processing\XmlProcessing;
-use Illuminate\Http\UploadedFile;
 
 class Processing
 {
     private string $mimeType;
-    private CsvProcessing|XmlProcessing|JsonProcessing $processing;
+    private ProcessingInterface $processing;
 
-    public function setMimeType(string $mimeType)
+    /**
+     * @param string $mimeType
+     * @return $this
+     * @throws UnknownProcessingException
+     */
+    public function setMimeType(string $mimeType): static
     {
         $this->mimeType = $mimeType;
         $this->selectProcessing();
         return $this;
     }
 
-    public function validate(UploadedFile $file, $schema)
+    /**
+     * @param string $path
+     * @return array|bool
+     */
+    public function validate(string $path): bool|array
     {
-        $this->processing->validate($file, $schema);
+        return $this->processing->validate($path);
     }
 
     /**
-     * @throws \Exception
+     * @throws UnknownProcessingException
      */
-    protected function selectProcessing()
+    protected function selectProcessing(): void
     {
-        switch ($this->mimeType) {
-            case 'text/xml':
-            case 'application/xml':
-                $this->processing = new XmlProcessing();
-                break;
-            case 'text/json':
-            case 'application/json':
-                $this->processing = new JsonProcessing();
-                break;
-            case 'text/csv':
-                $this->processing = new CsvProcessing();
-                break;
-            default:
-                throw new UnknownProcessingException();
-        }
+        $this->processing = match ($this->mimeType) {
+            'text/xml', 'application/xml' => app(XmlProcessing::class),
+            'text/json', 'application/json' => app(JsonProcessing::class),
+            'text/csv' => new CsvProcessing(),
+            default => throw new UnknownProcessingException(),
+        };
     }
 }

@@ -3,13 +3,17 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\UploadedFile;
 
+/**
+ * @property UploadedFile $document
+ */
 class ConverterRequest extends FormRequest
 {
     public function rules(): array
     {
         return [
-            'file' => [
+            'document' => [
                 'required',
                 'file',
                 'mimes:csv,json,xml',
@@ -18,7 +22,7 @@ class ConverterRequest extends FormRequest
             'method' => [
                 'nullable',
                 'string',
-                'in:simplexml,readerxml'
+                'in:simplexml,xmlreader'
             ]
         ];
     }

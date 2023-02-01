@@ -34,7 +34,7 @@
                                             {{ __('Something went wrong. Please, try again later.') }}
                                         </div>
                                     @endif
-                                    <form method="POST" action="{{ route('convertor') }}" id="feedback-form"
+                                    <form method="POST" action="{{ route('convertor') }}" id="convertor-form"
                                           enctype="multipart/form-data">
                                         @csrf
                                         <div class="row mb-3">
@@ -44,13 +44,13 @@
                                             </label>
 
                                             <div class="col-md-6">
-                                                <input class="form-control" type="file" id="file" name="file"
+                                                <input class="form-control" type="file" id="file" name="document"
                                                        onchange="isXML()"
                                                        accept=".xml,.csv,.json">
                                                 <div id="passwordHelpBlock" class="form-text">
                                                     Select file up to 1 Mb and formats: xml, csv, json
                                                 </div>
-                                                @error('file')
+                                                @error('document')
                                                 <span class="invalid-feedback" role="alert" data-cy=“errorMessage”>
                                                     <strong>{{ $message }}</strong>
                                                 </span>
@@ -97,22 +97,23 @@
                                     @if(!empty($fileErrors))
                                         <div class="row">
                                             <div class="col-12">
-                                                <h3>The following errors were found in the "someone" file</h3>
-                                                <small class="text-muted">
-                                                    For a success conversion, upload the file without errors
-                                                </small>
-                                                <p class="text-start">
-                                                <table class="table">
+                                                <p>
+                                                    <h3>The following errors were found in the "someone" file</h3>
+                                                    <small class="text-muted">
+                                                        For a success conversion, upload the file without errors
+                                                    </small>
+                                                </p>
+                                                <table class="table table-bordered">
                                                     <tbody>
                                                     @foreach($fileErrors as $fileError)
-                                                        <td>
-                                                            <tr>Line {{ $fileError->line }}</tr>
-                                                            <tr>{{ $fileError->$message }}</tr>
-                                                        </td>
+                                                        <tr>
+                                                            <td>Line {{ $fileError->line }}</td>
+                                                            <td>{{ $fileError->code }}</td>
+                                                            <td>{{ $fileError->message }}</td>
+                                                        </tr>
                                                     @endforeach
                                                     </tbody>
                                                 </table>
-                                                </p>
                                             </div>
                                         </div>
                                     @endif
