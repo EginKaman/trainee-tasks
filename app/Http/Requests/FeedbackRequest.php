@@ -9,12 +9,14 @@ class FeedbackRequest extends FormRequest
 {
     protected function prepareForValidation(): void
     {
-        $this->text = preg_replace('/\n+/m', "\n", $this->text);
-        $this->text = preg_replace('/ +/m', ' ', $this->text);
+        $text = preg_replace('/ +/m', ' ', $this->text);
+        $text = preg_replace('/[\r\n]{2,}+/m', "\r\n\r\n", $text);
+        $text = preg_replace('/[\n]{2,}+/m', "\n\n", $text);
+        $email = preg_replace('/\s+(?=(?:(?:[^"]*"){2})*[^"]*"[^"]*)/', ' ', $this->email);
         $this->merge([
-            'email' => preg_replace('/\s+/', '', $this->email),
+            'email' => $email,
             'name' => preg_replace('/\s+/', ' ', $this->name),
-            'text' => $this->text
+            'text' => $text
         ]);
     }
 
@@ -28,7 +30,7 @@ class FeedbackRequest extends FormRequest
         return [
             'email' => [
                 'required',
-                'email',
+                'email:rfc,dns',
                 'string',
                 'min:6',
                 'max:254'
