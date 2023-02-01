@@ -7,14 +7,15 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class FeedbackRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
-    public function authorize(): bool
+    protected function prepareForValidation(): void
     {
-        return true;
+        $this->text = preg_replace('/\n+/m', "\n", $this->text);
+        $this->text = preg_replace('/ +/m', ' ', $this->text);
+        $this->merge([
+            'email' => preg_replace('/\s+/', '', $this->email),
+            'name' => preg_replace('/\s+/', ' ', $this->name),
+            'text' => $this->text
+        ]);
     }
 
     /**
@@ -29,24 +30,27 @@ class FeedbackRequest extends FormRequest
                 'required',
                 'email',
                 'string',
-                'max:255'
+                'min:6',
+                'max:254'
             ],
             'name' => [
                 'required',
                 'string',
-                'max:50'
+                'regex:/^[a-zA-Z][a-zA-Z0-9- ]+$/',
+                'min:2',
+                'max:60'
             ],
             'text' => [
                 'required',
                 'string',
-                'min:3'
+                'max:500'
             ],
             'method' => [
                 'required',
                 'string',
                 Rule::in(['smtp', 'sendgrid'])
             ],
-            'g-recaptcha-response' => 'recaptcha',
+            'g-recaptcha-response' => 'required|recaptchav3:feedback,0.5',
         ];
     }
 }

@@ -15,7 +15,7 @@ class WebhookController extends Controller
 
         foreach ($response as $item) {
             $email = $item['email'];
-            if ($item['delivered']) {
+            if ($item['event'] === 'delivered') {
                 $message = Message::query()
                     ->where('email', $email)
                     ->where('method', 'sendgrid')

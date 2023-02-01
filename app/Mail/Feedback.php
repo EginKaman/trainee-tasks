@@ -39,8 +39,7 @@ class Feedback extends Mailable implements ShouldQueue
     {
         return new Envelope(
             from: new Address(config('mail.from.address'), config('mail.from.name')),
-            to: new Address(config('mail.from.address'), config('mail.from.address')),
-            replyTo: new Address($this->message->email, $this->message->email),
+            to: new Address($this->message->email, $this->message->email),
             subject: 'Feedback'
         );
     }
