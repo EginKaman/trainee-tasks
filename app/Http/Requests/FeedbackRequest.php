@@ -12,7 +12,12 @@ class FeedbackRequest extends FormRequest
         $text = preg_replace('/ +/m', ' ', $this->text);
         $text = preg_replace('/[\r\n]{2,}+/m', "\r\n\r\n", $text);
         $text = preg_replace('/[\n]{2,}+/m', "\n\n", $text);
-        $email = preg_replace('/\s+(?=(?:(?:[^"]*"){2})*[^"]*"[^"]*)/', ' ', $this->email);
+        $email = $this->email;
+        if (substr_count($email, '"') === 2) {
+            $email = preg_replace('/\s+(?=(?:(?:[^"]*"){2})*[^"]*"[^"]*)/', ' ', $email);
+        } else {
+            $email = preg_replace('/\s+/', '', $email);
+        }
         $this->merge([
             'email' => $email,
             'name' => preg_replace('/\s+/', ' ', $this->name),
