@@ -60,4 +60,11 @@ class FeedbackRequest extends FormRequest
             'g-recaptcha-response' => 'required|recaptchav3:feedback,0.5',
         ];
     }
+
+    public function messages()
+    {
+        return [
+            'name.regex' => 'The name field must start with letter and allow only latin symbols, digits, space and "-"'
+        ];
+    }
 }
