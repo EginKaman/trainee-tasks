@@ -30,7 +30,7 @@
                                     @if($key === 'g-recaptcha-response')
                                         @continue
                                     @endif
-                                    <li>{{ $key }} - {{ $message[0] }}</li>
+                                    <li>{{ __($key) }} - {{ $message[0] }}</li>
                                 @endforeach
                             </div>
                         @endif

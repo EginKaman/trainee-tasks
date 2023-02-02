@@ -176,4 +176,7 @@ return [
 
     'attributes' => [],
 
+    'fields' => [
+        'text' => 'message'
+    ]
 ];
