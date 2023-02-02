@@ -4,7 +4,9 @@ namespace App\Services\Processing;
 
 class CsvProcessing implements ProcessingInterface
 {
-    public function validate($file, $schema)
+    use ValidatorTrait;
+
+    public function validate(string $path): bool|array
     {
         // TODO: Implement validate() method.
     }
