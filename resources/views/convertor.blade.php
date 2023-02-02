@@ -103,7 +103,7 @@
                                         <div class="row">
                                             <div class="col-12">
                                                 <p>
-                                                <h3>The following errors were found in the "someone" file</h3>
+                                                <h3>The following errors were found in the {{ $document->getClientOriginalName() }} file</h3>
                                                 <small class="text-muted">
                                                     For a success conversion, upload the file without errors
                                                 </small>
@@ -131,7 +131,7 @@
                                                 </small>
                                                 </p>
                                                 @foreach($results as $exrate)
-                                                    <p><h4>Date: {{ $exrate->lastUpdated }}</h4></p>
+                                                    <p><h4>Date: {{ $exrate->lastUpdate }}</h4></p>
                                                     <table class="table table-bordered">
                                                         <thead>
                                                         <tr>

@@ -27,12 +27,13 @@ class ConvertorController extends Controller
         $path = $document->store('documents');
         $validateFile = $processing->validate(Storage::path($path));
         $fileErrors = [];
+        $results = [];
         if ($validateFile !== true) {
             $fileErrors = $validateFile;
         }
         if ($validateFile === true) {
-            $processing->process(Storage::path($path));
+            $results = $processing->process(Storage::path($path));
         }
-        return view('convertor', compact('fileErrors'));
+        return view('convertor', compact('fileErrors', 'document', 'results'));
     }
 }

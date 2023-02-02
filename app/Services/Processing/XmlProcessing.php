@@ -72,19 +72,22 @@ class XmlProcessing implements ProcessingInterface
         } catch (\Exception $e) {
             return false;
         }
-        foreach ($xml->exrate as $key => $exrate) {
-            if ($key === 0) {
+        $loop = 0;
+        foreach ($xml->exrate as $exrate) {
+            if ($loop === 0) {
                 $exrate->lastUpdate = Date::today()->format('Y-m-d');
             } else {
-                $exrate->lastUpdate = Date::createFromFormat('Y-m-d', $xml->exrate[$key - 1]->lastUpdate)
+                $exrate->lastUpdate = Date::createFromFormat('Y-m-d', $xml->exrate[$loop - 1]->lastUpdate)
                     ->subDay()
                     ->format('Y-m-d');
             }
             foreach ($exrate->currency as $currency) {
-                $currency->rate = round(random_int(0, 1000000) / mt_getrandmax(), 5);
-                $currency->change = round(random_int(0, (int)$currency->rate) / mt_getrandmax(), 5);
+                $currency->rate = round(random_int(0, 1000000) / random_int(2, 100), 5);
+                $currency->change = round(random_int(0, (int)$currency->rate) / random_int(2, 100), 5);
             }
+
+            $loop++;
         }
-        return $xml->asXML();
+        return $xml;
     }
 }

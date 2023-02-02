@@ -69,8 +69,10 @@ class JsonProcessing implements ProcessingInterface
                     ->subDay()
                     ->format('Y-m-d');
             }
-            $exrate->rate = round(random_int(0, 1000000) / mt_getrandmax(), 5);
-            $exrate->change = round(random_int(0, $exrate->rate) / mt_getrandmax(), 5);
+            foreach ($exrate->currency as $currency) {
+                $currency->rate = round(random_int(0, 1000000) / random_int(2, 100), 5);
+                $currency->change = round(random_int(0, (int)$currency->rate) / random_int(2, 100), 5);
+            }
         }
         return $json;
     }
