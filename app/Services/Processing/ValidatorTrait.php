@@ -37,7 +37,7 @@ trait ValidatorTrait
 
     protected function nameValidate(string $name): void
     {
-        if (preg_match('/[A-Za-z ]{2,60}/', $name)) {
+        if (!preg_match('/[A-Za-z ]{2,60}/', $name)) {
             $error = new LibXMLError();
             $error->message = "The name must be smaller include only [A-Za-z ] symbols and between 2 to 60 letters.";
             $error->line = 1;
@@ -86,7 +86,7 @@ trait ValidatorTrait
             $this->errors[] = $error;
         }
         $data = (new ISO3166())->alpha3($country);
-        if (!in_array($country, $data['currency'], true)) {
+        if (!in_array($currencyCode, $data['currency'], true)) {
             $error = new LibXMLError();
             $error->message = "Invalid currencyCode {$currencyCode} for country {$country}";
             $error->line = 1;
@@ -96,13 +96,13 @@ trait ValidatorTrait
 
     protected function rateChangeValidate($rate, $change): void
     {
-        if (!is_float($rate)) {
+        if (!is_numeric($rate)) {
             $error = new LibXMLError();
             $error->message = "Rate must be decimal";
             $error->line = 1;
             $this->errors[] = $error;
         }
-        if (!is_float($change)) {
+        if (!is_numeric($change)) {
             $error = new LibXMLError();
             $error->message = "Change must be decimal";
             $error->line = 1;

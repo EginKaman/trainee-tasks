@@ -108,7 +108,6 @@
                                                     @foreach($fileErrors as $fileError)
                                                         <tr>
                                                             <td>Line {{ $fileError->line }}</td>
-                                                            <td>{{ $fileError->code }}</td>
                                                             <td>{{ $fileError->message }}</td>
                                                         </tr>
                                                     @endforeach
