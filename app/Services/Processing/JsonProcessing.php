@@ -3,6 +3,7 @@
 namespace App\Services\Processing;
 
 use Exception;
+use Illuminate\Support\Facades\Date;
 use LibXMLError;
 use RamosHenrique\JsonSchemaValidator\JsonSchemaValidator;
 use RamosHenrique\JsonSchemaValidator\JsonSchemaValidatorException;
@@ -25,14 +26,13 @@ class JsonProcessing implements ProcessingInterface
     /**
      * @param string $path
      * @return bool|array
-     * @throws JsonSchemaValidatorException
      */
     public function validate(string $path): bool|array
     {
         try {
             $schema = Schema::import(json_decode(file_get_contents($this->schema)));
             $json = $schema->in(json_decode(file_get_contents($path)));
-        } catch (Exception | InvalidValue $exception) {
+        } catch (Exception|InvalidValue $exception) {
             $error = new LibXMLError();
             $error->message = $exception->getMessage();
             $error->line = 1;
@@ -56,5 +56,22 @@ class JsonProcessing implements ProcessingInterface
     public function read($file)
     {
         // TODO: Implement read() method.
+    }
+
+    public function process(string $path)
+    {
+        $json = json_decode(file_get_contents($path), false);
+        foreach ($json as $key => $exrate) {
+            if ($key === 0) {
+                $exrate->lastUpdate = Date::today()->format('Y-m-d');
+            } else {
+                $exrate->lastUpdate = Date::createFromFormat('Y-m-d', $json[$key - 1]->lastUpdate)
+                    ->subDay()
+                    ->format('Y-m-d');
+            }
+            $exrate->rate = round(random_int(0, 1000000) / mt_getrandmax(), 5);
+            $exrate->change = round(random_int(0, $exrate->rate) / mt_getrandmax(), 5);
+        }
+        return $json;
     }
 }

@@ -30,6 +30,9 @@ class ConvertorController extends Controller
         if ($validateFile !== true) {
             $fileErrors = $validateFile;
         }
+        if ($validateFile === true) {
+            $processing->process(Storage::path($path));
+        }
         return view('convertor', compact('fileErrors'));
     }
 }

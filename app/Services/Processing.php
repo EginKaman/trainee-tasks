@@ -46,4 +46,9 @@ class Processing
             default => throw new UnknownProcessingException(),
         };
     }
+
+    public function process(string $path)
+    {
+        return $this->processing->process($path);
+    }
 }

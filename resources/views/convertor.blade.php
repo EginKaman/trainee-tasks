@@ -31,7 +31,12 @@
                                     @endif
                                     @if (session('failure'))
                                         <div class="alert alert-success" role="alert" data-cy=“errorAlert”>
-                                            {{ __('Something went wrong. Please, try again later.') }}
+                                            {{ __('Attention! An error has occurred, see the details below.') }}
+                                        </div>
+                                    @endif
+                                    @if ($errors->any())
+                                        <div class="alert alert-success" role="alert" data-cy=“errorAlert”>
+                                            {{ __('Attention! An error has occurred, see the details below.') }}
                                         </div>
                                     @endif
                                     <form method="POST" action="{{ route('convertor') }}" id="convertor-form"
@@ -65,14 +70,14 @@
 
                                             <div class="col-md-6">
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="radio" name="method"
+                                                    <input class="form-check-input" type="radio" name="reader"
                                                            id="method-1" value="xmlreader" checked>
                                                     <label class="form-check-label" for="method-1">
                                                         XMLReader
                                                     </label>
                                                 </div>
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="radio" name="method"
+                                                    <input class="form-check-input" type="radio" name="reader"
                                                            id="method-2" value="simplexml">
                                                     <label class="form-check-label" for="method-2">
                                                         SimpleXML
@@ -98,10 +103,10 @@
                                         <div class="row">
                                             <div class="col-12">
                                                 <p>
-                                                    <h3>The following errors were found in the "someone" file</h3>
-                                                    <small class="text-muted">
-                                                        For a success conversion, upload the file without errors
-                                                    </small>
+                                                <h3>The following errors were found in the "someone" file</h3>
+                                                <small class="text-muted">
+                                                    For a success conversion, upload the file without errors
+                                                </small>
                                                 </p>
                                                 <table class="table table-bordered">
                                                     <tbody>
@@ -113,6 +118,47 @@
                                                     @endforeach
                                                     </tbody>
                                                 </table>
+                                            </div>
+                                        </div>
+                                    @endif
+                                    @if(!empty($results))
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <p>
+                                                <h3>Processing result</h3>
+                                                <small class="text-muted">
+                                                    The tables show the converted data
+                                                </small>
+                                                </p>
+                                                @foreach($results as $exrate)
+                                                    <p><h4>Date: {{ $exrate->lastUpdated }}</h4></p>
+                                                    <table class="table table-bordered">
+                                                        <thead>
+                                                        <tr>
+                                                            <th>#</th>
+                                                            <th>Name</th>
+                                                            <th>Unit</th>
+                                                            <th>Code</th>
+                                                            <th>Country</th>
+                                                            <th>Rate</th>
+                                                            <th>Change</th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        @foreach($exrate->currency as $currency)
+                                                            <tr>
+                                                                <td>{{ $loop->iteration }}</td>
+                                                                <td>{{ $currency->name }}</td>
+                                                                <td>{{ $currency->unit }}</td>
+                                                                <td>{{ $currency->currencyCode }}</td>
+                                                                <td>{{ $currency->country }}</td>
+                                                                <td>{{ $currency->rate }}</td>
+                                                                <td>{{ $currency->change }}</td>
+                                                            </tr>
+                                                        @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                @endforeach
                                             </div>
                                         </div>
                                     @endif

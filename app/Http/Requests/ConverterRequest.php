@@ -19,7 +19,7 @@ class ConverterRequest extends FormRequest
                 'mimes:csv,json,xml',
                 'max:1024'
             ],
-            'method' => [
+            'reader' => [
                 'nullable',
                 'string',
                 'in:simplexml,xmlreader'

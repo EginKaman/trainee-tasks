@@ -77,7 +77,7 @@ trait ValidatorTrait
         }
     }
 
-    protected function currencyCodeValidate($currencyCode, string $country): void
+    protected function currencyCodeValidate(string $currencyCode, string $country): void
     {
         if (!preg_match('/[A-Z]{3}/', $currencyCode)) {
             $error = new LibXMLError();

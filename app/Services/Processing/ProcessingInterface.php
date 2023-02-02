@@ -15,4 +15,5 @@ interface ProcessingInterface
      * @return mixed
      */
     public function read(string $path);
+    public function process(string $path);
 }
