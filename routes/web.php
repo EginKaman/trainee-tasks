@@ -24,3 +24,9 @@ Route::post('/sendgrid/webhook', [\App\Http\Controllers\Sendgrid\WebhookControll
 Route::get('/convertor', [\App\Http\Controllers\ConvertorController::class, 'index'])
     ->name('convertor');
 Route::post('/convertor', [\App\Http\Controllers\ConvertorController::class, 'store']);
+Route::get('/schema.json', [\App\Http\Controllers\ConvertorController::class, 'jsonSchema'])->name(
+    'convertor.json-schema'
+);
+Route::get('/schema.xsd', [\App\Http\Controllers\ConvertorController::class, 'xmlSchema'])->name(
+    'convertor.xml-schema'
+);

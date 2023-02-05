@@ -30,13 +30,18 @@
                                         </div>
                                     @endif
                                     @if (session('failure'))
-                                        <div class="alert alert-success" role="alert" data-cy=“errorAlert”>
+                                        <div class="alert alert-danger" role="alert" data-cy=“errorAlert”>
                                             {{ __('Attention! An error has occurred, see the details below.') }}
                                         </div>
                                     @endif
                                     @if ($errors->any())
-                                        <div class="alert alert-success" role="alert" data-cy=“errorAlert”>
+                                        <div class="alert alert-danger" role="alert" data-cy=“errorAlert”>
                                             {{ __('Attention! An error has occurred, see the details below.') }}
+                                            @error('document')
+                                            <div data-cy=“errorMessage”>
+                                                <strong>{{ $message }}</strong>
+                                            </div>
+                                            @enderror
                                         </div>
                                     @endif
                                     <form method="POST" action="{{ route('convertor') }}" id="convertor-form"
@@ -49,17 +54,19 @@
                                             </label>
 
                                             <div class="col-md-6">
-                                                <input class="form-control" type="file" id="file" name="document"
+                                                <input class="form-control @error('name') is-invalid @enderror"
+                                                       type="file" id="file" name="document"
                                                        onchange="isXML()"
                                                        accept=".xml,.csv,.json">
+                                                @error('document')
+                                                <div class="invalid-feedback" role="alert" data-cy=“errorMessage”>
+                                                    <strong>{{ $message }}</strong>
+                                                </div>
+                                                @enderror
                                                 <div id="passwordHelpBlock" class="form-text">
                                                     Select file up to 1 Mb and formats: xml, csv, json
                                                 </div>
-                                                @error('document')
-                                                <span class="invalid-feedback" role="alert" data-cy=“errorMessage”>
-                                                    <strong>{{ $message }}</strong>
-                                                </span>
-                                                @enderror
+
                                             </div>
                                         </div>
                                         <div class="row mb-0" id="xml-processing" style="display:none;">
@@ -103,7 +110,8 @@
                                         <div class="row">
                                             <div class="col-12">
                                                 <p>
-                                                <h3>The following errors were found in the {{ $document->getClientOriginalName() }} file</h3>
+                                                <h3>The following errors were found in
+                                                    the {{ $document->getClientOriginalName() }} file</h3>
                                                 <small class="text-muted">
                                                     For a success conversion, upload the file without errors
                                                 </small>
@@ -174,8 +182,10 @@
                                             the link below
                                         </small>
                                         <p class="text-start">
-                                            <a href="#">JSON Schema</a> <span>(941 kB)</span><br>
-                                            <a href="#">XML Schema</a> <span>(671 kB)</span>
+                                            <a href="{{ route('convertor.json-schema') }}">JSON Schema</a>
+                                            <span>({{ round($json->getSize() / 1024, 2) }} kB)</span><br>
+                                            <a href="{{ route('convertor.xml-schema') }}">XML Schema</a>
+                                            <span>({{ round($xml->getSize() / 1024, 2) }} kB)</span>
                                         </p>
                                     </div>
                                 </div>
@@ -194,8 +204,46 @@
                                             </thead>
                                             <tbody>
                                             <tr>
-                                                <td><a href="#">correct-file-schema.json</a> <span>(511 kB)</span></td>
-                                                <td><a href="#">wrong-file-schema.json</a> <span>(214 kB)</span></td>
+                                                <td>
+                                                    <a href="{{ \Storage::url('examples/correct-file-schema.xml') }}">
+                                                        correct-file-schema.xml
+                                                    </a>
+                                                    <span>(511 kB)</span>
+                                                </td>
+                                                <td>
+                                                    <a href="{{ \Storage::url('examples/wrong-file-schema.xml') }}">
+                                                        wrong-file-schema.xml
+                                                    </a>
+                                                    <span>(214 kB)</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <a href="{{ \Storage::url('examples/correct-file-schema.json') }}">
+                                                        correct-file-schema.json
+                                                    </a>
+                                                    <span>(511 kB)</span>
+                                                </td>
+                                                <td>
+                                                    <a href="{{ \Storage::url('examples/wrong-file-schema.json') }}">
+                                                        wrong-file-schema.json
+                                                    </a>
+                                                    <span>(214 kB)</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <a href="{{ \Storage::url('examples/correct-file-schema.csv') }}">
+                                                        correct-file-schema.csv
+                                                    </a>
+                                                    <span>(511 kB)</span>
+                                                </td>
+                                                <td>
+                                                    <a href="{{ \Storage::url('examples/wrong-file-schema.csv') }}">
+                                                        wrong-file-schema.csv
+                                                    </a>
+                                                    <span>(214 kB)</span>
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <td><a href="#">correct-file-min.xml</a> <span>(8 kB)</span></td>

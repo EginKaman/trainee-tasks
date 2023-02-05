@@ -42,7 +42,7 @@ class Processing
         $this->processing = match ($this->mimeType) {
             'text/xml', 'application/xml' => app(XmlProcessing::class),
             'text/json', 'application/json' => app(JsonProcessing::class),
-            'text/csv' => new CsvProcessing(),
+            'text/csv' => app(CsvProcessing::class),
             default => throw new UnknownProcessingException(),
         };
     }

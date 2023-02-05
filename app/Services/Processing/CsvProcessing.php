@@ -2,30 +2,72 @@
 
 namespace App\Services\Processing;
 
-use Illuminate\Http\File;
+use App\Exceptions\UnknownProcessingException;
+use App\Services\Processing\Validator\FieldValidator;
 use Illuminate\Support\Facades\Date;
-use Illuminate\Support\Facades\Storage;
 use League\Csv\Reader;
 use League\Csv\Writer;
 
 class CsvProcessing implements ProcessingInterface
 {
-    use ValidatorTrait;
+    private int $line = 1;
+    private FieldValidator $fieldValidator;
+
+    /**
+     * @param FieldValidator $fieldValidator
+     */
+    public function __construct(FieldValidator $fieldValidator)
+    {
+        $this->fieldValidator = $fieldValidator;
+    }
 
     public function validate(string $path): bool|array
     {
         $csv = Reader::createFromPath($path);
         $csv->setDelimiter(',');
-        if (in_array(['lastUpdate', 'name', 'currencyCode'], $csv->fetchOne(), true)) {
+        if (in_array('lastUpdate', $csv->fetchOne(), true)) {
             $csv->setHeaderOffset(0);
+            $this->line++;
         }
         foreach ($csv->getRecords() as $record) {
-            $this->lastUpdateValidate($record['lastUpdate'] ?? $record[0]);
-            $this->nameValidate($record['name'] ?? $record[1]);
-            $this->unitValidate($record['unit'] ?? $record[2]);
-            $this->currencyCodeValidate($record['currencyCode'] ?? $record[3], $record['country'] ?? $record[4]);
-            $this->countryValidate($record['country'] ?? $record[4]);
-            $this->rateChangeValidate($record['rate'] ?? $record[5], $record['change'] ?? $record[6]);
+            $record = $this->mapRecord($record);
+
+            $this->fieldValidator->validate(
+                $record,
+                FieldValidator::NAME_FIELD,
+                ++$this->line
+            );
+
+            $this->fieldValidator->validate(
+                $record,
+                FieldValidator::UNIT_FIELD,
+                ++$this->line
+            );
+
+            $this->fieldValidator->validate(
+                $record,
+                FieldValidator::COUNTRY_FIELD,
+                ++$this->line
+            );
+
+            $this->fieldValidator->validate(
+                $record,
+                FieldValidator::CURRENCY_CODE_FIELD,
+                ++$this->line
+            );
+
+            $this->fieldValidator->validate(
+                $record,
+                FieldValidator::RATE_FIELD,
+                ++$this->line
+            );
+
+            $this->fieldValidator->validate(
+                $record,
+                FieldValidator::CHANGE_FIELD,
+                ++$this->line
+            );
+            $this->line++;
         }
         return empty($this->errors) ? true : $this->errors;
     }
@@ -39,7 +81,7 @@ class CsvProcessing implements ProcessingInterface
     {
         $csv = Reader::createFromPath($path);
         $csv->setDelimiter(',');
-        if (in_array(['lastUpdate', 'name', 'currencyCode'], $csv->fetchOne(), true)) {
+        if (in_array('lastUpdate', $csv->fetchOne(), true)) {
             $csv->setHeaderOffset(0);
         }
         $previousLastUpdate = null;
@@ -56,8 +98,9 @@ class CsvProcessing implements ProcessingInterface
             }
             $rate = round(random_int(0, 1000000) / mt_getrandmax(), 5);
             $change = round(random_int(0, (int)$rate) / mt_getrandmax(), 5);
-            $updatedRecord[] = [
-                'lastUpdate' => $lastUpdate->format('Y-m-d'),
+            $date = $lastUpdate->format('Y-m-d');
+            $updatedRecord[$date][] = [
+                'lastUpdate' => $date,
                 'name' => $record['name'] ?? $record[1],
                 'unit' => $record['unit'] ?? $record[2],
                 'currencyCode' => $record['currencyCode'] ?? $record[3],
@@ -66,11 +109,21 @@ class CsvProcessing implements ProcessingInterface
                 'change' => $change
             ];
         }
-        $writer = Writer::createFromString('lastUpdate,name,unit,currencyCode,country,rate,change');
-        $writer->insertAll($updatedRecord);
-        $file = new File($path);
-        $file->
-        Storage::copy($path, );
-        return $updatedRecord;
+//        $writer = Writer::createFromString('lastUpdate,name,unit,currencyCode,country,rate,change');
+//        $writer->insertAll($updatedRecord);
+        return (object)$updatedRecord;
+    }
+
+    protected function mapRecord(array $record)
+    {
+        return [
+            'lastUpdate' => $record['lastUpdate'] ?? $record[0],
+            'name' => $record['name'] ?? $record[1],
+            'unit' => $record['unit'] ?? $record[2],
+            'currencyCode' => $record['currencyCode'] ?? $record[3],
+            'country' => $record['country'] ?? $record[4],
+            'rate' => $record['rate'] ?? $record[5],
+            'change' => $record['change'] ?? $record[6]
+        ];
     }
 }

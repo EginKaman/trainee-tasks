@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Services\Processing;
 
 use App\Exceptions\UnknownProcessingException;
+use App\Services\Processing\Validator\Error;
+use App\Services\Processing\Validator\FieldValidator;
 use DOMDocument;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Storage;
@@ -14,23 +16,24 @@ use SimpleXMLElement;
 
 class XmlProcessing implements ProcessingInterface
 {
-    use ValidatorTrait;
-
     private DOMDocument $DOMDocument;
     private string $schema;
     private SimpleXMLElement $XMLElement;
+    private FieldValidator $fieldValidator;
 
     /**
      * @param DOMDocument $DOMDocument
+     * @param FieldValidator $fieldValidator
      * @throws UnknownProcessingException
      */
-    public function __construct(DOMDocument $DOMDocument)
+    public function __construct(DOMDocument $DOMDocument, FieldValidator $fieldValidator)
     {
         $this->DOMDocument = $DOMDocument;
         if (!file_exists(resource_path('schemas/schema.xsd'))) {
             throw new UnknownProcessingException();
         }
         $this->schema = resource_path('schemas/schema.xsd');
+        $this->fieldValidator = $fieldValidator;
     }
 
     /**
@@ -40,32 +43,68 @@ class XmlProcessing implements ProcessingInterface
     public function validate(string $path): array|bool
     {
         libxml_use_internal_errors(true);
-        $result = true;
         $this->DOMDocument->load($path);
         if (!$this->DOMDocument->schemaValidate($this->schema)) {
-            $this->errors = libxml_get_errors();
-            $result = false;
+            return $this->xmlErrorToError(libxml_get_errors());
         }
-        try {
-            $xml = new SimpleXMLElement(file_get_contents($path));
-        } catch (\Exception $e) {
-            return false;
-        }
-        foreach ($xml->exrate as $exrate) {
-            $this->lastUpdateValidate((string)$exrate->lastUpdate);
-            foreach ($exrate->currency as $currency) {
-                $this->currencyCodeValidate((string)$currency->currencyCode, (string)$currency->country);
-                $this->rateChangeValidate($currency->rate, $currency->change);
-            }
-        }
-        return $result ?: $this->errors;
+        $this->read($path);
+        return !$this->fieldValidator->hasErrors() ?: $this->fieldValidator->errors();
     }
 
     public function read(string $path)
     {
+        try {
+            $xml = new SimpleXMLElement(file_get_contents($path));
+        } catch (\Exception $e) {
+            return;
+        }
+        foreach ($xml->exrate as $exrate) {
+            $this->fieldValidator->validate(
+                $exrate,
+                FieldValidator::LAST_UPDATE_FIELD,
+                $this->getLine($exrate->lastUpdate)
+            );
+            foreach ($exrate->currency as $currency) {
+                $this->fieldValidator->validate(
+                    $currency,
+                    FieldValidator::NAME_FIELD,
+                    $this->getLine($currency->name)
+                );
+                $this->fieldValidator->validate(
+                    $currency,
+                    FieldValidator::UNIT_FIELD,
+                    $this->getLine($currency->unit)
+                );
+                $this->fieldValidator->validate(
+                    $currency,
+                    FieldValidator::COUNTRY_FIELD,
+                    $this->getLine($currency->country)
+                );
+                $this->fieldValidator->validate(
+                    $currency,
+                    FieldValidator::CURRENCY_CODE_FIELD,
+                    $this->getLine($currency->currencyCode)
+                );
+                $this->fieldValidator->validate(
+                    $currency,
+                    FieldValidator::RATE_FIELD,
+                    $this->getLine($currency->rate)
+                );
+                $this->fieldValidator->validate(
+                    $currency,
+                    FieldValidator::CHANGE_FIELD,
+                    $this->getLine($currency->change)
+                );
+            }
+        }
     }
 
-    public function process(string $path)
+    /**
+     * @param string $path
+     * @return SimpleXMLElement|bool
+     * @throws \Exception
+     */
+    public function process(string $path): SimpleXMLElement|bool
     {
         try {
             $xml = new SimpleXMLElement(file_get_contents($path));
@@ -89,5 +128,27 @@ class XmlProcessing implements ProcessingInterface
             $loop++;
         }
         return $xml;
+    }
+
+    /**
+     * @param $node
+     * @return int
+     */
+    protected function getLine($node): int
+    {
+        return dom_import_simplexml($node)->getLineNo();
+    }
+
+    /**
+     * @param LibXMLError[] $xmlErrors
+     * @return Error[]
+     */
+    protected function xmlErrorToError(array $xmlErrors): array
+    {
+        $errors = [];
+        foreach ($xmlErrors as $xmlError) {
+            $errors[] = new Error($xmlError->message, $xmlError->line);
+        }
+        return $errors;
     }
 }

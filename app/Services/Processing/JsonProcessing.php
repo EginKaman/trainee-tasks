@@ -2,25 +2,23 @@
 
 namespace App\Services\Processing;
 
+use App\Services\Processing\Validator\Error;
+use App\Services\Processing\Validator\FieldValidator;
 use Exception;
 use Illuminate\Support\Facades\Date;
-use LibXMLError;
 use RamosHenrique\JsonSchemaValidator\JsonSchemaValidator;
-use RamosHenrique\JsonSchemaValidator\JsonSchemaValidatorException;
-use Swaggest\JsonSchema\InvalidValue;
 use Swaggest\JsonSchema\Schema;
 
 class JsonProcessing implements ProcessingInterface
 {
-    use ValidatorTrait;
-
     private string $schema;
-    private JsonSchemaValidator $jsonSchemaValidator;
+    private int $line = 0;
+    private FieldValidator $fieldValidator;
 
-    public function __construct(JsonSchemaValidator $jsonSchemaValidator)
+    public function __construct(JsonSchemaValidator $jsonSchemaValidator, FieldValidator $fieldValidator)
     {
         $this->schema = resource_path('schemas/schema.json');
-        $this->jsonSchemaValidator = $jsonSchemaValidator;
+        $this->fieldValidator = $fieldValidator;
     }
 
     /**
@@ -30,32 +28,66 @@ class JsonProcessing implements ProcessingInterface
     public function validate(string $path): bool|array
     {
         try {
-            $schema = Schema::import(json_decode(file_get_contents($this->schema)));
-            $json = $schema->in(json_decode(file_get_contents($path)));
-        } catch (Exception|InvalidValue $exception) {
-            $error = new LibXMLError();
-            $error->message = $exception->getMessage();
-            $error->line = 1;
-            $this->errors[] = $error;
-            return false;
+            $json = $this->read($path);
+        } catch (Exception $exception) {
+            return [new Error($exception->getMessage(), 1)];
         }
 
         foreach ($json as $exrate) {
-            $this->lastUpdateValidate((string)$exrate->lastUpdate);
+            $this->line += 2;
+            $this->fieldValidator->validate(
+                $exrate,
+                FieldValidator::LAST_UPDATE_FIELD,
+                $this->line
+            );
             foreach ($exrate->currency as $currency) {
-                $this->nameValidate((string)$currency->name);
-                $this->unitValidate((string)$currency->unit);
-                $this->countryValidate((string)$currency->country);
-                $this->currencyCodeValidate((string)$currency->currencyCode, (string)$currency->country);
-                $this->rateChangeValidate((string)$currency->rate, (string)$currency->change);
+                ++$this->line;
+                $this->fieldValidator->validate(
+                    $currency,
+                    FieldValidator::NAME_FIELD,
+                    ++$this->line
+                );
+
+                $this->fieldValidator->validate(
+                    $currency,
+                    FieldValidator::UNIT_FIELD,
+                    ++$this->line
+                );
+
+                $this->fieldValidator->validate(
+                    $currency,
+                    FieldValidator::COUNTRY_FIELD,
+                    ++$this->line
+                );
+
+                $this->fieldValidator->validate(
+                    $currency,
+                    FieldValidator::CURRENCY_CODE_FIELD,
+                    ++$this->line
+                );
+
+                $this->fieldValidator->validate(
+                    $currency,
+                    FieldValidator::RATE_FIELD,
+                    ++$this->line
+                );
+
+                $this->fieldValidator->validate(
+                    $currency,
+                    FieldValidator::CHANGE_FIELD,
+                    ++$this->line
+                );
+                ++$this->line;
             }
+            ++$this->line;
         }
-        return empty($this->errors) ? true : $this->errors;
+        return !$this->fieldValidator->hasErrors() ?: $this->fieldValidator->errors();
     }
 
-    public function read($file)
+    public function read($path)
     {
-        // TODO: Implement read() method.
+        $schema = Schema::import(json_decode(file_get_contents($this->schema)));
+        return $schema->in(json_decode(file_get_contents($path)));
     }
 
     public function process(string $path)
