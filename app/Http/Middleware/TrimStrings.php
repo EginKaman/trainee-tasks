@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
@@ -11,9 +11,5 @@ class TrimStrings extends Middleware
      *
      * @var array<int, string>
      */
-    protected $except = [
-        'current_password',
-        'password',
-        'password_confirmation',
-    ];
+    protected $except = ['current_password', 'password', 'password_confirmation'];
 }

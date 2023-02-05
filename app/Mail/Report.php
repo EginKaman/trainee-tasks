@@ -1,14 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Address;
-use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Mail\Mailables\{Address, Attachment, Content, Envelope};
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Date;
 
@@ -18,13 +14,18 @@ class Report extends Mailable
     use SerializesModels;
 
     private string $text;
+    /**
+     * @var array<string>
+     */
     private array $logs;
     private ?string $logPath;
 
     /**
      * Create a new message instance.
      *
-     * @return void
+     * @param string $text
+     * @param array<string> $logs
+     * @param ?string $logPath
      */
     public function __construct(string $text, array $logs, ?string $logPath)
     {
@@ -35,23 +36,20 @@ class Report extends Mailable
 
     /**
      * Get the message envelope.
-     *
-     * @return \Illuminate\Mail\Mailables\Envelope
      */
-    public function envelope()
+    public function envelope(): Envelope
     {
         return new Envelope(
-            to: new Address(config('mail.from.address'), config('mail.from.address')),
+            from: new Address((string) config('mail.from.address'), (string) config('mail.from.address')),
+            to: new Address((string) config('mail.from.address'), (string) config('mail.from.address')),
             subject: 'Report ' . Date::yesterday()->format('Y-m-d')
         );
     }
 
     /**
      * Get the message content definition.
-     *
-     * @return \Illuminate\Mail\Mailables\Content
      */
-    public function content()
+    public function content(): Content
     {
         return new Content(
             view: 'emails.report',
@@ -65,17 +63,14 @@ class Report extends Mailable
     /**
      * Get the attachments for the message.
      *
-     * @return array
+     * @return array<Attachment>
      */
-    public function attachments()
+    public function attachments(): array
     {
         if ($this->logPath === null) {
             return [];
         }
-        return [
-            Attachment::fromPath($this->logPath)
-                ->as('laravel.log')
-                ->withMime('plain/text')
-        ];
+
+        return [Attachment::fromPath($this->logPath)->as('laravel.log')->withMime('plain/text')];
     }
 }
