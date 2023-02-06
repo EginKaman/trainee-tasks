@@ -16,7 +16,7 @@ definitions:
           - public/**
     - step: &composer
         name: Install composer packages
-        image: php:8.1
+        image: php:8.2
         script:
           - apt-get update && apt-get install -y libfreetype6-dev libjpeg62-turbo-dev libpng-dev git zip
           - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
