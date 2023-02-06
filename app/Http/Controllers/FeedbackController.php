@@ -1,7 +1,9 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Actions\Message\NewMessage;
 use App\Http\Requests\FeedbackRequest;
 use App\Mail\Feedback;
 use App\Models\Message;
@@ -20,11 +22,7 @@ class FeedbackController extends Controller
 
     public function store(FeedbackRequest $request): Redirector|Application|RedirectResponse
     {
-        $message = new Message($request->validated());
-        $message->save();
-
-        Mail::mailer($message->method)
-            ->send(new Feedback($message));
+        app(NewMessage::class)->create($request->validated());
 
         return redirect(route('feedback'))
             ->with('success', true);

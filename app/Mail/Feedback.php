@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Mail;
 
@@ -16,15 +18,12 @@ class Feedback extends Mailable implements ShouldQueue
     use SendGrid;
     use SerializesModels;
 
-    private Message $message;
-
     /**
      * Create a new message instance.
      */
-    public function __construct(Message $message)
-    {
-        $this->message = $message;
-    }
+    public function __construct(
+        private readonly Message $message
+    ) {}
 
     /**
      * Get the message envelope.
