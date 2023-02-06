@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services\Processing\Validator;
 
 use Illuminate\Support\Str;
@@ -13,15 +15,7 @@ class FieldValidator
     public const CURRENCY_CODE_FIELD = 'currencyCode';
     public const RATE_FIELD = 'rate';
     public const CHANGE_FIELD = 'change';
-    public array $fields = [
-        'name',
-        'lastUpdate',
-        'unit',
-        'country',
-        'currencyCode',
-        'rate',
-        'change'
-    ];
+    public array $fields = ['name', 'lastUpdate', 'unit', 'country', 'currencyCode', 'rate', 'change'];
     private ErrorBag $errorBag;
 
     public function __construct(ErrorBag $errorBag)
@@ -41,7 +35,7 @@ class FieldValidator
                     }
                     $fieldClass = $this->second($fieldClass, $object);
                 }
-                $answer = $fieldClass->$method((string)$this->getProperty($object, $field), $line);
+                $answer = $fieldClass->{$method}((string) $this->getProperty($object, $field), $line);
                 if (!is_bool($answer)) {
                     $this->errorBag->add($answer);
                 }
@@ -52,72 +46,10 @@ class FieldValidator
         } else {
             $this->errorBag->add($this->propertyNotExistError($field, $line));
         }
+
         return $this;
     }
 
-    /**
-     * @param string|object|array $object
-     * @param string $property
-     * @return bool
-     */
-    protected function isExistProperty(string|object|array $object, string $property): bool
-    {
-        if (is_array($object)) {
-            return isset($object[$property]);
-        }
-        if (is_object($object) || is_string($object)) {
-            return property_exists($object, $property);
-        }
-        return false;
-    }
-
-    protected function getProperty(object|array $object, string $property)
-    {
-        if (is_array($object)) {
-            return $object[$property];
-        }
-        return $object->$property;
-    }
-
-    /**
-     * @param object|string $class
-     * @return array
-     */
-    protected function getMethods(object|string $class): array
-    {
-        return get_class_methods($class);
-    }
-
-    /**
-     * @param string $property
-     * @param $line
-     * @return Error
-     */
-    protected function propertyNotExistError(string $property, $line): Error
-    {
-        return new Error("Field {$property} is not exist in file", $line);
-    }
-
-    /**
-     * @param $fieldClass
-     * @return bool
-     */
-    protected function hasSecond($fieldClass): bool
-    {
-        $secondField = $this->isExistProperty($fieldClass, 'secondField');
-        $secondValue = $this->isExistProperty($fieldClass, 'secondValue');
-        return ($secondValue === true && $secondField === true);
-    }
-
-    protected function second($fieldClass, $object)
-    {
-        $fieldClass->secondValue = $this->getProperty($object, $fieldClass->secondField);
-        return $fieldClass;
-    }
-
-    /**
-     * @return bool
-     */
     public function hasErrors(): bool
     {
         return $this->errorBag->isNotEmpty();
@@ -129,5 +61,51 @@ class FieldValidator
     public function errors(): array
     {
         return $this->errorBag->errors();
+    }
+
+    protected function isExistProperty(string|object|array $object, string $property): bool
+    {
+        if (is_array($object)) {
+            return isset($object[$property]);
+        }
+        if (is_object($object) || is_string($object)) {
+            return property_exists($object, $property);
+        }
+
+        return false;
+    }
+
+    protected function getProperty(object|array $object, string $property)
+    {
+        if (is_array($object)) {
+            return $object[$property];
+        }
+
+        return $object->{$property};
+    }
+
+    protected function getMethods(object|string $class): array
+    {
+        return get_class_methods($class);
+    }
+
+    protected function propertyNotExistError(string $property, $line): Error
+    {
+        return new Error("Field {$property} is not exist in file", $line);
+    }
+
+    protected function hasSecond($fieldClass): bool
+    {
+        $secondField = $this->isExistProperty($fieldClass, 'secondField');
+        $secondValue = $this->isExistProperty($fieldClass, 'secondValue');
+
+        return $secondValue === true && $secondField === true;
+    }
+
+    protected function second($fieldClass, $object)
+    {
+        $fieldClass->secondValue = $this->getProperty($object, $fieldClass->secondField);
+
+        return $fieldClass;
     }
 }

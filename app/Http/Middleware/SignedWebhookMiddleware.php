@@ -7,17 +7,10 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Exceptions\InvalidSignatureException;
-use SendGrid\EventWebhook\EventWebhook;
-use SendGrid\EventWebhook\EventWebhookHeader;
+use SendGrid\EventWebhook\{EventWebhook, EventWebhookHeader};
 
 class SignedWebhookMiddleware
 {
-    /**
-     * @param Request $request
-     * @param Closure $next
-     * @param EventWebhook $webhook
-     * @return mixed
-     */
     public function handle(Request $request, Closure $next, EventWebhook $webhook): mixed
     {
         $publicKey = $webhook->convertPublicKeyToECDSA(config('services.sendgrid.webhook.verification_key'));
@@ -27,6 +20,7 @@ class SignedWebhookMiddleware
         if (!$verify) {
             throw new InvalidSignatureException();
         }
+
         return $next($request);
     }
 }

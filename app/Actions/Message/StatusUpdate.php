@@ -10,7 +10,6 @@ class StatusUpdate
 {
     /**
      * @param string[] $response
-     * @return void
      */
     public function update(array $response): void
     {

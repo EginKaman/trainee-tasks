@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services\Processing;
 
-use App\Services\Processing\Validator\Error;
-use App\Services\Processing\Validator\FieldValidator;
+use App\Services\Processing\Validator\{Error, FieldValidator};
 use Exception;
 use Illuminate\Support\Facades\Date;
 use RamosHenrique\JsonSchemaValidator\JsonSchemaValidator;
@@ -21,10 +22,6 @@ class JsonProcessing implements ProcessingInterface
         $this->fieldValidator = $fieldValidator;
     }
 
-    /**
-     * @param string $path
-     * @return bool|array
-     */
     public function validate(string $path): bool|array
     {
         try {
@@ -35,59 +32,31 @@ class JsonProcessing implements ProcessingInterface
 
         foreach ($json as $exrate) {
             $this->line += 2;
-            $this->fieldValidator->validate(
-                $exrate,
-                FieldValidator::LAST_UPDATE_FIELD,
-                $this->line
-            );
+            $this->fieldValidator->validate($exrate, FieldValidator::LAST_UPDATE_FIELD, $this->line);
             foreach ($exrate->currency as $currency) {
                 ++$this->line;
-                $this->fieldValidator->validate(
-                    $currency,
-                    FieldValidator::NAME_FIELD,
-                    ++$this->line
-                );
+                $this->fieldValidator->validate($currency, FieldValidator::NAME_FIELD, ++$this->line);
 
-                $this->fieldValidator->validate(
-                    $currency,
-                    FieldValidator::UNIT_FIELD,
-                    ++$this->line
-                );
+                $this->fieldValidator->validate($currency, FieldValidator::UNIT_FIELD, ++$this->line);
 
-                $this->fieldValidator->validate(
-                    $currency,
-                    FieldValidator::COUNTRY_FIELD,
-                    ++$this->line
-                );
+                $this->fieldValidator->validate($currency, FieldValidator::COUNTRY_FIELD, ++$this->line);
 
-                $this->fieldValidator->validate(
-                    $currency,
-                    FieldValidator::CURRENCY_CODE_FIELD,
-                    ++$this->line
-                );
+                $this->fieldValidator->validate($currency, FieldValidator::CURRENCY_CODE_FIELD, ++$this->line);
 
-                $this->fieldValidator->validate(
-                    $currency,
-                    FieldValidator::RATE_FIELD,
-                    ++$this->line
-                );
+                $this->fieldValidator->validate($currency, FieldValidator::RATE_FIELD, ++$this->line);
 
-                $this->fieldValidator->validate(
-                    $currency,
-                    FieldValidator::CHANGE_FIELD,
-                    ++$this->line
-                );
+                $this->fieldValidator->validate($currency, FieldValidator::CHANGE_FIELD, ++$this->line);
                 ++$this->line;
             }
             ++$this->line;
         }
+
         return !$this->fieldValidator->hasErrors() ?: $this->fieldValidator->errors();
     }
 
     public function read($path)
     {
-        $schema = Schema::import(json_decode(file_get_contents($this->schema)));
-        return $schema->in(json_decode(file_get_contents($path)));
+        return Schema::import(json_decode(file_get_contents($this->schema)))->in(json_decode(file_get_contents($path)));
     }
 
     public function process(string $path)
@@ -103,9 +72,10 @@ class JsonProcessing implements ProcessingInterface
             }
             foreach ($exrate->currency as $currency) {
                 $currency->rate = round(random_int(0, 1000000) / random_int(2, 100), 5);
-                $currency->change = round(random_int(0, (int)$currency->rate) / random_int(2, 100), 5);
+                $currency->change = round(random_int(0, (int) $currency->rate) / random_int(2, 100), 5);
             }
         }
+
         return $json;
     }
 }

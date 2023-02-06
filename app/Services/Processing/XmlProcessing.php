@@ -5,12 +5,9 @@ declare(strict_types=1);
 namespace App\Services\Processing;
 
 use App\Exceptions\UnknownProcessingException;
-use App\Services\Processing\Validator\Error;
-use App\Services\Processing\Validator\FieldValidator;
+use App\Services\Processing\Validator\{Error, FieldValidator};
 use DOMDocument;
-use Illuminate\Support\Facades\Date;
-use Illuminate\Support\Facades\Storage;
-use League\ISO3166\ISO3166;
+use Illuminate\Support\Facades\{Date, Storage};
 use LibXMLError;
 use SimpleXMLElement;
 
@@ -22,8 +19,6 @@ class XmlProcessing implements ProcessingInterface
     private FieldValidator $fieldValidator;
 
     /**
-     * @param DOMDocument $DOMDocument
-     * @param FieldValidator $fieldValidator
      * @throws UnknownProcessingException
      */
     public function __construct(DOMDocument $DOMDocument, FieldValidator $fieldValidator)
@@ -37,8 +32,7 @@ class XmlProcessing implements ProcessingInterface
     }
 
     /**
-     * @param string $path
-     * @return LibXMLError[]|bool
+     * @return bool|LibXMLError[]
      */
     public function validate(string $path): array|bool
     {
@@ -48,10 +42,11 @@ class XmlProcessing implements ProcessingInterface
             return $this->xmlErrorToError(libxml_get_errors());
         }
         $this->read($path);
+
         return !$this->fieldValidator->hasErrors() ?: $this->fieldValidator->errors();
     }
 
-    public function read(string $path)
+    public function read(string $path): void
     {
         try {
             $xml = new SimpleXMLElement(file_get_contents($path));
@@ -100,8 +95,6 @@ class XmlProcessing implements ProcessingInterface
     }
 
     /**
-     * @param string $path
-     * @return SimpleXMLElement|bool
      * @throws \Exception
      */
     public function process(string $path): SimpleXMLElement|bool
@@ -122,18 +115,15 @@ class XmlProcessing implements ProcessingInterface
             }
             foreach ($exrate->currency as $currency) {
                 $currency->rate = round(random_int(0, 1000000) / random_int(2, 100), 5);
-                $currency->change = round(random_int(0, (int)$currency->rate) / random_int(2, 100), 5);
+                $currency->change = round(random_int(0, (int) $currency->rate) / random_int(2, 100), 5);
             }
 
-            $loop++;
+            ++$loop;
         }
+
         return $xml;
     }
 
-    /**
-     * @param $node
-     * @return int
-     */
     protected function getLine($node): int
     {
         return dom_import_simplexml($node)->getLineNo();
@@ -141,6 +131,7 @@ class XmlProcessing implements ProcessingInterface
 
     /**
      * @param LibXMLError[] $xmlErrors
+     *
      * @return Error[]
      */
     protected function xmlErrorToError(array $xmlErrors): array
@@ -149,6 +140,7 @@ class XmlProcessing implements ProcessingInterface
         foreach ($xmlErrors as $xmlError) {
             $errors[] = new Error($xmlError->message, $xmlError->line);
         }
+
         return $errors;
     }
 }

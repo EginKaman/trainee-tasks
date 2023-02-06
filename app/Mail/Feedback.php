@@ -23,7 +23,8 @@ class Feedback extends Mailable implements ShouldQueue
      */
     public function __construct(
         private readonly Message $message
-    ) {}
+    ) {
+    }
 
     /**
      * Get the message envelope.

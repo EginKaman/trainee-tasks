@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services\Processing;
 
 use Illuminate\Support\Facades\Date;
@@ -15,7 +17,7 @@ trait ValidatorTrait
         $lastUpdate = Date::createFromFormat('Y-m-d', $lastUpdate);
         if (!$lastUpdate) {
             $error = new LibXMLError();
-            $error->message = "Invalid date format";
+            $error->message = 'Invalid date format';
             $error->line = $this->line;
             $this->errors[] = $error;
         }
@@ -23,13 +25,13 @@ trait ValidatorTrait
         $minDate = Date::createFromFormat('Y-m-d', '1970-01-01');
         if ($lastUpdate > Date::today()) {
             $error = new LibXMLError();
-            $error->message = "The value '{$lastUpdate}' must be smaller than '$today'.";
+            $error->message = "The value '{$lastUpdate}' must be smaller than '{$today}'.";
             $error->line = $this->line;
             $this->errors[] = $error;
         }
         if ($lastUpdate < $minDate) {
             $error = new LibXMLError();
-            $error->message = "The value '{$lastUpdate}' must be greater than '$minDate'.";
+            $error->message = "The value '{$lastUpdate}' must be greater than '{$minDate}'.";
             $error->line = $this->line;
             $this->errors[] = $error;
         }
@@ -39,7 +41,7 @@ trait ValidatorTrait
     {
         if (!preg_match('/[A-Za-z ]{2,60}/', $name)) {
             $error = new LibXMLError();
-            $error->message = "The name must be smaller include only [A-Za-z ] symbols and between 2 to 60 letters.";
+            $error->message = 'The name must be smaller include only [A-Za-z ] symbols and between 2 to 60 letters.';
             $error->line = $this->line;
             $this->errors[] = $error;
         }
@@ -49,19 +51,19 @@ trait ValidatorTrait
     {
         if (is_int($unit)) {
             $error = new LibXMLError();
-            $error->message = "The unit must be whole number.";
+            $error->message = 'The unit must be whole number.';
             $error->line = $this->line;
             $this->errors[] = $error;
         }
-        if ((int)$unit > 1000000) {
+        if ((int) $unit > 1000000) {
             $error = new LibXMLError();
-            $error->message = "The unit c";
+            $error->message = 'The unit c';
             $error->line = $this->line;
             $this->errors[] = $error;
         }
-        if ((int)$unit < 1) {
+        if ((int) $unit < 1) {
             $error = new LibXMLError();
-            $error->message = "The unit must be greater than 1.";
+            $error->message = 'The unit must be greater than 1.';
             $error->line = $this->line;
             $this->errors[] = $error;
         }
@@ -71,7 +73,7 @@ trait ValidatorTrait
     {
         if (!preg_match('/[A-Z]{3}/', $country)) {
             $error = new LibXMLError();
-            $error->message = "Invalid country format. Must follow the ISO 3166-1 alpha-3";
+            $error->message = 'Invalid country format. Must follow the ISO 3166-1 alpha-3';
             $error->line = $this->line;
             $this->errors[] = $error;
         }
@@ -81,7 +83,7 @@ trait ValidatorTrait
     {
         if (!preg_match('/[A-Z]{3}/', $currencyCode)) {
             $error = new LibXMLError();
-            $error->message = "Invalid currencyCode format. Must follow the ISO 4217";
+            $error->message = 'Invalid currencyCode format. Must follow the ISO 4217';
             $error->line = $this->line;
             $this->errors[] = $error;
         }
@@ -98,25 +100,25 @@ trait ValidatorTrait
     {
         if (!is_numeric($rate)) {
             $error = new LibXMLError();
-            $error->message = "Rate must be decimal";
+            $error->message = 'Rate must be decimal';
             $error->line = $this->line;
             $this->errors[] = $error;
         }
         if (!is_numeric($change)) {
             $error = new LibXMLError();
-            $error->message = "Change must be decimal";
+            $error->message = 'Change must be decimal';
             $error->line = $this->line;
             $this->errors[] = $error;
         }
-        if ((float)$rate < (float)$change) {
+        if ((float) $rate < (float) $change) {
             $error = new LibXMLError();
-            $error->message = "Rate must be greater than change";
+            $error->message = 'Rate must be greater than change';
             $error->line = $this->line;
             $this->errors[] = $error;
         }
-        if ((float)$change > (float)$rate) {
+        if ((float) $change > (float) $rate) {
             $error = new LibXMLError();
-            $error->message = "Change must be smaller than rate";
+            $error->message = 'Change must be smaller than rate';
             $error->line = $this->line;
             $this->errors[] = $error;
         }

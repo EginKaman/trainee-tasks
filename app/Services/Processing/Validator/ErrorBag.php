@@ -1,34 +1,28 @@
 <?php
 
-namespace App\Services\Processing\Validator;
+declare(strict_types=1);
 
-use Illuminate\Contracts\Support\Arrayable;
+namespace App\Services\Processing\Validator;
 
 class ErrorBag
 {
     public array $errors = [];
 
     /**
-     * @param Error $error
      * @return $this
      */
     public function add(Error $error): static
     {
         $this->errors[] = $error;
+
         return $this;
     }
 
-    /**
-     * @return int
-     */
     public function count(): int
     {
         return count($this->errors);
     }
 
-    /**
-     * @return bool
-     */
     public function isNotEmpty(): bool
     {
         return $this->count() > 0;

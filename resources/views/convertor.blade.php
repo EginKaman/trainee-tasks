@@ -26,7 +26,7 @@
                                 <div class="row pt-3">
                                     @if (session('success'))
                                         <div class="alert alert-success" role="alert" data-cy=“successAlert”>
-                                            {{ __('Your feedback was sent successful.') }}
+                                            {{ __('Successfully!') }}
                                         </div>
                                     @endif
                                     @if (session('failure'))
@@ -56,7 +56,7 @@
                                             <div class="col-md-6">
                                                 <input class="form-control @error('name') is-invalid @enderror"
                                                        type="file" id="file" name="document"
-                                                       onchange="isXML()"
+                                                       onchange="change()"
                                                        accept=".xml,.csv,.json">
                                                 @error('document')
                                                 <div class="invalid-feedback" role="alert" data-cy=“errorMessage”>
@@ -100,7 +100,7 @@
 
                                         <div class="row mb-0">
                                             <div class="col-md-6 offset-md-4">
-                                                <button type="submit" class="btn btn-primary">
+                                                <button type="submit" class="btn btn-primary" id="convert-button" disabled>
                                                     {{ __('Convert') }}
                                                 </button>
                                             </div>
@@ -278,6 +278,12 @@
                 radios.removeAttribute('style')
             } else {
                 radios.style['display'] = 'none';
+            }
+        }
+        function change() {
+            let file = document.getElementById('file').files[0];
+            if (file.length > 0) {
+                document.getElementById('convert-button').removeAttribute('disabled');
             }
         }
     </script>

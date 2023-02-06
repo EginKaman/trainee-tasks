@@ -1,12 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Exceptions\UnknownProcessingException;
-use App\Services\Processing\CsvProcessing;
-use App\Services\Processing\JsonProcessing;
-use App\Services\Processing\ProcessingInterface;
-use App\Services\Processing\XmlProcessing;
+use App\Services\Processing\{CsvProcessing, JsonProcessing, ProcessingInterface, XmlProcessing};
 
 class Processing
 {
@@ -14,24 +13,26 @@ class Processing
     private ProcessingInterface $processing;
 
     /**
-     * @param string $mimeType
-     * @return $this
      * @throws UnknownProcessingException
+     *
+     * @return $this
      */
     public function setMimeType(string $mimeType): static
     {
         $this->mimeType = $mimeType;
         $this->selectProcessing();
+
         return $this;
     }
 
-    /**
-     * @param string $path
-     * @return array|bool
-     */
     public function validate(string $path): bool|array
     {
         return $this->processing->validate($path);
+    }
+
+    public function process(string $path)
+    {
+        return $this->processing->process($path);
     }
 
     /**
@@ -45,10 +46,5 @@ class Processing
             'text/csv' => app(CsvProcessing::class),
             default => throw new UnknownProcessingException(),
         };
-    }
-
-    public function process(string $path)
-    {
-        return $this->processing->process($path);
     }
 }

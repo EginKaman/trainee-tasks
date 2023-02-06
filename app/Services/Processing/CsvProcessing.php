@@ -1,21 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services\Processing;
 
-use App\Exceptions\UnknownProcessingException;
 use App\Services\Processing\Validator\FieldValidator;
 use Illuminate\Support\Facades\Date;
-use League\Csv\Reader;
-use League\Csv\Writer;
+use League\Csv\{Reader, Writer};
 
 class CsvProcessing implements ProcessingInterface
 {
     private int $line = 1;
     private FieldValidator $fieldValidator;
 
-    /**
-     * @param FieldValidator $fieldValidator
-     */
     public function __construct(FieldValidator $fieldValidator)
     {
         $this->fieldValidator = $fieldValidator;
@@ -27,54 +24,31 @@ class CsvProcessing implements ProcessingInterface
         $csv->setDelimiter(',');
         if (in_array('lastUpdate', $csv->fetchOne(), true)) {
             $csv->setHeaderOffset(0);
-            $this->line++;
+            ++$this->line;
         }
         foreach ($csv->getRecords() as $record) {
             $record = $this->mapRecord($record);
 
-            $this->fieldValidator->validate(
-                $record,
-                FieldValidator::NAME_FIELD,
-                ++$this->line
-            );
+            $this->fieldValidator->validate($record, FieldValidator::NAME_FIELD, ++$this->line);
 
-            $this->fieldValidator->validate(
-                $record,
-                FieldValidator::UNIT_FIELD,
-                ++$this->line
-            );
+            $this->fieldValidator->validate($record, FieldValidator::UNIT_FIELD, ++$this->line);
 
-            $this->fieldValidator->validate(
-                $record,
-                FieldValidator::COUNTRY_FIELD,
-                ++$this->line
-            );
+            $this->fieldValidator->validate($record, FieldValidator::COUNTRY_FIELD, ++$this->line);
 
-            $this->fieldValidator->validate(
-                $record,
-                FieldValidator::CURRENCY_CODE_FIELD,
-                ++$this->line
-            );
+            $this->fieldValidator->validate($record, FieldValidator::CURRENCY_CODE_FIELD, ++$this->line);
 
-            $this->fieldValidator->validate(
-                $record,
-                FieldValidator::RATE_FIELD,
-                ++$this->line
-            );
+            $this->fieldValidator->validate($record, FieldValidator::RATE_FIELD, ++$this->line);
 
-            $this->fieldValidator->validate(
-                $record,
-                FieldValidator::CHANGE_FIELD,
-                ++$this->line
-            );
-            $this->line++;
+            $this->fieldValidator->validate($record, FieldValidator::CHANGE_FIELD, ++$this->line);
+            ++$this->line;
         }
+
         return empty($this->errors) ? true : $this->errors;
     }
 
-    public function read($file)
+    public function read($file): void
     {
-        // TODO: Implement read() method.
+        
     }
 
     public function process(string $path)
@@ -97,7 +71,7 @@ class CsvProcessing implements ProcessingInterface
                 $lastUpdate = $previousLastUpdate->subDay();
             }
             $rate = round(random_int(0, 1000000) / mt_getrandmax(), 5);
-            $change = round(random_int(0, (int)$rate) / mt_getrandmax(), 5);
+            $change = round(random_int(0, (int) $rate) / mt_getrandmax(), 5);
             $date = $lastUpdate->format('Y-m-d');
             $updatedRecord[$date][] = [
                 'lastUpdate' => $date,
@@ -106,12 +80,12 @@ class CsvProcessing implements ProcessingInterface
                 'currencyCode' => $record['currencyCode'] ?? $record[3],
                 'country' => $record['country'] ?? $record[4],
                 'rate' => $rate,
-                'change' => $change
+                'change' => $change,
             ];
         }
 //        $writer = Writer::createFromString('lastUpdate,name,unit,currencyCode,country,rate,change');
 //        $writer->insertAll($updatedRecord);
-        return (object)$updatedRecord;
+        return (object) $updatedRecord;
     }
 
     protected function mapRecord(array $record)
@@ -123,7 +97,7 @@ class CsvProcessing implements ProcessingInterface
             'currencyCode' => $record['currencyCode'] ?? $record[3],
             'country' => $record['country'] ?? $record[4],
             'rate' => $record['rate'] ?? $record[5],
-            'change' => $record['change'] ?? $record[6]
+            'change' => $record['change'] ?? $record[6],
         ];
     }
 }

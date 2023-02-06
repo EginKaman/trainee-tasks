@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services\Processing\Validator\Fields;
 
 use App\Services\Processing\Validator\Error;
@@ -18,8 +20,10 @@ class CurrencyCode
     {
         if (!preg_match('/^[A-Z]{3}$/', $value)) {
             $this->break = true;
+
             return new Error('Invalid currencyCode format. Must follow the ISO 4217', $line);
         }
+
         return true;
     }
 
@@ -29,6 +33,7 @@ class CurrencyCode
         if (!in_array($value, $data['currency'], true)) {
             return new Error("Invalid currencyCode {$value} for country {$this->secondValue}", $line);
         }
+
         return true;
     }
 }
