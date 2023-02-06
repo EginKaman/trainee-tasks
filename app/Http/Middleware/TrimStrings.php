@@ -20,7 +20,6 @@ class TrimStrings extends Middleware
      *
      * @param string $key
      * @param mixed $value
-     * @return mixed
      */
     protected function transform($key, $value): mixed
     {
@@ -31,8 +30,7 @@ class TrimStrings extends Middleware
         $value = preg_replace('~^[\s\x{FEFF}\x{200B}]+|[\s\x{FEFF}\x{200B}]+$~u', '', $value) ?? trim($value);
         $value = preg_replace('/[\r\n]{2,}+/m', "\r\n\r\n", $value);
         $value = preg_replace('/\n{2,}+/m', "\n\n", $value);
-        $value = preg_replace('/ +/m', ' ', $value);
 
-        return $value;
+        return preg_replace('/ +/m', ' ', $value);
     }
 }

@@ -10,10 +10,6 @@ use Illuminate\Support\Facades\Mail;
 
 class NewMessage
 {
-    /**
-     * @param array $data
-     * @return Message
-     */
     public function create(array $data): Message
     {
         $message = new Message($data);

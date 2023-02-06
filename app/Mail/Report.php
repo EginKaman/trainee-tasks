@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Mail;
 
@@ -23,7 +25,6 @@ class Report extends Mailable
     /**
      * Create a new message instance.
      *
-     * @param string $text
      * @param array<string> $logs
      * @param ?string $logPath
      */
