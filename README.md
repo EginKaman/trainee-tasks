@@ -1,6 +1,7 @@
 ## Install on local environment
 1. `composer install`
 2. `cp ./.env.example ./.env `
+3. Set in `.env` variable `PLATFORM` with your platform `amd64` or `arm64`
 3. Start local environment = `./vendor/bin/sail up -d`
 4. `./vendor/bin/sail artisan key:generate`
 5. Fill credentials for smtp, sendgrid, recaptcha
