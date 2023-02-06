@@ -1,7 +1,6 @@
-<?php
+<?php declare(strict_types=1);
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Third Party Services
@@ -16,9 +15,12 @@ return [
 
     'sendgrid' => [
         'api_key' => env('SENDGRID_API_KEY'),
+        'webhook' => [
+            'verification_key' => env('SENDGRID_VERIFICATION_KEY')
+        ],
         'templates' => [
-            'dynamic_template_id' => env('SENDGRID_DYNAMIC_TEMPLATE_ID')
-        ]
+            'dynamic_template_id' => env('SENDGRID_DYNAMIC_TEMPLATE_ID'),
+        ],
     ],
 
     'mailgun' => [
@@ -37,5 +39,4 @@ return [
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
-
 ];

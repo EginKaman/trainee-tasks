@@ -1,18 +1,13 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Jobs;
 
 use App\Mail\Report;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
-use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Contracts\Queue\{ShouldBeUnique, ShouldQueue};
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Date;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Queue\{InteractsWithQueue, SerializesModels};
+use Illuminate\Support\Facades\{DB, Date, Log, Mail};
 use Illuminate\Support\Str;
 
 class EmailReport implements ShouldQueue
@@ -24,35 +19,28 @@ class EmailReport implements ShouldQueue
 
     /**
      * Create a new job instance.
-     *
-     * @return void
      */
     public function __construct()
     {
-        //
     }
 
     /**
      * Execute the job.
-     *
-     * @return void
      */
-    public function handle()
+    public function handle(): void
     {
-        $availableDates = $this->getLogFileDates();
         $date = Date::yesterday()->format('Y-m-d');
+        $file = storage_path('logs/laravel-' . $date);
         $message = 'Errors was found with selected date ' . $date;
         $logs = [];
         $filePath = null;
 
-        if (count($availableDates) > 0 || !isset($availableDates[$date])) {
+        if (file_exists($file)) {
             $message = 'No log available';
         } else {
-            $pattern = "/^\[(?<date>.*)\]\s(?<env>\w+)\.(?<type>\w+):(?<message>.*)/m";
+            $pattern = '/^\\[(?<date>.*)\\]\\s(?<env>\\w+)\\.(?<type>\\w+):(?<message>.*)/m';
 
-            $fileName = 'laravel-' . $date . '.log';
-            $filePath = storage_path('logs/' . $fileName);
-            $content = file_get_contents($filePath);
+            $content = file_get_contents($file);
             preg_match_all($pattern, $content, $matches, PREG_SET_ORDER, 0);
 
             foreach ($matches as $match) {
@@ -63,31 +51,11 @@ class EmailReport implements ShouldQueue
                     'count' => $count,
                     'env' => $match['env'],
                     'type' => $match['type'],
-                    'message' => trim($match['message'])
+                    'message' => trim($match['message']),
                 ];
             }
         }
 
         Mail::send(new Report($message, $logs, $filePath));
-    }
-
-    /**
-     * Returned array with log file dates
-     *
-     * @return array
-     */
-    public function getLogFileDates(): array
-    {
-        $dates = [];
-        $files = glob(storage_path('logs/laravel-*.log'));
-        $files = array_reverse($files);
-        foreach ($files as $path) {
-            $fileName = basename($path);
-            preg_match('/(?<=laravel-)(.*)(?=.log)/', $fileName, $dtMatch);
-            $date = $dtMatch[0];
-            $dates[$date] = $date;
-        }
-
-        return $dates;
     }
 }

@@ -1,34 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Sendgrid;
 
+use App\Actions\Message\StatusUpdate;
 use App\Http\Controllers\Controller;
-use App\Models\Message;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Http\{Request, Response};
 
 class WebhookController extends Controller
 {
+    /**
+     * @return Application|Response|ResponseFactory
+     */
     public function update(Request $request)
     {
-        $response = $request->json();
-
-        foreach ($response as $item) {
-            $email = $item['email'];
-            if ($item['event'] === 'delivered') {
-                $message = Message::query()
-                    ->where('email', $email)
-                    ->where('method', 'sendgrid')
-                    ->latest()
-                    ->first();
-                if ($message === null) {
-                    continue;
-                }
-                $message->success = true;
-                $message->save();
-            }
-        }
-
+        app(StatusUpdate::class)->update($request->json());
 
         return response('');
     }
