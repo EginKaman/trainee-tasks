@@ -15,6 +15,9 @@ return [
 
     'sendgrid' => [
         'api_key' => env('SENDGRID_API_KEY'),
+        'webhook' => [
+            'verification_key' => env('SENDGRID_VERIFICATION_KEY')
+        ],
         'templates' => [
             'dynamic_template_id' => env('SENDGRID_DYNAMIC_TEMPLATE_ID'),
         ],

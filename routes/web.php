@@ -19,4 +19,5 @@ Route::get('/', function () {
 Route::get('/feedback', [\App\Http\Controllers\FeedbackController::class, 'index'])
     ->name('feedback');
 Route::post('/feedback', [\App\Http\Controllers\FeedbackController::class, 'store']);
-Route::post('/sendgrid/webhook', [\App\Http\Controllers\Sendgrid\WebhookController::class, 'update']);
+Route::post('/sendgrid/webhook', [\App\Http\Controllers\Sendgrid\WebhookController::class, 'update'])
+    ->middleware(\App\Http\Middleware\SignedWebhookMiddleware::class);
