@@ -25,6 +25,11 @@ return [
         ],
     ],
 
+    'kraken' => [
+        'key' => env('KRAKEN_API_KEY'),
+        'secret' => env('KRAKEN_API_SECRET')
+    ],
+
     'mailgun' => [
         'domain' => env('MAILGUN_DOMAIN'),
         'secret' => env('MAILGUN_SECRET'),

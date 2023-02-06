@@ -1,5 +1,11 @@
 <?php
 
+use App\Http\Controllers\ConvertorController;
+use App\Http\Controllers\FeedbackController;
+use App\Http\Controllers\Images\CallbackController;
+use App\Http\Controllers\Images\OptimizerController;
+use App\Http\Controllers\Sendgrid\WebhookController;
+use App\Http\Middleware\SignedWebhookMiddleware;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,18 +22,21 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return redirect()->route('feedback');
 });
-Route::get('/feedback', [\App\Http\Controllers\FeedbackController::class, 'index'])
+Route::get('/feedback', [FeedbackController::class, 'index'])
     ->name('feedback');
-Route::post('/feedback', [\App\Http\Controllers\FeedbackController::class, 'store']);
-Route::post('/sendgrid/webhook', [\App\Http\Controllers\Sendgrid\WebhookController::class, 'update'])
-    ->middleware(\App\Http\Middleware\SignedWebhookMiddleware::class);
+Route::post('/feedback', [FeedbackController::class, 'store']);
+Route::post('/sendgrid/webhook', [WebhookController::class, 'update'])
+    ->middleware(SignedWebhookMiddleware::class);
 
-Route::get('/convertor', [\App\Http\Controllers\ConvertorController::class, 'index'])
+Route::get('/convertor', [ConvertorController::class, 'index'])
     ->name('convertor');
-Route::post('/convertor', [\App\Http\Controllers\ConvertorController::class, 'store']);
-Route::get('/schema.json', [\App\Http\Controllers\ConvertorController::class, 'jsonSchema'])->name(
-    'convertor.json-schema'
-);
-Route::get('/schema.xsd', [\App\Http\Controllers\ConvertorController::class, 'xmlSchema'])->name(
-    'convertor.xml-schema'
-);
+Route::post('/convertor', [ConvertorController::class, 'store']);
+Route::get('/schema.json', [ConvertorController::class, 'jsonSchema'])
+    ->name('convertor.json-schema');
+Route::get('/schema.xsd', [ConvertorController::class, 'xmlSchema'])
+    ->name('convertor.xml-schema');
+Route::prefix('images')->group(function () {
+    Route::get('optimizer', [OptimizerController::class, 'index'])->name('optimizer');
+    Route::post('optimizer', [OptimizerController::class, 'store']);
+    Route::post('callback', CallbackController::class)->name('callback');
+})->name('images');

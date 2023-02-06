@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7295940197ff135b5c32b83296beeff1",
+    "content-hash": "0f2f7ef46019b1f0cab8aa63565aefda",
     "packages": [
         {
             "name": "brick/math",
@@ -1029,6 +1029,47 @@
                 "source": "https://github.com/josiasmontag/laravel-recaptchav3/tree/1.0.1"
             },
             "time": "2022-10-27T09:23:16+00:00"
+        },
+        {
+            "name": "kraken-io/kraken-php",
+            "version": "1.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kraken-io/kraken-php.git",
+                "reference": "56563df1b9a7829f7039cc6e712cf89fab655e26"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kraken-io/kraken-php/zipball/56563df1b9a7829f7039cc6e712cf89fab655e26",
+                "reference": "56563df1b9a7829f7039cc6e712cf89fab655e26",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-json": "*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Kraken": "lib"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Kraken Image Optimizer",
+                    "email": "support@kraken.io"
+                }
+            ],
+            "description": "Official Kraken.io SDK",
+            "support": {
+                "issues": "https://github.com/kraken-io/kraken-php/issues",
+                "source": "https://github.com/kraken-io/kraken-php/tree/master"
+            },
+            "time": "2016-07-26T08:03:24+00:00"
         },
         {
             "name": "laravel/framework",
@@ -9636,9 +9677,9 @@
     "prefer-lowest": false,
     "platform": {
         "php": "^8.2.1",
-        "ext-pdo": "*",
         "ext-dom": "*",
         "ext-libxml": "*",
+        "ext-pdo": "*",
         "ext-simplexml": "*"
     },
     "platform-dev": [],
