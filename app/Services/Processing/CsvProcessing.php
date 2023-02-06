@@ -29,26 +29,27 @@ class CsvProcessing implements ProcessingInterface
         foreach ($csv->getRecords() as $record) {
             $record = $this->mapRecord($record);
 
-            $this->fieldValidator->validate($record, FieldValidator::NAME_FIELD, ++$this->line);
+            $this->fieldValidator->validate($record, FieldValidator::LAST_UPDATE_FIELD, $this->line);
 
-            $this->fieldValidator->validate($record, FieldValidator::UNIT_FIELD, ++$this->line);
+            $this->fieldValidator->validate($record, FieldValidator::NAME_FIELD, $this->line);
 
-            $this->fieldValidator->validate($record, FieldValidator::COUNTRY_FIELD, ++$this->line);
+            $this->fieldValidator->validate($record, FieldValidator::UNIT_FIELD, $this->line);
 
-            $this->fieldValidator->validate($record, FieldValidator::CURRENCY_CODE_FIELD, ++$this->line);
+            $this->fieldValidator->validate($record, FieldValidator::COUNTRY_FIELD, $this->line);
 
-            $this->fieldValidator->validate($record, FieldValidator::RATE_FIELD, ++$this->line);
+            $this->fieldValidator->validate($record, FieldValidator::CURRENCY_CODE_FIELD, $this->line);
 
-            $this->fieldValidator->validate($record, FieldValidator::CHANGE_FIELD, ++$this->line);
+            $this->fieldValidator->validate($record, FieldValidator::RATE_FIELD, $this->line);
+
+            $this->fieldValidator->validate($record, FieldValidator::CHANGE_FIELD, $this->line);
             ++$this->line;
         }
 
-        return empty($this->errors) ? true : $this->errors;
+        return !$this->fieldValidator->hasErrors() ?: $this->fieldValidator->errors();
     }
 
     public function read($file): void
     {
-        
     }
 
     public function process(string $path)
@@ -71,7 +72,7 @@ class CsvProcessing implements ProcessingInterface
                 $lastUpdate = $previousLastUpdate->subDay();
             }
             $rate = round(random_int(0, 1000000) / mt_getrandmax(), 5);
-            $change = round(random_int(0, (int) $rate) / mt_getrandmax(), 5);
+            $change = round(random_int(0, (int)$rate) / mt_getrandmax(), 5);
             $date = $lastUpdate->format('Y-m-d');
             $updatedRecord[$date][] = [
                 'lastUpdate' => $date,
@@ -85,7 +86,7 @@ class CsvProcessing implements ProcessingInterface
         }
 //        $writer = Writer::createFromString('lastUpdate,name,unit,currencyCode,country,rate,change');
 //        $writer->insertAll($updatedRecord);
-        return (object) $updatedRecord;
+        return (object)$updatedRecord;
     }
 
     protected function mapRecord(array $record)

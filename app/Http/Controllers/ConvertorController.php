@@ -67,7 +67,9 @@ class ConvertorController extends Controller
      */
     public function jsonSchema(): BinaryFileResponse
     {
-        return response()->file(resource_path('schemas/schema.json'));
+        return response()->download(resource_path('schemas/schema.json'), 'schema.json', [
+            'Content-Type: application/json'
+        ]);
     }
 
     /**
@@ -75,6 +77,8 @@ class ConvertorController extends Controller
      */
     public function xmlSchema(): BinaryFileResponse
     {
-        return response()->file(resource_path('schemas/schema.xml'));
+        return response()->download(resource_path('schemas/schema.xsd'), 'schema.xsd', [
+            'Content-Type: application/xml'
+        ]);
     }
 }

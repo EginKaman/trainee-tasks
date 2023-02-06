@@ -115,7 +115,7 @@ class XmlProcessing implements ProcessingInterface
             }
             foreach ($exrate->currency as $currency) {
                 $currency->rate = round(random_int(0, 1000000) / random_int(2, 100), 5);
-                $currency->change = round(random_int(0, (int) $currency->rate) / random_int(2, 100), 5);
+                $currency->change = round(random_int(0, (int)$currency->rate) / random_int(2, 100), 5);
             }
 
             ++$loop;

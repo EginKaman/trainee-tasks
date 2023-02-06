@@ -100,7 +100,8 @@
 
                                         <div class="row mb-0">
                                             <div class="col-md-6 offset-md-4">
-                                                <button type="submit" class="btn btn-primary" id="convert-button" disabled>
+                                                <button type="submit" class="btn btn-primary" id="convert-button"
+                                                        disabled>
                                                     {{ __('Convert') }}
                                                 </button>
                                             </div>
@@ -182,9 +183,11 @@
                                             the link below
                                         </small>
                                         <p class="text-start">
-                                            <a href="{{ route('convertor.json-schema') }}">JSON Schema</a>
+                                            <a href="{{ route('convertor.json-schema') }}" target="_blank" download="">JSON
+                                                Schema</a>
                                             <span>({{ round($json->getSize() / 1024, 2) }} kB)</span><br>
-                                            <a href="{{ route('convertor.xml-schema') }}">XML Schema</a>
+                                            <a href="{{ route('convertor.xml-schema') }}" target="_blank" download="">XML
+                                                Schema</a>
                                             <span>({{ round($xml->getSize() / 1024, 2) }} kB)</span>
                                         </p>
                                     </div>
@@ -205,13 +208,15 @@
                                             <tbody>
                                             <tr>
                                                 <td>
-                                                    <a href="{{ \Storage::url('examples/correct-file-schema.xml') }}">
+                                                    <a href="{{ \Storage::url('examples/correct-file-schema.xml') }}"
+                                                       target="_blank" download="">
                                                         correct-file-schema.xml
                                                     </a>
                                                     <span>(511 kB)</span>
                                                 </td>
                                                 <td>
-                                                    <a href="{{ \Storage::url('examples/wrong-file-schema.xml') }}">
+                                                    <a href="{{ \Storage::url('examples/wrong-file-schema.xml') }}"
+                                                       target="_blank" download="">
                                                         wrong-file-schema.xml
                                                     </a>
                                                     <span>(214 kB)</span>
@@ -219,13 +224,15 @@
                                             </tr>
                                             <tr>
                                                 <td>
-                                                    <a href="{{ \Storage::url('examples/correct-file-schema.json') }}">
+                                                    <a href="{{ \Storage::url('examples/correct-file-schema.json') }}"
+                                                       target="_blank" download="">
                                                         correct-file-schema.json
                                                     </a>
                                                     <span>(511 kB)</span>
                                                 </td>
                                                 <td>
-                                                    <a href="{{ \Storage::url('examples/wrong-file-schema.json') }}">
+                                                    <a href="{{ \Storage::url('examples/wrong-file-schema.json') }}"
+                                                       target="_blank" download="">
                                                         wrong-file-schema.json
                                                     </a>
                                                     <span>(214 kB)</span>
@@ -233,29 +240,264 @@
                                             </tr>
                                             <tr>
                                                 <td>
-                                                    <a href="{{ \Storage::url('examples/correct-file-schema.csv') }}">
+                                                    <a href="{{ \Storage::url('examples/correct-file-schema.csv') }}"
+                                                       target="_blank" download="">
                                                         correct-file-schema.csv
                                                     </a>
                                                     <span>(511 kB)</span>
                                                 </td>
                                                 <td>
-                                                    <a href="{{ \Storage::url('examples/wrong-file-schema.csv') }}">
+                                                    <a href="{{ \Storage::url('examples/wrong-file-schema.csv') }}"
+                                                       target="_blank" download="">
                                                         wrong-file-schema.csv
                                                     </a>
                                                     <span>(214 kB)</span>
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td><a href="#">correct-file-min.xml</a> <span>(8 kB)</span></td>
-                                                <td><a href="#">invalid-syntax.xml</a> <span>(571 kB)</span></td>
+                                                <td>
+                                                    <a href="{{ \Storage::url('examples/correct-file-schema-header.csv') }}"
+                                                       target="_blank" download="">
+                                                        correct-file-schema-header.csv
+                                                    </a>
+                                                    <span>(511 kB)</span>
+                                                </td>
+                                                <td>
+                                                    <a href="{{ \Storage::url('examples/wrong-file-schema-header.csv') }}"
+                                                       target="_blank" download="">
+                                                        wrong-file-schema-header.csv
+                                                    </a>
+                                                    <span>(214 kB)</span>
+                                                </td>
                                             </tr>
                                             <tr>
-                                                <td><a href="#">correct-file-max.xml</a> <span>(942 kB)</span></td>
-                                                <td><a href="#">wrong-file-min.csv</a> <span>(485 kB)</span></td>
+                                                <td>
+                                                    <a href="#" target="_blank" download="">correct-file-min.xml</a>
+                                                    <span>(8 kB)</span>
+                                                </td>
+                                                <td>
+                                                    <a href="#" target="_blank" download="">invalid-syntax.xml</a>
+                                                    <span>(571 kB)</span>
+                                                </td>
                                             </tr>
                                             <tr>
-                                                <td><a href="#">correct-file-max.csv</a> <span>(567 kB)</span></td>
-                                                <td><a href="#">wrong-file-max</a> <span>(941 kB)</span></td>
+                                                <td>
+                                                    <a href="#" target="_blank" download="">correct-file-max.xml</a>
+                                                    <span>(942 kB)</span>
+                                                </td>
+                                                <td>
+                                                    <a href="#" target="_blank" download="">wrong-file-min.csv</a>
+                                                    <span>(485 kB)</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>
+                                                    <a href="{{ \Storage::url('examples/wrong-data-last-update.xml') }}"
+                                                       target="_blank" download="">
+                                                        wrong-data-last-update.xml
+                                                    </a>
+                                                    <span>(941 kB)</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>
+                                                    <a href="{{ \Storage::url('examples/wrong-data-name.xml') }}"
+                                                       target="_blank" download="">
+                                                        wrong-data-name.xml
+                                                    </a>
+                                                    <span>(941 kB)</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>
+                                                    <a href="{{ \Storage::url('examples/wrong-data-unit.xml') }}"
+                                                       target="_blank" download="">
+                                                        wrong-data-unit.xml
+                                                    </a>
+                                                    <span>(941 kB)</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>
+                                                    <a href="{{ \Storage::url('examples/wrong-data-country.xml') }}"
+                                                       target="_blank" download="">
+                                                        wrong-data-country.xml
+                                                    </a>
+                                                    <span>(941 kB)</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>
+                                                    <a href="{{ \Storage::url('examples/wrong-data-currency-code.xml') }}"
+                                                       target="_blank" download="">
+                                                        wrong-data-currency-code.xml
+                                                    </a>
+                                                    <span>(941 kB)</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>
+                                                    <a href="{{ \Storage::url('examples/wrong-data-change.xml') }}"
+                                                       target="_blank" download="">
+                                                        wrong-data-change.xml
+                                                    </a>
+                                                    <span>(941 kB)</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>
+                                                    <a href="{{ \Storage::url('examples/wrong-data-rate.xml') }}"
+                                                       target="_blank" download="">
+                                                        wrong-data-rate.xml
+                                                    </a>
+                                                    <span>(941 kB)</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>
+                                                    <a href="{{ \Storage::url('examples/wrong-data-last-update.json') }}"
+                                                       target="_blank" download="">
+                                                        wrong-data-last-update.json
+                                                    </a>
+                                                    <span>(941 kB)</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>
+                                                    <a href="{{ \Storage::url('examples/wrong-data-name.json') }}"
+                                                       target="_blank" download="">
+                                                        wrong-data-name.json
+                                                    </a>
+                                                    <span>(941 kB)</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>
+                                                    <a href="{{ \Storage::url('examples/wrong-data-unit.json') }}"
+                                                       target="_blank" download="">
+                                                        wrong-data-unit.json
+                                                    </a>
+                                                    <span>(941 kB)</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>
+                                                    <a href="{{ \Storage::url('examples/wrong-data-country.json') }}"
+                                                       target="_blank" download="">
+                                                        wrong-data-country.json
+                                                    </a>
+                                                    <span>(941 kB)</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>
+                                                    <a href="{{ \Storage::url('examples/wrong-data-currency-code.json') }}"
+                                                       target="_blank" download="">
+                                                        wrong-data-currency-code.json
+                                                    </a>
+                                                    <span>(941 kB)</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>
+                                                    <a href="{{ \Storage::url('examples/wrong-data-change.json') }}"
+                                                       target="_blank" download="">
+                                                        wrong-data-change.json
+                                                    </a>
+                                                    <span>(941 kB)</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>
+                                                    <a href="{{ \Storage::url('examples/wrong-data-rate.json') }}"
+                                                       target="_blank" download="">
+                                                        wrong-data-rate.json
+                                                    </a>
+                                                    <span>(941 kB)</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>
+                                                    <a href="{{ \Storage::url('examples/wrong-data-last-update.csv') }}"
+                                                       target="_blank" download="">
+                                                        wrong-data-last-update.csv
+                                                    </a>
+                                                    <span>(941 kB)</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td><a href="{{ \Storage::url('examples/wrong-data-name.csv') }}"
+                                                       target="_blank" download="">
+                                                        wrong-data-name.csv
+                                                    </a>
+                                                    <span>(941 kB)</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>
+                                                    <a href="{{ \Storage::url('examples/wrong-data-unit.csv') }}"
+                                                       target="_blank" download="">
+                                                        wrong-data-unit.csv
+                                                    </a>
+                                                    <span>(941 kB)</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>
+                                                    <a href="{{ \Storage::url('examples/wrong-data-country.csv') }}"
+                                                       target="_blank" download="">
+                                                        wrong-data-country.csv
+                                                    </a>
+                                                    <span>(941 kB)</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>
+                                                    <a href="{{ \Storage::url('examples/wrong-data-currency-code.csv') }}"
+                                                       target="_blank" download="">
+                                                        wrong-data-currency-code.csv
+                                                    </a>
+                                                    <span>(941 kB)</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>
+                                                    <a href="{{ \Storage::url('examples/wrong-data-change.csv') }}"
+                                                       target="_blank" download="">
+                                                        wrong-data-change.csv
+                                                    </a>
+                                                    <span>(941 kB)</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td></td>
+                                                <td>
+                                                    <a href="{{ \Storage::url('examples/wrong-data-rate.csv') }}"
+                                                       target="_blank" download="">
+                                                        wrong-data-rate.csv
+                                                    </a>
+                                                    <span>(941 kB)</span>
+                                                </td>
                                             </tr>
                                             </tbody>
                                         </table>
@@ -280,8 +522,10 @@
                 radios.style['display'] = 'none';
             }
         }
+
         function change() {
-            let file = document.getElementById('file').files[0];
+            isXML();
+            let file = document.getElementById('file').files;
             if (file.length > 0) {
                 document.getElementById('convert-button').removeAttribute('disabled');
             }

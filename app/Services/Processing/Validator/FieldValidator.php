@@ -81,7 +81,7 @@ class FieldValidator
             return $object[$property];
         }
 
-        return $object->{$property};
+        return (string)$object->{$property};
     }
 
     protected function getMethods(object|string $class): array
@@ -104,7 +104,7 @@ class FieldValidator
 
     protected function second($fieldClass, $object)
     {
-        $fieldClass->secondValue = $this->getProperty($object, $fieldClass->secondField);
+        $fieldClass->secondValue = $this->getProperty($object, (string)$fieldClass->secondField);
 
         return $fieldClass;
     }
