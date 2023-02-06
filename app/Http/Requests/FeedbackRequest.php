@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Http\Requests;
@@ -53,9 +54,6 @@ class FeedbackRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        $text = preg_replace('/ +/m', ' ', $this->text);
-        $text = preg_replace('/[\r\n]{2,}+/m', "\r\n\r\n", $text);
-        $text = preg_replace('/\n{2,}+/m', "\n\n", $text);
         $email = $this->email;
         if (mb_substr_count($email, '"') === 2) {
             $email = preg_replace('/\s+(?=(?:(?:[^"]*"){2})*[^"]*"[^"]*)/', ' ', $email);
@@ -64,8 +62,6 @@ class FeedbackRequest extends FormRequest
         }
         $this->merge([
             'email' => $email,
-            'name' => preg_replace('/\s+/', ' ', $this->name),
-            'text' => $text,
         ]);
     }
 }
