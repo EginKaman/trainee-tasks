@@ -2,13 +2,13 @@
 version: '3'
 services:
     laravel.test:
+        platform: 'linux/${PLATFORM}'
         build:
             context: ./vendor/laravel/sail/runtimes/8.2
             dockerfile: Dockerfile
             args:
                 WWWGROUP: '${WWWGROUP}'
         image: sail-8.2/app
-        platform: 'linux/${PLATFORM}'
         extra_hosts:
             - 'host.docker.internal:host-gateway'
         ports:
@@ -28,8 +28,8 @@ services:
             - redis
             - mailhog
     mysql:
-        image: 'mysql/mysql-server:8.0'
         platform: 'linux/${PLATFORM}'
+        image: 'mysql/mysql-server:8.0'
         ports:
             - '${FORWARD_DB_PORT:-3306}:3306'
         environment:
@@ -49,8 +49,8 @@ services:
             retries: 3
             timeout: 5s
     redis:
-        image: 'redis:alpine'
         platform: 'linux/${PLATFORM}'
+        image: 'redis:alpine'
         ports:
             - '${FORWARD_REDIS_PORT:-6379}:6379'
         volumes:

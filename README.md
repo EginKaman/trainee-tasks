@@ -2,11 +2,13 @@
 1. `composer install`
 2. `cp ./.env.example ./.env `
 3. Set in `.env` variable `PLATFORM` with your platform `amd64` or `arm64`
-3. Start local environment = `./vendor/bin/sail up -d`
-4. `./vendor/bin/sail artisan key:generate`
-5. Fill credentials for smtp, sendgrid, recaptcha
-6. Run migrations `./vendor/bin/sail artisan migrate`
-7. Run the Vite development server `./vendor/bin/sail sail npm run dev`
+4. Run build `./vendor/bin/sail build --no-cache`
+5. Start local environment `./vendor/bin/sail up -d`
+6. `./vendor/bin/sail artisan key:generate`
+7. Fill credentials for smtp, sendgrid, recaptcha
+8. Run migrations `./vendor/bin/sail artisan migrate`
+9. Install NPM packages `./vendor/bin/sail npm install`
+10. Run the Vite development server `./vendor/bin/sail npm run dev`
 
 Useful commands:
 
@@ -14,9 +16,11 @@ Start local environment = `./vendor/bin/sail up -d`
 
 Stop local environment = `./vendor/bin/sail down`
 
-Run the Vite development server `./vendor/bin/sail sail npm run dev`
+Install NPM packages `./vendor/bin/sail npm install`
 
-Build and version the assets for production `./vendor/bin/sail sail npm run build`
+Run the Vite development server `./vendor/bin/sail npm run dev`
+
+Build and version the assets for production `./vendor/bin/sail npm run build`
 
 ## Install on remote environment
 1. Prepare remote environment using cookbooks - https://bitbucket.org/Trainee_abz/test2023_backend_ivan_t_cookbooks/src/master/
