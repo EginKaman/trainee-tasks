@@ -24,7 +24,7 @@ class Name
         'CAD' => 'canadian dollar',
         'GEL' => 'lari',
         'PHP' => 'peso',
-        'RUN' => 'rubble'
+        'RUB' => 'ruble'
     ];
 
     /**

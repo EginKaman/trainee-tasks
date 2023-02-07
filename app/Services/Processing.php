@@ -38,7 +38,7 @@ class Processing
      * @param string $path
      * @return object
      */
-    public function process(string $path): object
+    public function process(string $path)
     {
         return $this->processing->process($path);
     }

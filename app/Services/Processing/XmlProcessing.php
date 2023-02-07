@@ -97,7 +97,7 @@ class XmlProcessing implements ProcessingInterface
     /**
      * @throws \Exception
      */
-    public function process(string $path): SimpleXMLElement|bool
+    public function process(string $path)
     {
         try {
             $xml = new SimpleXMLElement(file_get_contents($path));
@@ -106,6 +106,7 @@ class XmlProcessing implements ProcessingInterface
         }
         $loop = 0;
         foreach ($xml->exrate as $exrate) {
+            $exrate->lastUpdate = $this->fieldValidator->prepareValue((string)$exrate->lastUpdate, FieldValidator::LAST_UPDATE_FIELD);
             if ($loop === 0) {
                 $exrate->lastUpdate = Date::today()->format('Y-m-d');
             } else {
@@ -114,6 +115,10 @@ class XmlProcessing implements ProcessingInterface
                     ->format('Y-m-d');
             }
             foreach ($exrate->currency as $currency) {
+                $currency->name = $this->fieldValidator->prepareValue((string)$currency->name, FieldValidator::NAME_FIELD);
+                $currency->unit = $this->fieldValidator->prepareValue((string)$currency->unit, FieldValidator::UNIT_FIELD);
+                $currency->currencyCode = $this->fieldValidator->prepareValue((string)$currency->currencyCode, FieldValidator::CURRENCY_CODE_FIELD);
+                $currency->country = $this->fieldValidator->prepareValue((string)$currency->country, FieldValidator::COUNTRY_FIELD);
                 $currency->rate = round(random_int(0, 1000000) / random_int(2, 100), 5);
                 $currency->change = round(random_int(0, (int)$currency->rate) / random_int(2, 100), 5);
             }

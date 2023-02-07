@@ -23,6 +23,15 @@ class FieldValidator
         $this->errorBag = $errorBag;
     }
 
+    public function prepareValue(string $value, $field)
+    {
+        $value = trim($value);
+        if ($field === self::NAME_FIELD) {
+            return preg_replace('/\s+/', ' ', $value);
+        }
+        return preg_replace('/\s/', '', $value);
+    }
+
     public function validate(string|object|array $object, string $field, ?int $line): static
     {
         if ($this->isExistProperty($object, $field)) {
@@ -78,10 +87,10 @@ class FieldValidator
     protected function getProperty(object|array $object, string $property)
     {
         if (is_array($object)) {
-            return $object[$property];
+            return $this->prepareValue($object[$property], $property);
         }
 
-        return (string)$object->{$property};
+        return $this->prepareValue((string)$object->{$property}, $property);
     }
 
     protected function getMethods(object|string $class): array

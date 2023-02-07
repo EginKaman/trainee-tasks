@@ -24,12 +24,12 @@
                             <div class="tab-pane fade show active" id="nav-converter" role="tabpanel"
                                  aria-labelledby="nav-converter-tab">
                                 <div class="row pt-3">
-                                    @if (session('success'))
+                                    @if ($errors->isEmpty() && empty($fileErrors) && !empty($results))
                                         <div class="alert alert-success" role="alert" data-cy=“successAlert”>
                                             {{ __('Successfully!') }}
                                         </div>
                                     @endif
-                                    @if (session('failure'))
+                                    @if (!empty($fileErrors))
                                         <div class="alert alert-danger" role="alert" data-cy=“errorAlert”>
                                             {{ __('Attention! An error has occurred, see the details below.') }}
                                         </div>
@@ -54,7 +54,7 @@
                                             </label>
 
                                             <div class="col-md-6">
-                                                <input class="form-control @error('name') is-invalid @enderror"
+                                                <input class="form-control @error('document') is-invalid @enderror"
                                                        type="file" id="file" name="document"
                                                        onchange="change()"
                                                        accept=".xml,.csv,.json">

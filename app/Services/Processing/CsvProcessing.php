@@ -59,7 +59,7 @@ class CsvProcessing implements ProcessingInterface
      * @return object
      * @throws \Exception
      */
-    public function process(string $path): object
+    public function process(string $path)
     {
         $csv = $this->read($path);
         $previousLastUpdate = null;

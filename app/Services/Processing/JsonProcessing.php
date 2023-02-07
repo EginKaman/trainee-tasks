@@ -60,10 +60,11 @@ class JsonProcessing implements ProcessingInterface
         return Schema::import(json_decode(file_get_contents($this->schema)))->in(json_decode(file_get_contents($path)));
     }
 
-    public function process(string $path): object
+    public function process(string $path)
     {
         $json = $this->read($path);
         foreach ($json as $key => $exrate) {
+            $exrate->lastUpdate = $this->fieldValidator->prepareValue($exrate->lastUpdate, FieldValidator::LAST_UPDATE_FIELD);
             if ($key === 0) {
                 $exrate->lastUpdate = Date::today()->format('Y-m-d');
             } else {
@@ -72,6 +73,10 @@ class JsonProcessing implements ProcessingInterface
                     ->format('Y-m-d');
             }
             foreach ($exrate->currency as $currency) {
+                $currency->name = $this->fieldValidator->prepareValue($currency->name, FieldValidator::NAME_FIELD);
+                $currency->unit = $this->fieldValidator->prepareValue($currency->unit, FieldValidator::UNIT_FIELD);
+                $currency->currencyCode = $this->fieldValidator->prepareValue($currency->currencyCode, FieldValidator::CURRENCY_CODE_FIELD);
+                $currency->country = $this->fieldValidator->prepareValue($currency->country, FieldValidator::COUNTRY_FIELD);
                 $currency->rate = round(random_int(0, 1000000) / random_int(2, 100), 5);
                 $currency->change = round(random_int(0, (int) $currency->rate) / random_int(2, 100), 5);
             }
