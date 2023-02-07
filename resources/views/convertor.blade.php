@@ -24,12 +24,12 @@
                             <div class="tab-pane fade show active" id="nav-converter" role="tabpanel"
                                  aria-labelledby="nav-converter-tab">
                                 <div class="row pt-3">
-                                    @if (session('success'))
+                                    @if ($errors->isEmpty() && empty($fileErrors) && !empty($results))
                                         <div class="alert alert-success" role="alert" data-cy=“successAlert”>
                                             {{ __('Successfully!') }}
                                         </div>
                                     @endif
-                                    @if (session('failure'))
+                                    @if (!empty($fileErrors))
                                         <div class="alert alert-danger" role="alert" data-cy=“errorAlert”>
                                             {{ __('Attention! An error has occurred, see the details below.') }}
                                         </div>
@@ -54,7 +54,7 @@
                                             </label>
 
                                             <div class="col-md-6">
-                                                <input class="form-control @error('name') is-invalid @enderror"
+                                                <input class="form-control @error('document') is-invalid @enderror"
                                                        type="file" id="file" name="document"
                                                        onchange="change()"
                                                        accept=".xml,.csv,.json">
@@ -168,6 +168,43 @@
                                                         </tbody>
                                                     </table>
                                                 @endforeach
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <h3>Processing results for download</h3>
+                                                <small class="text-muted">
+                                                    Download the results of processing the
+                                                    file {{ $document->getClientOriginalName() }} by clicking on the
+                                                    link
+                                                    below
+                                                </small>
+                                                <table class="table">
+                                                    <tbody>
+                                                    <tr>
+                                                        <td><a href="{{ $urls['processing_results_simple'] }}" download>processing_results.xml
+                                                                (Simple)</a>
+                                                            ({{ round($files['processing_results_simple']->getSize() / 1024, 2) }}
+                                                            kB)
+                                                        </td>
+                                                        <td><a href="{{ $urls['processing_results_writer'] }}" download>processing_results.xml
+                                                                (XmlWriter)</a>
+                                                            ({{ round($files['processing_results_writer']->getSize() / 1024, 2) }}
+                                                            kB)
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><a href="{{ $urls['processing_results_json'] }}" download>processing_results.json</a>
+                                                            ({{ round($files['processing_results_json']->getSize() / 1024, 2) }}
+                                                            kB)
+                                                        </td>
+                                                        <td><a href="{{ $urls['processing_results_csv'] }}">processing_results.csv</a>
+                                                            ({{ round($files['processing_results_csv']->getSize() / 1024, 2) }}
+                                                            kB)
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
                                     @endif

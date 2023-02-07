@@ -23,6 +23,15 @@ class Change
         return true;
     }
 
+    public function min($value, $line)
+    {
+        if ((float) $value <= 0) {
+            return new Error('Change must be greater than 0', $line);
+        }
+
+        return true;
+    }
+
     public function max($value, $line)
     {
         if ((float) $value > (float) $this->secondValue) {

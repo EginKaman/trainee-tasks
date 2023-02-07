@@ -4,16 +4,20 @@ declare(strict_types=1);
 
 namespace App\Services\Processing;
 
+use DOMDocument;
 use App\Services\Processing\Validator\{Error, FieldValidator};
 use Exception;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\Storage;
+use League\Csv\Writer;
 use RamosHenrique\JsonSchemaValidator\JsonSchemaValidator;
+use SimpleXMLElement;
 use Swaggest\JsonSchema\Schema;
 
 class JsonProcessing implements ProcessingInterface
 {
     private string $schema;
-    private int $line = 0;
+    private int $line = 1;
     private FieldValidator $fieldValidator;
 
     public function __construct(JsonSchemaValidator $jsonSchemaValidator, FieldValidator $fieldValidator)
@@ -32,7 +36,8 @@ class JsonProcessing implements ProcessingInterface
 
         foreach ($json as $exrate) {
             $this->line += 2;
-            $this->fieldValidator->validate($exrate, FieldValidator::LAST_UPDATE_FIELD, $this->line);
+            $this->fieldValidator->validate($exrate, FieldValidator::LAST_UPDATE_FIELD, ++$this->line);
+            ++$this->line;
             foreach ($exrate->currency as $currency) {
                 ++$this->line;
                 $this->fieldValidator->validate($currency, FieldValidator::NAME_FIELD, ++$this->line);
@@ -61,8 +66,12 @@ class JsonProcessing implements ProcessingInterface
 
     public function process(string $path)
     {
-        $json = json_decode(file_get_contents($path), false);
+        $json = $this->read($path);
         foreach ($json as $key => $exrate) {
+            $exrate->lastUpdate = $this->fieldValidator->prepareValue(
+                $exrate->lastUpdate,
+                FieldValidator::LAST_UPDATE_FIELD
+            );
             if ($key === 0) {
                 $exrate->lastUpdate = Date::today()->format('Y-m-d');
             } else {
@@ -71,11 +80,84 @@ class JsonProcessing implements ProcessingInterface
                     ->format('Y-m-d');
             }
             foreach ($exrate->currency as $currency) {
+                $currency->name = $this->fieldValidator->prepareValue($currency->name, FieldValidator::NAME_FIELD);
+                $currency->unit = $this->fieldValidator->prepareValue($currency->unit, FieldValidator::UNIT_FIELD);
+                $currency->currencyCode = $this->fieldValidator->prepareValue(
+                    $currency->currencyCode,
+                    FieldValidator::CURRENCY_CODE_FIELD
+                );
+                $currency->country = $this->fieldValidator->prepareValue(
+                    $currency->country,
+                    FieldValidator::COUNTRY_FIELD
+                );
                 $currency->rate = round(random_int(0, 1000000) / random_int(2, 100), 5);
-                $currency->change = round(random_int(0, (int) $currency->rate) / random_int(2, 100), 5);
+                $currency->change = round(random_int(0, (int)$currency->rate) / random_int(2, 100), 5);
             }
         }
 
         return $json;
+    }
+
+    public function write($json, $hash)
+    {
+        if (!mkdir(
+                directory: $concurrentDirectory = storage_path("app/public/documents/{$hash}"),
+                recursive: true
+            ) && !is_dir($concurrentDirectory)) {
+            throw new \RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
+        }
+
+        Storage::put("public/documents/{$hash}/processing_results.json", json_encode($json));
+        Storage::put("public/documents/{$hash}/processing_results.csv", '');
+        Storage::put("public/documents/{$hash}/processing_results_writer.xml", '');
+        $writer = Writer::createFromPath(storage_path("app/public/documents/{$hash}/processing_results.csv"));
+        $writer->insertOne(['lastUpdate', 'name', 'unit', 'currencyCode', 'country', 'rate', 'change']);
+        $xw = new \XMLWriter();
+        $xw->openUri(storage_path("app/public/documents/{$hash}/processing_results_writer.xml"));
+        $xw->startDocument('1.0', 'UTF-8');
+        $xw->startElement('currencies');
+        foreach ($json as $exrate) {
+            $xw->startElement('exrate');
+            $xw->startElement('lastUpdate');
+            $xw->text((string)$exrate->lastUpdate);
+            $xw->endElement();
+            foreach ($exrate->currency as $currency) {
+                $xw->startElement('name');
+                $xw->text((string)$currency->name);
+                $xw->endElement();
+                $xw->startElement('unit');
+                $xw->text((string)$currency->unit);
+                $xw->endElement();
+                $xw->startElement('currencyCode');
+                $xw->text((string)$currency->currencyCode);
+                $xw->endElement();
+                $xw->startElement('country');
+                $xw->text((string)$currency->country);
+                $xw->endElement();
+                $xw->startElement('rate');
+                $xw->text((string)$currency->rate);
+                $xw->endElement();
+                $xw->startElement('change');
+                $xw->text((string)$currency->change);
+                $xw->endElement();
+                $writer->insertOne([
+                    'lastUpdate' => (string)$exrate->lastUpdate,
+                    'name' => (string)$currency->name,
+                    'unit' => (string)$currency->unit,
+                    'currencyCode' => (string)$currency->currencyCode,
+                    'country' => (string)$currency->country,
+                    'rate' => (string)$currency->rate,
+                    'change' => (string)$currency->change,
+                ]);
+            }
+            $xw->endElement();
+        }
+        $xw->endElement();
+        $xw->endDocument();
+        $xw->flush();
+        Storage::put(
+            "public/documents/{$hash}/processing_results_simple.xml",
+            file_get_contents(storage_path("app/public/documents/{$hash}/processing_results_writer.xml"))
+        );
     }
 }
