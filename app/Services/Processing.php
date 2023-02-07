@@ -25,12 +25,20 @@ class Processing
         return $this;
     }
 
+    /**
+     * @param string $path
+     * @return bool|array
+     */
     public function validate(string $path): bool|array
     {
         return $this->processing->validate($path);
     }
 
-    public function process(string $path)
+    /**
+     * @param string $path
+     * @return object
+     */
+    public function process(string $path): object
     {
         return $this->processing->process($path);
     }
@@ -46,5 +54,10 @@ class Processing
             'text/csv' => app(CsvProcessing::class),
             default => throw new UnknownProcessingException(),
         };
+    }
+
+    public function write($data)
+    {
+
     }
 }

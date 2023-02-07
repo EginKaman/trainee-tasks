@@ -20,12 +20,7 @@ class CsvProcessing implements ProcessingInterface
 
     public function validate(string $path): bool|array
     {
-        $csv = Reader::createFromPath($path);
-        $csv->setDelimiter(',');
-        if (in_array('lastUpdate', $csv->fetchOne(), true)) {
-            $csv->setHeaderOffset(0);
-            ++$this->line;
-        }
+        $csv = $this->read($path);
         foreach ($csv->getRecords() as $record) {
             $record = $this->mapRecord($record);
 
@@ -48,17 +43,25 @@ class CsvProcessing implements ProcessingInterface
         return !$this->fieldValidator->hasErrors() ?: $this->fieldValidator->errors();
     }
 
-    public function read($file): void
-    {
-    }
-
-    public function process(string $path)
+    public function read(string $path): Reader
     {
         $csv = Reader::createFromPath($path);
         $csv->setDelimiter(',');
         if (in_array('lastUpdate', $csv->fetchOne(), true)) {
             $csv->setHeaderOffset(0);
+            ++$this->line;
         }
+        return $csv;
+    }
+
+    /**
+     * @param string $path
+     * @return object
+     * @throws \Exception
+     */
+    public function process(string $path): object
+    {
+        $csv = $this->read($path);
         $previousLastUpdate = null;
         $updatedRecord = [];
         foreach ($csv->getRecords() as $record) {
@@ -71,10 +74,10 @@ class CsvProcessing implements ProcessingInterface
             } else {
                 $lastUpdate = $previousLastUpdate->subDay();
             }
-            $rate = round(random_int(0, 1000000) / mt_getrandmax(), 5);
-            $change = round(random_int(0, (int)$rate) / mt_getrandmax(), 5);
+            $rate = round(random_int(0, 1000000) / random_int(2, 100), 5);
+            $change = round(random_int(0, (int)$rate) / random_int(2, 100), 5);
             $date = $lastUpdate->format('Y-m-d');
-            $updatedRecord[$date][] = [
+            $record = [
                 'lastUpdate' => $date,
                 'name' => $record['name'] ?? $record[1],
                 'unit' => $record['unit'] ?? $record[2],
@@ -83,13 +86,18 @@ class CsvProcessing implements ProcessingInterface
                 'rate' => $rate,
                 'change' => $change,
             ];
+            $updatedRecord[] = $this->mapObject($this->mapRecord($record));
         }
 //        $writer = Writer::createFromString('lastUpdate,name,unit,currencyCode,country,rate,change');
 //        $writer->insertAll($updatedRecord);
         return (object)$updatedRecord;
     }
 
-    protected function mapRecord(array $record)
+    /**
+     * @param array $record
+     * @return array
+     */
+    protected function mapRecord(array $record): array
     {
         return [
             'lastUpdate' => $record['lastUpdate'] ?? $record[0],
@@ -100,5 +108,24 @@ class CsvProcessing implements ProcessingInterface
             'rate' => $record['rate'] ?? $record[5],
             'change' => $record['change'] ?? $record[6],
         ];
+    }
+
+    /**
+     * @param array $record
+     * @return object
+     */
+    protected function mapObject(array $record): object
+    {
+        $currency = new \stdClass();
+        $currency->name = $record['name'];
+        $currency->unit = $record['unit'];
+        $currency->currencyCode = $record['currencyCode'];
+        $currency->country = $record['country'];
+        $currency->rate = $record['rate'];
+        $currency->change = $record['change'];
+        $exrate = new \stdClass();
+        $exrate->lastUpdate = $record['lastUpdate'];
+        $exrate->currency[] = $currency;
+        return $exrate;
     }
 }

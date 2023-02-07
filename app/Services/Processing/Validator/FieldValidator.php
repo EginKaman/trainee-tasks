@@ -35,7 +35,7 @@ class FieldValidator
                     }
                     $fieldClass = $this->second($fieldClass, $object);
                 }
-                $answer = $fieldClass->{$method}((string) $this->getProperty($object, $field), $line);
+                $answer = $fieldClass->{$method}((string)$this->getProperty($object, $field), $line);
                 if (!is_bool($answer)) {
                     $this->errorBag->add($answer);
                 }

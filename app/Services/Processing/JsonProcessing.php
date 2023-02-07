@@ -13,7 +13,7 @@ use Swaggest\JsonSchema\Schema;
 class JsonProcessing implements ProcessingInterface
 {
     private string $schema;
-    private int $line = 0;
+    private int $line = 1;
     private FieldValidator $fieldValidator;
 
     public function __construct(JsonSchemaValidator $jsonSchemaValidator, FieldValidator $fieldValidator)
@@ -32,7 +32,8 @@ class JsonProcessing implements ProcessingInterface
 
         foreach ($json as $exrate) {
             $this->line += 2;
-            $this->fieldValidator->validate($exrate, FieldValidator::LAST_UPDATE_FIELD, $this->line);
+            $this->fieldValidator->validate($exrate, FieldValidator::LAST_UPDATE_FIELD, ++$this->line);
+            ++$this->line;
             foreach ($exrate->currency as $currency) {
                 ++$this->line;
                 $this->fieldValidator->validate($currency, FieldValidator::NAME_FIELD, ++$this->line);
@@ -59,9 +60,9 @@ class JsonProcessing implements ProcessingInterface
         return Schema::import(json_decode(file_get_contents($this->schema)))->in(json_decode(file_get_contents($path)));
     }
 
-    public function process(string $path)
+    public function process(string $path): object
     {
-        $json = json_decode(file_get_contents($path), false);
+        $json = $this->read($path);
         foreach ($json as $key => $exrate) {
             if ($key === 0) {
                 $exrate->lastUpdate = Date::today()->format('Y-m-d');
