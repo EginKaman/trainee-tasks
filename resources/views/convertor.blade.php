@@ -170,6 +170,43 @@
                                                 @endforeach
                                             </div>
                                         </div>
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <h3>Processing results for download</h3>
+                                                <small class="text-muted">
+                                                    Download the results of processing the
+                                                    file {{ $document->getClientOriginalName() }} by clicking on the
+                                                    link
+                                                    below
+                                                </small>
+                                                <table class="table">
+                                                    <tbody>
+                                                    <tr>
+                                                        <td><a href="{{ $urls['processing_results_simple'] }}" download>processing_results.xml
+                                                                (Simple)</a>
+                                                            ({{ round($files['processing_results_simple']->getSize() / 1024, 2) }}
+                                                            kB)
+                                                        </td>
+                                                        <td><a href="{{ $urls['processing_results_writer'] }}" download>processing_results.xml
+                                                                (XmlWriter)</a>
+                                                            ({{ round($files['processing_results_writer']->getSize() / 1024, 2) }}
+                                                            kB)
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><a href="{{ $urls['processing_results_json'] }}" download>processing_results.json</a>
+                                                            ({{ round($files['processing_results_json']->getSize() / 1024, 2) }}
+                                                            kB)
+                                                        </td>
+                                                        <td><a href="{{ $urls['processing_results_csv'] }}">processing_results.csv</a>
+                                                            ({{ round($files['processing_results_csv']->getSize() / 1024, 2) }}
+                                                            kB)
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
                                     @endif
                                 </div>
                             </div>

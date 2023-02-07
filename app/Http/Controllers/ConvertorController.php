@@ -12,6 +12,7 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\File;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\{Log, Storage};
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -54,12 +55,26 @@ class ConvertorController extends Controller
         if ($validateFile === true) {
             $results = $processing->process(Storage::path($path));
         }
+        $hash = Str::random(32);
+
+        $processing->write($results, $hash);
 
         $json = new File(resource_path('schemas/schema.json'));
         $xml = new File(resource_path('schemas/schema.xsd'));
 
-        return view('convertor', compact('fileErrors', 'document', 'results', 'json', 'xml'))
-            ->with('success', true);
+        $files = [
+            'processing_results_simple' => new File(storage_path("app/public/documents/{$hash}/processing_results_simple.xml")),
+            'processing_results_writer' => new File(storage_path("app/public/documents/{$hash}/processing_results_writer.xml")),
+            'processing_results_json' => new File(storage_path("app/public/documents/{$hash}/processing_results.json")),
+            'processing_results_csv' => new File(storage_path("app/public/documents/{$hash}/processing_results.csv")),
+        ];
+        $urls = [
+            'processing_results_simple' => Storage::url("documents/{$hash}/processing_results_simple.xml"),
+            'processing_results_writer' => Storage::url("documents/{$hash}/processing_results_writer.xml"),
+            'processing_results_json' => Storage::url("documents/{$hash}/processing_results.json"),
+            'processing_results_csv' => Storage::url("documents/{$hash}/processing_results.csv"),
+        ];
+        return view('convertor', compact(['fileErrors', 'document', 'results', 'json', 'xml', 'files', 'urls']));
     }
 
     /**

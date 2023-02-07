@@ -56,8 +56,8 @@ class Processing
         };
     }
 
-    public function write($data)
+    public function write($data, $hash)
     {
-
+        $this->processing->write($data, $hash);
     }
 }

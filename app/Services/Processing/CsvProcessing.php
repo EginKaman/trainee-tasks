@@ -6,6 +6,7 @@ namespace App\Services\Processing;
 
 use App\Services\Processing\Validator\FieldValidator;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\Storage;
 use League\Csv\{Reader, Writer};
 
 class CsvProcessing implements ProcessingInterface
@@ -127,5 +128,68 @@ class CsvProcessing implements ProcessingInterface
         $exrate->lastUpdate = $record['lastUpdate'];
         $exrate->currency[] = $currency;
         return $exrate;
+    }
+
+    public function write($csv, $hash)
+    {
+        if (!mkdir(
+                directory: $concurrentDirectory = storage_path("app/public/documents/{$hash}"),
+                recursive: true
+            ) && !is_dir($concurrentDirectory)) {
+            throw new \RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
+        }
+
+        Storage::put("public/documents/{$hash}/processing_results.json", json_encode($csv));
+        Storage::put("public/documents/{$hash}/processing_results.csv", '');
+        Storage::put("public/documents/{$hash}/processing_results_writer.xml", '');
+        $writer = Writer::createFromPath(storage_path("app/public/documents/{$hash}/processing_results.csv"));
+        $writer->insertOne(['lastUpdate', 'name', 'unit', 'currencyCode', 'country', 'rate', 'change']);
+        $xw = new \XMLWriter();
+        $xw->openUri(storage_path("app/public/documents/{$hash}/processing_results_writer.xml"));
+        $xw->startDocument('1.0', 'UTF-8');
+        $xw->startElement('currencies');
+        foreach ($csv as $exrate) {
+            $xw->startElement('exrate');
+            $xw->startElement('lastUpdate');
+            $xw->text((string)$exrate->lastUpdate);
+            $xw->endElement();
+            foreach ($exrate->currency as $currency) {
+                $xw->startElement('name');
+                $xw->text((string)$currency->name);
+                $xw->endElement();
+                $xw->startElement('unit');
+                $xw->text((string)$currency->unit);
+                $xw->endElement();
+                $xw->startElement('currencyCode');
+                $xw->text((string)$currency->currencyCode);
+                $xw->endElement();
+                $xw->startElement('country');
+                $xw->text((string)$currency->country);
+                $xw->endElement();
+                $xw->startElement('rate');
+                $xw->text((string)$currency->rate);
+                $xw->endElement();
+                $xw->startElement('change');
+                $xw->text((string)$currency->change);
+                $xw->endElement();
+                $writer->insertOne([
+                    'lastUpdate' => (string)$exrate->lastUpdate,
+                    'name' => (string)$currency->name,
+                    'unit' => (string)$currency->unit,
+                    'currencyCode' => (string)$currency->currencyCode,
+                    'country' => (string)$currency->country,
+                    'rate' => (string)$currency->rate,
+                    'change' => (string)$currency->change,
+                ]);
+            }
+            $xw->endElement();
+        }
+        $xw->endElement();
+        $xw->endDocument();
+        $xw->flush();
+        Storage::put(
+            "public/documents/{$hash}/processing_results_simple.xml",
+            file_get_contents(storage_path("app/public/documents/{$hash}/processing_results_writer.xml"))
+        );
     }
 }
