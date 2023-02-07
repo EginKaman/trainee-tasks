@@ -58,11 +58,11 @@
                                             </label>
 
                                             <div class="col-md-10">
-                                                <input class="form-control @error('name') is-invalid @enderror"
+                                                <input class="form-control @error('image') is-invalid @enderror"
                                                        type="file" id="file" name="image"
                                                        onchange="change()"
                                                        accept=".webp,.jpg,.png,.gif,.bmp">
-                                                @error('document')
+                                                @error('image')
                                                 <div class="invalid-feedback" role="alert" data-cy=“errorMessage”>
                                                     <strong>{{ $message }}</strong>
                                                 </div>
@@ -71,14 +71,12 @@
                                                     Select a file up to 10 MB size, with a resolution higher than
                                                     500x500px and formats: WebP, JPG, PNG, GIF, BMP
                                                 </div>
-
                                             </div>
                                         </div>
 
                                         <div class="row mb-0">
                                             <div class="col-md-6 offset-md-4">
-                                                <button type="submit" class="btn btn-primary" id="convert-button"
-                                                        disabled>
+                                                <button type="submit" class="btn btn-primary" id="convert-button">
                                                     {{ __('Convert') }}
                                                 </button>
                                             </div>
@@ -90,27 +88,21 @@
                                  aria-labelledby="nav-test-tab">
                                 <div class="row pt-3">
                                     <div class="col-12">
-                                        <h3>File structure templates for test data</h3>
+                                        <h3>Test valid image for convert</h3>
                                         <small class="text-muted">
-                                            You can download the templates of data structure XML and JSON by clicking on
-                                            the link below
+                                            Here you can download files for testing the converter with positive answers
                                         </small>
                                         <p class="text-start">
                                         </p>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="tab-pane fade" id="nav-test" role="tabpanel"
-                                 aria-labelledby="nav-test-tab">
                                 <div class="row pt-3">
                                     <div class="col-12">
-                                        <h3>File structure templates for test data</h3>
+                                        <h3>Test invalid image for convert</h3>
                                         <small class="text-muted">
-                                            You can download the templates of data structure XML and JSON by clicking on
-                                            the link below
+                                            Here you can download files for testing the converter with negative answers
                                         </small>
                                         <p class="text-start">
-
                                         </p>
                                     </div>
                                 </div>
@@ -119,10 +111,9 @@
                                  aria-labelledby="nav-test-tab">
                                 <div class="row pt-3">
                                     <div class="col-12">
-                                        <h3>File structure templates for test data</h3>
+                                        <h3>Processing results for the last two days</h3>
                                         <small class="text-muted">
-                                            You can download the templates of data structure XML and JSON by clicking on
-                                            the link below
+                                            You can see the conversion results
                                         </small>
                                         <p class="text-start">
 
@@ -131,7 +122,6 @@
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
