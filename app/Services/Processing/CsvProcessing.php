@@ -101,13 +101,13 @@ class CsvProcessing implements ProcessingInterface
     protected function mapRecord(array $record): array
     {
         return [
-            'lastUpdate' => $record['lastUpdate'] ?? $record[0],
-            'name' => $record['name'] ?? $record[1],
-            'unit' => $record['unit'] ?? $record[2],
-            'currencyCode' => $record['currencyCode'] ?? $record[3],
-            'country' => $record['country'] ?? $record[4],
-            'rate' => $record['rate'] ?? $record[5],
-            'change' => $record['change'] ?? $record[6],
+            'lastUpdate' => $record['lastUpdate'] ?? $record[0] ?? '',
+            'name' => $record['name'] ?? $record[1] ?? '',
+            'unit' => $record['unit'] ?? $record[2] ?? '',
+            'currencyCode' => $record['currencyCode'] ?? $record[3] ?? '',
+            'country' => $record['country'] ?? $record[4] ?? '',
+            'rate' => $record['rate'] ?? $record[5] ?? '',
+            'change' => $record['change'] ?? $record[6] ?? '',
         ];
     }
 
