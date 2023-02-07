@@ -53,8 +53,8 @@ class Name
     public function exist(string $value, int $line): bool|Error
     {
         if (
-            !isset($this->currencies[$this->secondValue]) ||
-            Str::lower($this->currencies[$this->secondValue]) !== Str::lower($value)
+            (!isset($this->currencies[$this->secondValue]) ||
+            Str::lower($this->currencies[$this->secondValue]) !== Str::lower($value))
         ) {
             return new Error(
                 'The name must be related to currencyCode.',
