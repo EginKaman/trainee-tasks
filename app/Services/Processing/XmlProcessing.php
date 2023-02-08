@@ -61,6 +61,13 @@ class XmlProcessing implements ProcessingInterface
                 FieldValidator::LAST_UPDATE_FIELD,
                 $this->getLine($exrate->lastUpdate)
             );
+            if (!$this->fieldValidator->unique(
+                $exrate->currency,
+                FieldValidator::CURRENCY_CODE_FIELD,
+                $this->getLine($exrate->lastUpdate)
+            )) {
+                continue;
+            }
             foreach ($exrate->currency as $currency) {
                 $this->fieldValidator->validate(
                     $currency,

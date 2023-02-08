@@ -34,9 +34,16 @@ class JsonProcessing implements ProcessingInterface
             return [new Error($exception->getMessage(), 1)];
         }
 
-        foreach ($json as $exrate) {
+        foreach ($json as $key => $exrate) {
             $this->line += 2;
             $this->fieldValidator->validate($exrate, FieldValidator::LAST_UPDATE_FIELD, ++$this->line);
+            if (!$this->fieldValidator->unique(
+                $exrate->currency,
+                FieldValidator::CURRENCY_CODE_FIELD,
+                $this->line
+            )) {
+                continue;
+            }
             ++$this->line;
             foreach ($exrate->currency as $currency) {
                 ++$this->line;
@@ -80,8 +87,14 @@ class JsonProcessing implements ProcessingInterface
                     ->format('Y-m-d');
             }
             foreach ($exrate->currency as $currency) {
-                $currency->name = $this->fieldValidator->prepareValue((string)$currency->name, FieldValidator::NAME_FIELD);
-                $currency->unit = $this->fieldValidator->prepareValue((string)$currency->unit, FieldValidator::UNIT_FIELD);
+                $currency->name = $this->fieldValidator->prepareValue(
+                    (string)$currency->name,
+                    FieldValidator::NAME_FIELD
+                );
+                $currency->unit = $this->fieldValidator->prepareValue(
+                    (string)$currency->unit,
+                    FieldValidator::UNIT_FIELD
+                );
                 $currency->currencyCode = $this->fieldValidator->prepareValue(
                     (string)$currency->currencyCode,
                     FieldValidator::CURRENCY_CODE_FIELD
