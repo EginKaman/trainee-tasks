@@ -23,6 +23,7 @@ class Country
     public function correct($value, $line): bool|Error
     {
         if (!preg_match('/^[A-Z]{3}$/', $value)) {
+            $this->break = true;
             return new Error('Invalid country format. Must follow the ISO 3166-1 alpha-3', $line);
         }
 

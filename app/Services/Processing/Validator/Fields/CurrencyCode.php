@@ -24,7 +24,6 @@ class CurrencyCode
     {
         if (!preg_match('/^[A-Z]{3}$/', $value)) {
             $this->break = true;
-
             return new Error('Invalid currencyCode format. Must follow the ISO 4217', $line);
         }
 
@@ -42,7 +41,7 @@ class CurrencyCode
             $data = (new ISO3166())->alpha3($this->secondValue);
         } catch (DomainException | OutOfBoundsException $exception) {
             $this->break = true;
-            return new Error('Invalid country format. Must follow the ISO 3166-1 alpha-3', $line);
+            return false;
         }
         if (!in_array($value, $data['currency'], true)) {
             return new Error("Invalid currencyCode {$value} for country {$this->secondValue}", $line);
