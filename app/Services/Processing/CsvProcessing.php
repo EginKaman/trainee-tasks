@@ -166,7 +166,7 @@ class CsvProcessing implements ProcessingInterface
         $writer = Writer::createFromPath(storage_path("app/public/documents/{$hash}/processing results.csv"));
         $writer->insertOne(['lastUpdate', 'name', 'unit', 'currencyCode', 'country', 'rate', 'change']);
         $xw = new \XMLWriter();
-        $xw->openUri(storage_path("app/public/documents/{$hash}/processing results_writer.xml"));
+        $xw->openUri(storage_path("app/public/documents/{$hash}/processing results writer.xml"));
         $xw->startDocument('1.0', 'UTF-8');
         $xw->startElement('currencies');
         foreach ($csv as $exrate) {
