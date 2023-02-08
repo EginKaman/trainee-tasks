@@ -133,14 +133,14 @@
                                     @if(!empty($results))
                                         <div class="row">
                                             <div class="col-12">
-                                                <p>
                                                 <h3>Processing result</h3>
                                                 <small class="text-muted">
                                                     The tables show the converted data
                                                 </small>
-                                                </p>
                                                 @foreach($results as $exrate)
-                                                    <p><h4>Date: {{ $exrate->lastUpdate }}</h4></p>
+                                                    <h4>
+                                                        Date: {{ \Illuminate\Support\Facades\Date::createFromFormat('Y-m-d', $exrate->lastUpdate)->format('Y.m.d') }}
+                                                    </h4>
                                                     <table class="table table-bordered">
                                                         <thead>
                                                         <tr>
@@ -330,11 +330,12 @@
                                                     <span>(485 kB)</span>
                                                 </td>
                                             </tr>
+                                            <tr>
                                                 <td>
                                                 </td>
                                                 <td>
                                                     <a href="{{ \Storage::url('examples/wrong-file-min.xml') }}"
-                                                       target="_blank" download="">wrong-file-min.csv</a>
+                                                       target="_blank" download="">wrong-file-min.xml</a>
                                                     <span>(485 kB)</span>
                                                 </td>
                                             </tr>
