@@ -160,13 +160,13 @@ class CsvProcessing implements ProcessingInterface
             throw new \RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
         }
 
-        Storage::put("public/documents/{$hash}/processing_results.json", json_encode($csv));
-        Storage::put("public/documents/{$hash}/processing_results.csv", '');
-        Storage::put("public/documents/{$hash}/processing_results_writer.xml", '');
-        $writer = Writer::createFromPath(storage_path("app/public/documents/{$hash}/processing_results.csv"));
+        Storage::put("public/documents/{$hash}/processing results.json", json_encode($csv));
+        Storage::put("public/documents/{$hash}/processing results.csv", '');
+        Storage::put("public/documents/{$hash}/processing results_writer.xml", '');
+        $writer = Writer::createFromPath(storage_path("app/public/documents/{$hash}/processing results.csv"));
         $writer->insertOne(['lastUpdate', 'name', 'unit', 'currencyCode', 'country', 'rate', 'change']);
         $xw = new \XMLWriter();
-        $xw->openUri(storage_path("app/public/documents/{$hash}/processing_results_writer.xml"));
+        $xw->openUri(storage_path("app/public/documents/{$hash}/processing results_writer.xml"));
         $xw->startDocument('1.0', 'UTF-8');
         $xw->startElement('currencies');
         foreach ($csv as $exrate) {
@@ -209,8 +209,8 @@ class CsvProcessing implements ProcessingInterface
         $xw->endDocument();
         $xw->flush();
         Storage::put(
-            "public/documents/{$hash}/processing_results_simple.xml",
-            file_get_contents(storage_path("app/public/documents/{$hash}/processing_results_writer.xml"))
+            "public/documents/{$hash}/processing results simple.xml",
+            file_get_contents(storage_path("app/public/documents/{$hash}/processing results writer.xml"))
         );
     }
 }

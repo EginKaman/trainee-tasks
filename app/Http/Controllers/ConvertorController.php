@@ -62,23 +62,23 @@ class ConvertorController extends Controller
 
             $files = [
                 'processing_results_simple' => new File(
-                    storage_path("app/public/documents/{$hash}/processing_results_simple.xml")
+                    storage_path("app/public/documents/{$hash}/processing results simple.xml")
                 ),
                 'processing_results_writer' => new File(
-                    storage_path("app/public/documents/{$hash}/processing_results_writer.xml")
+                    storage_path("app/public/documents/{$hash}/processing results writer.xml")
                 ),
                 'processing_results_json' => new File(
-                    storage_path("app/public/documents/{$hash}/processing_results.json")
+                    storage_path("app/public/documents/{$hash}/processing results.json")
                 ),
                 'processing_results_csv' => new File(
-                    storage_path("app/public/documents/{$hash}/processing_results.csv")
+                    storage_path("app/public/documents/{$hash}/processing results.csv")
                 ),
             ];
             $urls = [
-                'processing_results_simple' => Storage::url("documents/{$hash}/processing_results_simple.xml"),
-                'processing_results_writer' => Storage::url("documents/{$hash}/processing_results_writer.xml"),
-                'processing_results_json' => Storage::url("documents/{$hash}/processing_results.json"),
-                'processing_results_csv' => Storage::url("documents/{$hash}/processing_results.csv"),
+                'processing_results_simple' => Storage::url("documents/{$hash}/processing results simple.xml"),
+                'processing_results_writer' => Storage::url("documents/{$hash}/processing results writer.xml"),
+                'processing_results_json' => Storage::url("documents/{$hash}/processing results.json"),
+                'processing_results_csv' => Storage::url("documents/{$hash}/processing results.csv"),
             ];
         }
 

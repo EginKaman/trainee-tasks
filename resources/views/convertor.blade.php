@@ -54,7 +54,7 @@
                                             </label>
 
                                             <div class="col-md-6">
-                                                <input class="form-control @error('document') is-invalid @enderror"
+                                                <input class="form-control @error('document') is-invalid @enderror @if(!empty($fileErrors)) is-invalid @endif"
                                                        type="file" id="file" name="document"
                                                        onchange="change()"
                                                        accept=".xml,.csv,.json">
@@ -63,9 +63,16 @@
                                                     <strong>{{ $message }}</strong>
                                                 </div>
                                                 @enderror
-                                                <div id="passwordHelpBlock" class="form-text">
-                                                    Select file up to 1 Mb and formats: xml, csv, json
+                                                @if(!empty($fileErrors))
+                                                <div class="invalid-feedback" role="alert" data-cy=“errorMessage”>
+                                                    <strong>{{ __('File has errors, upload file without errors') }}</strong>
                                                 </div>
+                                                @endif
+                                                @if(empty($fileErrors) && $errors->isEmpty())
+                                                    <div id="passwordHelpBlock" class="form-text">
+                                                        Select file up to 1 Mb and formats: xml, csv, json
+                                                    </div>
+                                                @endif
 
                                             </div>
                                         </div>
@@ -111,13 +118,11 @@
                                     @if(!empty($fileErrors))
                                         <div class="row">
                                             <div class="col-12">
-                                                <p>
                                                 <h3>The following errors were found in
                                                     the {{ $document->getClientOriginalName() }} file</h3>
                                                 <small class="text-muted">
                                                     For a success conversion, upload the file without errors
                                                 </small>
-                                                </p>
                                                 <table class="table table-bordered">
                                                     <tbody>
                                                     @foreach($fileErrors as $fileError)
@@ -182,23 +187,23 @@
                                                 <table class="table">
                                                     <tbody>
                                                     <tr>
-                                                        <td><a href="{{ $urls['processing_results_simple'] }}" download>processing_results.xml
+                                                        <td><a href="{{ $urls['processing_results_simple'] }}" download>processing results.xml
                                                                 (Simple)</a>
                                                             ({{ round($files['processing_results_simple']->getSize() / 1024, 2) }}
                                                             kB)
                                                         </td>
-                                                        <td><a href="{{ $urls['processing_results_writer'] }}" download>processing_results.xml
+                                                        <td><a href="{{ $urls['processing_results_writer'] }}" download>processing results.xml
                                                                 (XmlWriter)</a>
                                                             ({{ round($files['processing_results_writer']->getSize() / 1024, 2) }}
                                                             kB)
                                                         </td>
                                                     </tr>
                                                     <tr>
-                                                        <td><a href="{{ $urls['processing_results_json'] }}" download>processing_results.json</a>
+                                                        <td><a href="{{ $urls['processing_results_json'] }}" download>processing results.json</a>
                                                             ({{ round($files['processing_results_json']->getSize() / 1024, 2) }}
                                                             kB)
                                                         </td>
-                                                        <td><a href="{{ $urls['processing_results_csv'] }}">processing_results.csv</a>
+                                                        <td><a href="{{ $urls['processing_results_csv'] }}">processing results.csv</a>
                                                             ({{ round($files['processing_results_csv']->getSize() / 1024, 2) }}
                                                             kB)
                                                         </td>
