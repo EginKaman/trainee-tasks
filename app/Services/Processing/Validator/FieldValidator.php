@@ -87,7 +87,7 @@ class FieldValidator
     protected function getProperty(object|array $object, string $property)
     {
         if (is_array($object)) {
-            return $this->prepareValue($object[$property], $property);
+            return $this->prepareValue((string)$object[$property], $property);
         }
 
         return $this->prepareValue((string)$object->{$property}, $property);

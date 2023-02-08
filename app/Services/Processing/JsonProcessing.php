@@ -80,14 +80,14 @@ class JsonProcessing implements ProcessingInterface
                     ->format('Y-m-d');
             }
             foreach ($exrate->currency as $currency) {
-                $currency->name = $this->fieldValidator->prepareValue($currency->name, FieldValidator::NAME_FIELD);
-                $currency->unit = $this->fieldValidator->prepareValue($currency->unit, FieldValidator::UNIT_FIELD);
+                $currency->name = $this->fieldValidator->prepareValue((string)$currency->name, FieldValidator::NAME_FIELD);
+                $currency->unit = $this->fieldValidator->prepareValue((string)$currency->unit, FieldValidator::UNIT_FIELD);
                 $currency->currencyCode = $this->fieldValidator->prepareValue(
-                    $currency->currencyCode,
+                    (string)$currency->currencyCode,
                     FieldValidator::CURRENCY_CODE_FIELD
                 );
                 $currency->country = $this->fieldValidator->prepareValue(
-                    $currency->country,
+                    (string)$currency->country,
                     FieldValidator::COUNTRY_FIELD
                 );
                 $currency->rate = round(random_int(0, 1000000) / random_int(2, 100), 5);
