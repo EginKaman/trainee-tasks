@@ -65,16 +65,14 @@ class CsvProcessing implements ProcessingInterface
         $csv = $this->read($path);
         $previousLastUpdate = null;
         $updatedRecord = [];
-        foreach ($csv->getRecords() as $record) {
-            $lastUpdate = Date::createFromFormat('Y-m-d', $record['lastUpdate'] ?? $record[0]);
-            if ($previousLastUpdate === null) {
-                $previousLastUpdate = $lastUpdate;
+        $records = $csv->getRecords();
+        foreach ($records as $key => $record) {
+            if ($key === 0) {
                 $lastUpdate = Date::today();
-            } elseif ($lastUpdate === $previousLastUpdate) {
-                $lastUpdate = $previousLastUpdate;
             } else {
                 $lastUpdate = $previousLastUpdate->subDay();
             }
+            $previousLastUpdate = Date::createFromFormat('Y-m-d', $record['lastUpdate'] ?? $record[0]);
             $rate = round(random_int(0, 1000000) / random_int(2, 100), 5);
             $change = round(random_int(0, (int)$rate) / random_int(2, 100), 5);
             $date = $lastUpdate->format('Y-m-d');
