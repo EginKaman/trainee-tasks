@@ -32,7 +32,7 @@ class LastUpdate
 
     public function max(string $value, $line): bool|Error
     {
-        $lastUpdate = Date::createFromFormat('Y-m-d', $value);
+        $lastUpdate = Date::createFromFormat('Y-m-d', $value)->startOfDay();
         $today = Date::today();
         if ($lastUpdate > Date::today()) {
             return new Error("The value '{$lastUpdate}' must be smaller than '{$today}'", $line);
