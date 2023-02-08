@@ -309,21 +309,25 @@
                                             </tr>
                                             <tr>
                                                 <td>
-                                                    <a href="#" target="_blank" download="">correct-file-min.xml</a>
+                                                    <a href="{{ \Storage::url('examples/correct-file-min.xml') }}"
+                                                       target="_blank" download="">correct-file-min.xml</a>
                                                     <span>(8 kB)</span>
                                                 </td>
                                                 <td>
-                                                    <a href="#" target="_blank" download="">invalid-syntax.xml</a>
+                                                    <a href="{{ \Storage::url('examples/invalid-syntax.xml') }}"
+                                                       target="_blank" download="">invalid-syntax.xml</a>
                                                     <span>(571 kB)</span>
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td>
-                                                    <a href="#" target="_blank" download="">correct-file-max.xml</a>
+                                                    <a href="{{ \Storage::url('examples/correct-file-max.xml') }}"
+                                                       target="_blank" download="">correct-file-max.xml</a>
                                                     <span>(942 kB)</span>
                                                 </td>
                                                 <td>
-                                                    <a href="#" target="_blank" download="">wrong-file-min.csv</a>
+                                                    <a href="{{ \Storage::url('examples/wrong-file-max.xml') }}"
+                                                       target="_blank" download="">wrong-file-max.csv</a>
                                                     <span>(485 kB)</span>
                                                 </td>
                                             </tr>
