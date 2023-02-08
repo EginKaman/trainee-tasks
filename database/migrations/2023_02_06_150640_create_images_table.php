@@ -10,6 +10,7 @@ return new class extends Migration {
         Schema::create('images', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('mimetype');
             $table->unsignedInteger('size');
             $table->unsignedInteger('height');
             $table->unsignedInteger('width');

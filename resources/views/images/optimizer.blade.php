@@ -2,7 +2,7 @@
 @section('content')
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-8">
+            <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">{{ __('Task 3 - Image') }}</div>
 
@@ -82,6 +82,18 @@
                                             </div>
                                         </div>
                                     </form>
+                                    @if(!empty($images))
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                @foreach($images as $ext=> $image)
+                                                    <img src="{{ Storage::url($image) }}" alt="">
+                                                    @foreach($croped[$ext] as $thumb)
+                                                        <img src="{{ Storage::url($thumb) }}" alt="">
+                                                    @endforeach
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                             <div class="tab-pane fade" id="nav-test" role="tabpanel"

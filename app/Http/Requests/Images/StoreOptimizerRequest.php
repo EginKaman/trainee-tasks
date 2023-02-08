@@ -8,6 +8,9 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\File;
 
+/**
+ * @property \Illuminate\Http\File $image
+ */
 class StoreOptimizerRequest extends FormRequest
 {
     public function rules(): array
