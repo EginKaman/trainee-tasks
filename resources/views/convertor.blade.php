@@ -76,18 +76,19 @@
                                             </label>
 
                                             <div class="col-md-6">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="radio" name="reader"
-                                                           id="method-1" value="xmlreader">
-                                                    <label class="form-check-label" for="method-1">
-                                                        XMLReader
-                                                    </label>
-                                                </div>
+
                                                 <div class="form-check">
                                                     <input class="form-check-input" type="radio" name="reader"
                                                            id="method-2" value="simplexml" checked>
                                                     <label class="form-check-label" for="method-2">
                                                         SimpleXML
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="reader"
+                                                           id="method-1" value="xmlreader">
+                                                    <label class="form-check-label" for="method-1">
+                                                        XMLReader
                                                     </label>
                                                 </div>
                                                 @error('method')
