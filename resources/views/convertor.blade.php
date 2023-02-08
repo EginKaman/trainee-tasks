@@ -330,6 +330,14 @@
                                                     <span>(485 kB)</span>
                                                 </td>
                                             </tr>
+                                                <td>
+                                                </td>
+                                                <td>
+                                                    <a href="{{ \Storage::url('examples/wrong-file-min.xml') }}"
+                                                       target="_blank" download="">wrong-file-min.csv</a>
+                                                    <span>(485 kB)</span>
+                                                </td>
+                                            </tr>
                                             <tr>
                                                 <td></td>
                                                 <td>
