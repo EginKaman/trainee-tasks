@@ -34,9 +34,16 @@ class JsonProcessing implements ProcessingInterface
             return [new Error($exception->getMessage(), 1)];
         }
 
-        foreach ($json as $exrate) {
+        foreach ($json as $key => $exrate) {
             $this->line += 2;
             $this->fieldValidator->validate($exrate, FieldValidator::LAST_UPDATE_FIELD, ++$this->line);
+            if (!$this->fieldValidator->unique(
+                $exrate->currency,
+                FieldValidator::CURRENCY_CODE_FIELD,
+                $this->line
+            )) {
+                continue;
+            }
             ++$this->line;
             foreach ($exrate->currency as $currency) {
                 ++$this->line;
@@ -80,14 +87,20 @@ class JsonProcessing implements ProcessingInterface
                     ->format('Y-m-d');
             }
             foreach ($exrate->currency as $currency) {
-                $currency->name = $this->fieldValidator->prepareValue($currency->name, FieldValidator::NAME_FIELD);
-                $currency->unit = $this->fieldValidator->prepareValue($currency->unit, FieldValidator::UNIT_FIELD);
+                $currency->name = $this->fieldValidator->prepareValue(
+                    (string)$currency->name,
+                    FieldValidator::NAME_FIELD
+                );
+                $currency->unit = $this->fieldValidator->prepareValue(
+                    (string)$currency->unit,
+                    FieldValidator::UNIT_FIELD
+                );
                 $currency->currencyCode = $this->fieldValidator->prepareValue(
-                    $currency->currencyCode,
+                    (string)$currency->currencyCode,
                     FieldValidator::CURRENCY_CODE_FIELD
                 );
                 $currency->country = $this->fieldValidator->prepareValue(
-                    $currency->country,
+                    (string)$currency->country,
                     FieldValidator::COUNTRY_FIELD
                 );
                 $currency->rate = round(random_int(0, 1000000) / random_int(2, 100), 5);
@@ -107,13 +120,13 @@ class JsonProcessing implements ProcessingInterface
             throw new \RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
         }
 
-        Storage::put("public/documents/{$hash}/processing_results.json", json_encode($json));
-        Storage::put("public/documents/{$hash}/processing_results.csv", '');
-        Storage::put("public/documents/{$hash}/processing_results_writer.xml", '');
-        $writer = Writer::createFromPath(storage_path("app/public/documents/{$hash}/processing_results.csv"));
+        Storage::put("public/documents/{$hash}/processing results.json", json_encode($json));
+        Storage::put("public/documents/{$hash}/processing results.csv", '');
+        Storage::put("public/documents/{$hash}/processing results writer.xml", '');
+        $writer = Writer::createFromPath(storage_path("app/public/documents/{$hash}/processing results.csv"));
         $writer->insertOne(['lastUpdate', 'name', 'unit', 'currencyCode', 'country', 'rate', 'change']);
         $xw = new \XMLWriter();
-        $xw->openUri(storage_path("app/public/documents/{$hash}/processing_results_writer.xml"));
+        $xw->openUri(storage_path("app/public/documents/{$hash}/processing results writer.xml"));
         $xw->startDocument('1.0', 'UTF-8');
         $xw->startElement('currencies');
         foreach ($json as $exrate) {
@@ -156,8 +169,8 @@ class JsonProcessing implements ProcessingInterface
         $xw->endDocument();
         $xw->flush();
         Storage::put(
-            "public/documents/{$hash}/processing_results_simple.xml",
-            file_get_contents(storage_path("app/public/documents/{$hash}/processing_results_writer.xml"))
+            "public/documents/{$hash}/processing results simple.xml",
+            file_get_contents(storage_path("app/public/documents/{$hash}/processing results writer.xml"))
         );
     }
 }

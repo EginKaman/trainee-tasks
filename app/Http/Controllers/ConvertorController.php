@@ -49,31 +49,42 @@ class ConvertorController extends Controller
         $validateFile = $processing->validate(Storage::path($path));
         $fileErrors = [];
         $results = [];
+        $files = [];
+        $urls = [];
         if ($validateFile !== true) {
             $fileErrors = $validateFile;
         }
         if ($validateFile === true) {
             $results = $processing->process(Storage::path($path));
-        }
-        $hash = Str::random(32);
+            $hash = Str::random(32);
 
-        $processing->write($results, $hash);
+            $processing->write($results, $hash);
+
+            $files = [
+                'processing_results_simple' => new File(
+                    storage_path("app/public/documents/{$hash}/processing results simple.xml")
+                ),
+                'processing_results_writer' => new File(
+                    storage_path("app/public/documents/{$hash}/processing results writer.xml")
+                ),
+                'processing_results_json' => new File(
+                    storage_path("app/public/documents/{$hash}/processing results.json")
+                ),
+                'processing_results_csv' => new File(
+                    storage_path("app/public/documents/{$hash}/processing results.csv")
+                ),
+            ];
+            $urls = [
+                'processing_results_simple' => Storage::url("documents/{$hash}/processing results simple.xml"),
+                'processing_results_writer' => Storage::url("documents/{$hash}/processing results writer.xml"),
+                'processing_results_json' => Storage::url("documents/{$hash}/processing results.json"),
+                'processing_results_csv' => Storage::url("documents/{$hash}/processing results.csv"),
+            ];
+        }
 
         $json = new File(resource_path('schemas/schema.json'));
         $xml = new File(resource_path('schemas/schema.xsd'));
 
-        $files = [
-            'processing_results_simple' => new File(storage_path("app/public/documents/{$hash}/processing_results_simple.xml")),
-            'processing_results_writer' => new File(storage_path("app/public/documents/{$hash}/processing_results_writer.xml")),
-            'processing_results_json' => new File(storage_path("app/public/documents/{$hash}/processing_results.json")),
-            'processing_results_csv' => new File(storage_path("app/public/documents/{$hash}/processing_results.csv")),
-        ];
-        $urls = [
-            'processing_results_simple' => Storage::url("documents/{$hash}/processing_results_simple.xml"),
-            'processing_results_writer' => Storage::url("documents/{$hash}/processing_results_writer.xml"),
-            'processing_results_json' => Storage::url("documents/{$hash}/processing_results.json"),
-            'processing_results_csv' => Storage::url("documents/{$hash}/processing_results.csv"),
-        ];
         return view('convertor', compact(['fileErrors', 'document', 'results', 'json', 'xml', 'files', 'urls']));
     }
 

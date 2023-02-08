@@ -59,6 +59,24 @@ class FieldValidator
         return $this;
     }
 
+    public function unique($currencies, $field, $line)
+    {
+        $uniques = [];
+        foreach ($currencies as $currency) {
+            if(!$this->isExistProperty($currency, $field)) {
+                continue;
+            }
+            $value = $this->getProperty($currency, $field);
+            if (!isset($uniques[$value])) {
+                $uniques[$value] = $value;
+            } else {
+                $this->errorBag->add(new Error("Value of {$field} is existed in this date", $line));
+                return false;
+            }
+        }
+        return true;
+    }
+
     public function hasErrors(): bool
     {
         return $this->errorBag->isNotEmpty();
@@ -87,7 +105,7 @@ class FieldValidator
     protected function getProperty(object|array $object, string $property)
     {
         if (is_array($object)) {
-            return $this->prepareValue($object[$property], $property);
+            return $this->prepareValue((string)$object[$property], $property);
         }
 
         return $this->prepareValue((string)$object->{$property}, $property);

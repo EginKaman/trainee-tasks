@@ -29,6 +29,7 @@ SHARED_FILES=(
 CUSTOM_COMMANDS=(
   "php artisan migrate"
   "php artisan optimize"
+  "php artisan view:cache"
   "php artisan storage:link"
 )
 AFTER_LINK_COMMANDS=(

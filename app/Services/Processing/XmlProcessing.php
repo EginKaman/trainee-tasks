@@ -61,6 +61,13 @@ class XmlProcessing implements ProcessingInterface
                 FieldValidator::LAST_UPDATE_FIELD,
                 $this->getLine($exrate->lastUpdate)
             );
+            if (!$this->fieldValidator->unique(
+                $exrate->currency,
+                FieldValidator::CURRENCY_CODE_FIELD,
+                $this->getLine($exrate->lastUpdate)
+            )) {
+                continue;
+            }
             foreach ($exrate->currency as $currency) {
                 $this->fieldValidator->validate(
                     $currency,
@@ -153,11 +160,11 @@ class XmlProcessing implements ProcessingInterface
             ) && !is_dir($concurrentDirectory)) {
             throw new \RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
         }
-        $xml->saveXML(storage_path("app/public/documents/{$hash}/processing_results_simple.xml"));
-        $xml->saveXML(storage_path("app/public/documents/{$hash}/processing_results_writer.xml"));
-        Storage::put("public/documents/{$hash}/processing_results.json", json_encode($xml));
-        Storage::put("public/documents/{$hash}/processing_results.csv", '');
-        $writer = Writer::createFromPath(storage_path("app/public/documents/{$hash}/processing_results.csv"));
+        $xml->saveXML(storage_path("app/public/documents/{$hash}/processing results simple.xml"));
+        $xml->saveXML(storage_path("app/public/documents/{$hash}/processing results writer.xml"));
+        Storage::put("public/documents/{$hash}/processing results.json", json_encode($xml));
+        Storage::put("public/documents/{$hash}/processing results.csv", '');
+        $writer = Writer::createFromPath(storage_path("app/public/documents/{$hash}/processing results.csv"));
         $writer->insertOne(['lastUpdate', 'name', 'unit', 'currencyCode', 'country', 'rate', 'change']);
         foreach ($xml->exrate as $exrate) {
             foreach($exrate->currency as $currency) {
