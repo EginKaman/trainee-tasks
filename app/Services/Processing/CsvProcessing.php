@@ -101,13 +101,34 @@ class CsvProcessing implements ProcessingInterface
     protected function mapRecord(array $record): array
     {
         return [
-            'lastUpdate' => $record['lastUpdate'] ?? $record[0] ?? '',
-            'name' => $record['name'] ?? $record[1] ?? '',
-            'unit' => $record['unit'] ?? $record[2] ?? '',
-            'currencyCode' => $record['currencyCode'] ?? $record[3] ?? '',
-            'country' => $record['country'] ?? $record[4] ?? '',
-            'rate' => $record['rate'] ?? $record[5] ?? '',
-            'change' => $record['change'] ?? $record[6] ?? '',
+            'lastUpdate' => $this->fieldValidator->prepareValue(
+                (string)($record['lastUpdate'] ?? $record[0] ?? ''),
+                FieldValidator::LAST_UPDATE_FIELD
+            ),
+            'name' => $this->fieldValidator->prepareValue(
+                (string)($record['name'] ?? $record[1] ?? ''),
+                FieldValidator::NAME_FIELD
+            ),
+            'unit' => $this->fieldValidator->prepareValue(
+                (string)($record['unit'] ?? $record[2] ?? ''),
+                FieldValidator::UNIT_FIELD
+            ),
+            'currencyCode' => $this->fieldValidator->prepareValue(
+                (string)($record['currencyCode'] ?? $record[3] ?? ''),
+                FieldValidator::CURRENCY_CODE_FIELD
+            ),
+            'country' => $this->fieldValidator->prepareValue(
+                (string)($record['country'] ?? $record[4] ?? ''),
+                FieldValidator::COUNTRY_FIELD
+            ),
+            'rate' => $this->fieldValidator->prepareValue(
+                (string)($record['rate'] ?? $record[5] ?? ''),
+                FieldValidator::RATE_FIELD
+            ),
+            'change' => $this->fieldValidator->prepareValue(
+                (string)($record['change'] ?? $record[6] ?? ''),
+                FieldValidator::CHANGE_FIELD
+            ),
         ];
     }
 
