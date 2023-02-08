@@ -4,6 +4,26 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-8">
+                @if ($errors->isEmpty() && empty($fileErrors) && !empty($results))
+                    <div class="alert alert-success" role="alert" data-cy=“successAlert”>
+                        {{ __('Successfully!') }}
+                    </div>
+                @endif
+                @if (!empty($fileErrors))
+                    <div class="alert alert-danger" role="alert" data-cy=“errorAlert”>
+                        {{ __('Attention! An error has occurred, see the details below.') }}
+                    </div>
+                @endif
+                @if ($errors->any())
+                    <div class="alert alert-danger" role="alert" data-cy=“errorAlert”>
+                        {{ __('Attention! An error has occurred, see the details below.') }}
+                        @error('document')
+                        <div data-cy=“errorMessage”>
+                            <strong>{{ $message }}</strong>
+                        </div>
+                        @enderror
+                    </div>
+                @endif
                 <div class="card">
                     <div class="card-header">{{ __('Task 2 - XML, CSV, JSON') }}</div>
 
@@ -24,26 +44,6 @@
                             <div class="tab-pane fade show active" id="nav-converter" role="tabpanel"
                                  aria-labelledby="nav-converter-tab">
                                 <div class="row pt-3">
-                                    @if ($errors->isEmpty() && empty($fileErrors) && !empty($results))
-                                        <div class="alert alert-success" role="alert" data-cy=“successAlert”>
-                                            {{ __('Successfully!') }}
-                                        </div>
-                                    @endif
-                                    @if (!empty($fileErrors))
-                                        <div class="alert alert-danger" role="alert" data-cy=“errorAlert”>
-                                            {{ __('Attention! An error has occurred, see the details below.') }}
-                                        </div>
-                                    @endif
-                                    @if ($errors->any())
-                                        <div class="alert alert-danger" role="alert" data-cy=“errorAlert”>
-                                            {{ __('Attention! An error has occurred, see the details below.') }}
-                                            @error('document')
-                                            <div data-cy=“errorMessage”>
-                                                <strong>{{ $message }}</strong>
-                                            </div>
-                                            @enderror
-                                        </div>
-                                    @endif
                                     <form method="POST" action="{{ route('convertor') }}" id="convertor-form"
                                           enctype="multipart/form-data">
                                         @csrf
@@ -78,14 +78,14 @@
                                             <div class="col-md-6">
                                                 <div class="form-check">
                                                     <input class="form-check-input" type="radio" name="reader"
-                                                           id="method-1" value="xmlreader" checked>
+                                                           id="method-1" value="xmlreader">
                                                     <label class="form-check-label" for="method-1">
                                                         XMLReader
                                                     </label>
                                                 </div>
                                                 <div class="form-check">
                                                     <input class="form-check-input" type="radio" name="reader"
-                                                           id="method-2" value="simplexml">
+                                                           id="method-2" value="simplexml" checked>
                                                     <label class="form-check-label" for="method-2">
                                                         SimpleXML
                                                     </label>
@@ -175,9 +175,8 @@
                                                 <h3>Processing results for download</h3>
                                                 <small class="text-muted">
                                                     Download the results of processing the
-                                                    file {{ $document->getClientOriginalName() }} by clicking on the
-                                                    link
-                                                    below
+                                                    file "{{ $document->getClientOriginalName() }}" by clicking on the
+                                                    link below
                                                 </small>
                                                 <table class="table">
                                                     <tbody>
