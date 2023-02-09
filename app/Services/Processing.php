@@ -31,7 +31,6 @@ class Processing
     }
 
     /**
-     * @param string $path
      * @return object
      */
     public function process(string $path): object|array

@@ -9,7 +9,7 @@ use Throwable;
 
 class UnknownProcessingException extends Exception
 {
-    public function __construct(string $message = null, int $code = null, ?Throwable $previous = null)
+    public function __construct(?string $message = null, ?int $code = null, ?Throwable $previous = null)
     {
         parent::__construct($message ?? 'Unknown processing.', 0, $previous);
 

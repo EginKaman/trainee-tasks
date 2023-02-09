@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Services\Processing;
 
 use App\Services\Processing\Validator\FieldValidator;
-use Illuminate\Support\Facades\{Date, Storage};
 use Exception;
+use Illuminate\Support\Facades\{Date, Storage};
 use League\Csv\{Reader, Writer};
 use SimpleXMLElement;
 use stdClass;
@@ -59,8 +59,6 @@ class CsvProcessing implements ProcessingInterface
     }
 
     /**
-     * @param string $path
-     * @return object
      * @throws Exception
      */
     public function process(string $path): object

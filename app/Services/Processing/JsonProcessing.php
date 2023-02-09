@@ -34,11 +34,7 @@ class JsonProcessing implements ProcessingInterface
             $this->line += 2;
             $this->fieldValidator->validate($exrate, FieldValidator::LAST_UPDATE_FIELD, ++$this->line);
             if (
-                !$this->fieldValidator->unique(
-                    $exrate->currency,
-                    FieldValidator::CURRENCY_CODE_FIELD,
-                    $this->line
-                )
+                !$this->fieldValidator->unique($exrate->currency, FieldValidator::CURRENCY_CODE_FIELD, $this->line)
             ) {
                 continue;
             }
