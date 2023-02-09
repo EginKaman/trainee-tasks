@@ -8,8 +8,7 @@ use App\Http\Controllers\Controller;
 
 class CallbackController extends Controller
 {
-    public function __invoke()
+    public function __invoke(): void
     {
-
     }
 }

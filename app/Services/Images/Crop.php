@@ -4,9 +4,19 @@ declare(strict_types=1);
 
 namespace App\Services\Images;
 
+use ImagickException;
+
 class Crop
 {
-    public function handle($path, int $width, int $height, string $output)
+    /**
+     * @param string $path
+     * @param int $width
+     * @param int $height
+     * @param string $output
+     * @return void
+     * @throws ImagickException
+     */
+    public function handle(string $path, int $width, int $height, string $output): void
     {
         $imagick = new \Imagick($path);
         $imagick->thumbnailImage($width, $height);

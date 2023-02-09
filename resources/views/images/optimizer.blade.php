@@ -2,7 +2,7 @@
 @section('content')
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-12">
+            <div class="col-md-8">
                 <div class="card">
                     <div class="card-header">{{ __('Task 3 - Image') }}</div>
 
@@ -83,13 +83,27 @@
                                         </div>
                                     </form>
                                     @if(!empty($images))
-                                        <div class="row">
-                                            <div class="col-md-12">
+                                        <div class="row mt-4">
+                                            <h4>Processing result</h4>
+                                            <small class="text-muted">
+                                                The processing image "somefile" weighing 9mb, size 900x900px is protected by a watermark and converted in 5 formats - 4 others and 1 the same, but cropped
+                                            </small>
+                                            <div class="col-md-12 mt-3">
                                                 @foreach($images as $ext=> $image)
-                                                    <img src="{{ Storage::url($image) }}" alt="">
-                                                    @foreach($croped[$ext] as $thumb)
-                                                        <img src="{{ Storage::url($thumb) }}" alt="">
-                                                    @endforeach
+                                                    <div class="row">
+                                                        <figure class="figure col-12">
+                                                            <img src="{{ Storage::url($image) }}"
+                                                                 class="figure-img img-fluid rounded" alt="...">
+                                                            <figcaption class="figure-caption">filename</figcaption>
+                                                        </figure>
+                                                        @foreach($cropped[$ext] as $size => $thumb)
+                                                            <figure class="figure @if($loop->first) col-3 @else col @endif">
+                                                                <img src="{{ Storage::url($thumb) }}"
+                                                                     class="figure-img img-fluid rounded" alt="...">
+                                                                <figcaption class="figure-caption">filename</figcaption>
+                                                            </figure>
+                                                        @endforeach
+                                                    </div>
                                                 @endforeach
                                             </div>
                                         </div>

@@ -9,18 +9,20 @@ use ImagickPixel;
 
 class Annotate
 {
-    public function handle($file)
+    public function handle(string $path): void
     {
-        $image = new \Imagick($file);
+        $image = new \Imagick($path);
         $draw = new \ImagickDraw();
         $draw->setFillColor(new ImagickPixel('red'));
         $draw->setFont('Courier');
         $draw->setFillOpacity(0.5);
         $draw->setFontSize(30);
-        for ($i = 1; $i <= 20; $i++) {
+        for ($i = 1; $i <= 20; ++$i) {
             $image->annotateImage($draw, 10, $i * 50, -45, 'Copy ' . now()->format('Y-m-d H:i:s'));
             $image->annotateImage($draw, 320, $i * 50, -45, 'Copy ' . now()->format('Y-m-d H:i:s'));
         }
-        $image->writeImage(storage_path('app/public/images/') . \Str::random(32) . '.' . Str::lower($image->getImageFormat()));
+        $image->writeImage(
+            storage_path('app/public/images/') . \Str::random(32) . '.' . Str::lower($image->getImageFormat())
+        );
     }
 }
