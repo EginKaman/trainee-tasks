@@ -9,9 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class Message extends Model
 {
     /**
-     * The attributes that should be cast.
-     *
-     * @var string[]
+     * @inheritdoc
      */
     protected $casts = [
         'success' => 'bool',

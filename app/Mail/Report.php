@@ -25,7 +25,8 @@ class Report extends Mailable
     /**
      * Create a new message instance.
      *
-     * @param array<string> $logs
+     * @param string $text
+     * @param array $logs
      * @param ?string $logPath
      */
     public function __construct(string $text, array $logs, ?string $logPath)
@@ -42,7 +43,7 @@ class Report extends Mailable
     {
         return new Envelope(
             from: new Address((string) config('mail.from.address'), (string) config('mail.from.address')),
-            to: new Address((string) config('mail.from.address'), (string) config('mail.from.address')),
+            to: [new Address((string) config('mail.from.address'), (string) config('mail.from.address'))],
             subject: 'Report ' . Date::yesterday()->format('Y-m-d')
         );
     }

@@ -23,12 +23,13 @@ class FieldValidator
         $this->errorBag = $errorBag;
     }
 
-    public function prepareValue(string $value, $field)
+    public function prepareValue(string $value, string $field): array|string|null
     {
         $value = trim($value);
         if ($field === self::NAME_FIELD) {
             return preg_replace('/\s+/', ' ', $value);
         }
+
         return preg_replace('/\s/', '', $value);
     }
 
@@ -44,7 +45,7 @@ class FieldValidator
                     }
                     $fieldClass = $this->second($fieldClass, $object);
                 }
-                $answer = $fieldClass->{$method}((string)$this->getProperty($object, $field), $line);
+                $answer = $fieldClass->{$method}((string) $this->getProperty($object, $field), $line);
                 if (!is_bool($answer)) {
                     $this->errorBag->add($answer);
                 }
@@ -59,11 +60,11 @@ class FieldValidator
         return $this;
     }
 
-    public function unique($currencies, $field, $line)
+    public function unique(object|array $currencies, string $field, int $line): bool
     {
         $uniques = [];
         foreach ($currencies as $currency) {
-            if(!$this->isExistProperty($currency, $field)) {
+            if (!$this->isExistProperty($currency, $field)) {
                 continue;
             }
             $value = $this->getProperty($currency, $field);
@@ -71,9 +72,11 @@ class FieldValidator
                 $uniques[$value] = $value;
             } else {
                 $this->errorBag->add(new Error("Value of {$field} is existed in this date", $line));
+
                 return false;
             }
         }
+
         return true;
     }
 
@@ -90,25 +93,22 @@ class FieldValidator
         return $this->errorBag->errors();
     }
 
-    protected function isExistProperty(string|object|array $object, string $property): bool
+    protected function isExistProperty(object|array $object, string $property): bool
     {
         if (is_array($object)) {
             return isset($object[$property]);
         }
-        if (is_object($object) || is_string($object)) {
-            return property_exists($object, $property);
-        }
 
-        return false;
+        return property_exists($object, $property);
     }
 
-    protected function getProperty(object|array $object, string $property)
+    protected function getProperty(object|array $object, string $property): array|string|null
     {
         if (is_array($object)) {
-            return $this->prepareValue((string)$object[$property], $property);
+            return $this->prepareValue((string) $object[$property], $property);
         }
 
-        return $this->prepareValue((string)$object->{$property}, $property);
+        return $this->prepareValue((string) $object->{$property}, $property);
     }
 
     protected function getMethods(object|string $class): array
@@ -116,12 +116,12 @@ class FieldValidator
         return get_class_methods($class);
     }
 
-    protected function propertyNotExistError(string $property, $line): Error
+    protected function propertyNotExistError(string $property, int $line): Error
     {
         return new Error("Field {$property} is not exist in file", $line);
     }
 
-    protected function hasSecond($fieldClass): bool
+    protected function hasSecond(object $fieldClass): bool
     {
         $secondField = $this->isExistProperty($fieldClass, 'secondField');
         $secondValue = $this->isExistProperty($fieldClass, 'secondValue');
@@ -129,9 +129,9 @@ class FieldValidator
         return $secondValue === true && $secondField === true;
     }
 
-    protected function second($fieldClass, $object)
+    protected function second(object $fieldClass, object|array $object): object
     {
-        $fieldClass->secondValue = $this->getProperty($object, (string)$fieldClass->secondField);
+        $fieldClass->secondValue = $this->getProperty($object, (string) $fieldClass->secondField);
 
         return $fieldClass;
     }

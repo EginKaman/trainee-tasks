@@ -12,7 +12,7 @@ class Change
     public string $secondField = 'rate';
     public bool $break = false;
 
-    public function correct($value, $line)
+    public function correct(string $value, int $line): true|Error
     {
         if (!is_numeric($value)) {
             $this->break = true;
@@ -23,7 +23,7 @@ class Change
         return true;
     }
 
-    public function min($value, $line)
+    public function min(string $value, int $line): true|Error
     {
         if ((float) $value <= 0) {
             return new Error('Change must be greater than 0', $line);
@@ -32,7 +32,7 @@ class Change
         return true;
     }
 
-    public function max($value, $line)
+    public function max(string $value, int $line): true|Error
     {
         if ((float) $value > (float) $this->secondValue) {
             return new Error('Change must be smaller than rate', $line);

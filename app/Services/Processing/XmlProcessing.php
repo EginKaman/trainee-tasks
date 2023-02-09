@@ -8,16 +8,17 @@ use App\Exceptions\UnknownProcessingException;
 use App\Services\Processing\Validator\{Error, FieldValidator};
 use DOMDocument;
 use Illuminate\Support\Facades\{Date, Storage};
-use Illuminate\Support\Str;
+use Exception;
+use League\Csv\CannotInsertRecord;
 use League\Csv\Writer;
 use LibXMLError;
 use SimpleXMLElement;
+use stdClass;
 
 class XmlProcessing implements ProcessingInterface
 {
     private DOMDocument $DOMDocument;
     private string $schema;
-    private SimpleXMLElement $XMLElement;
     private FieldValidator $fieldValidator;
 
     /**
@@ -34,7 +35,7 @@ class XmlProcessing implements ProcessingInterface
     }
 
     /**
-     * @return bool|LibXMLError[]
+     * @return bool|Error[]
      */
     public function validate(string $path): array|bool
     {
@@ -48,13 +49,12 @@ class XmlProcessing implements ProcessingInterface
         return !$this->fieldValidator->hasErrors() ?: $this->fieldValidator->errors();
     }
 
-    public function read(string $path): void
+    /**
+     * @throws Exception
+     */
+    public function read(string $path): object
     {
-        try {
-            $xml = new SimpleXMLElement(file_get_contents($path));
-        } catch (\Exception $e) {
-            return;
-        }
+        $xml = new SimpleXMLElement(file_get_contents($path));
         foreach ($xml->exrate as $exrate) {
             $this->fieldValidator->validate(
                 $exrate,
@@ -101,22 +101,23 @@ class XmlProcessing implements ProcessingInterface
                 );
             }
         }
+        return $xml;
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
-    public function process(string $path)
+    public function process(string $path): SimpleXMLElement|bool
     {
         try {
             $xml = new SimpleXMLElement(file_get_contents($path));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
         $loop = 0;
         foreach ($xml->exrate as $exrate) {
             $exrate->lastUpdate = $this->fieldValidator->prepareValue(
-                (string)$exrate->lastUpdate,
+                (string) $exrate->lastUpdate,
                 FieldValidator::LAST_UPDATE_FIELD
             );
             if ($loop === 0) {
@@ -128,60 +129,61 @@ class XmlProcessing implements ProcessingInterface
             }
             foreach ($exrate->currency as $currency) {
                 $currency->name = $this->fieldValidator->prepareValue(
-                    (string)$currency->name,
+                    (string) $currency->name,
                     FieldValidator::NAME_FIELD
                 );
                 $currency->unit = $this->fieldValidator->prepareValue(
-                    (string)$currency->unit,
+                    (string) $currency->unit,
                     FieldValidator::UNIT_FIELD
                 );
                 $currency->currencyCode = $this->fieldValidator->prepareValue(
-                    (string)$currency->currencyCode,
+                    (string) $currency->currencyCode,
                     FieldValidator::CURRENCY_CODE_FIELD
                 );
                 $currency->country = $this->fieldValidator->prepareValue(
-                    (string)$currency->country,
+                    (string) $currency->country,
                     FieldValidator::COUNTRY_FIELD
                 );
                 $currency->rate = round(random_int(0, 1000000) / random_int(2, 100), 5);
-                $currency->change = round(random_int(0, (int)$currency->rate) / random_int(2, 100), 5);
+                $currency->change = round(random_int(0, (int) $currency->rate) / random_int(2, 100), 5);
             }
 
             ++$loop;
         }
+
         return $xml;
     }
 
-    public function write(SimpleXMLElement $xml, $hash)
+    public function write(SimpleXMLElement|array|stdClass $data, string $hash): void
     {
         if (!mkdir(
-                directory: $concurrentDirectory = storage_path("app/public/documents/{$hash}"),
-                recursive: true
-            ) && !is_dir($concurrentDirectory)) {
+            directory: $concurrentDirectory = storage_path("app/public/documents/{$hash}"),
+            recursive: true
+        ) && !is_dir($concurrentDirectory)) {
             throw new \RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
         }
-        $xml->saveXML(storage_path("app/public/documents/{$hash}/processing results simple.xml"));
-        $xml->saveXML(storage_path("app/public/documents/{$hash}/processing results writer.xml"));
-        Storage::put("public/documents/{$hash}/processing results.json", json_encode($xml));
+        $data->saveXML(storage_path("app/public/documents/{$hash}/processing results simple.xml"));
+        $data->saveXML(storage_path("app/public/documents/{$hash}/processing results writer.xml"));
+        Storage::put("public/documents/{$hash}/processing results.json", json_encode($data));
         Storage::put("public/documents/{$hash}/processing results.csv", '');
         $writer = Writer::createFromPath(storage_path("app/public/documents/{$hash}/processing results.csv"));
         $writer->insertOne(['lastUpdate', 'name', 'unit', 'currencyCode', 'country', 'rate', 'change']);
-        foreach ($xml->exrate as $exrate) {
-            foreach($exrate->currency as $currency) {
+        foreach ($data->exrate as $exrate) {
+            foreach ($exrate->currency as $currency) {
                 $writer->insertOne([
-                    'lastUpdate' => (string)$exrate->lastUpdate,
-                    'name' => (string)$currency->name,
-                    'unit' => (string)$currency->unit,
-                    'currencyCode' => (string)$currency->currencyCode,
-                    'country' => (string)$currency->country,
-                    'rate' => (string)$currency->rate,
-                    'change' => (string)$currency->change,
+                    'lastUpdate' => (string) $exrate->lastUpdate,
+                    'name' => (string) $currency->name,
+                    'unit' => (string) $currency->unit,
+                    'currencyCode' => (string) $currency->currencyCode,
+                    'country' => (string) $currency->country,
+                    'rate' => (string) $currency->rate,
+                    'change' => (string) $currency->change,
                 ]);
             }
         }
     }
 
-    protected function getLine($node): int
+    protected function getLine(SimpleXMLElement $node): int
     {
         return dom_import_simplexml($node)->getLineNo();
     }
