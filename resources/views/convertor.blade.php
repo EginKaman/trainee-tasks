@@ -40,29 +40,15 @@
                     </div>
                 @endif
                 @if ($errors->any())
-                        <div class="alert alert-danger" role="alert">
-                            <h4 class="alert-heading">
-                                <svg class="" role="img" width="20px" height="20px" aria-label="Error:">
-                                    <use xlink:href="#exclamation-triangle-fill"/>
-                                </svg>
-                                {{ __('Validation error!') }}</h4>
-                            @error('document')
-                            <div data-cy=“errorMessage”>
-                                <strong>{{ $message }}</strong>
-                            </div>
-                            @enderror
-                            <p>
-                                @error('document')
-                                {{ $message }}
-                                @enderror
-                            </p>
-                        </div>
-                    <div class="alert alert-danger" role="alert" data-cy=“errorAlert”>
-                        {{ __('Attention! An error has occurred, see the details below.') }}
+                    <div class="alert alert-danger" role="alert">
+                        <h4 class="alert-heading">
+                            <svg class="" role="img" width="20px" height="20px" aria-label="Error:">
+                                <use xlink:href="#exclamation-triangle-fill"/>
+                            </svg>
+                            {{ __('Validation error!') }}
+                        </h4>
                         @error('document')
-                        <div data-cy=“errorMessage”>
-                            <strong>{{ $message }}</strong>
-                        </div>
+                        <p>{{ $message }}</p>
                         @enderror
                     </div>
                 @endif
@@ -116,7 +102,6 @@
                                                         Select file up to 1 Mb and formats: xml, csv, json
                                                     </div>
                                                 @endif
-
                                             </div>
                                         </div>
                                         <div class="row mb-0" id="xml-processing" style="display:none;">
