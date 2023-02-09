@@ -33,11 +33,13 @@ class JsonProcessing implements ProcessingInterface
         foreach ($json as $key => $exrate) {
             $this->line += 2;
             $this->fieldValidator->validate($exrate, FieldValidator::LAST_UPDATE_FIELD, ++$this->line);
-            if (!$this->fieldValidator->unique(
-                $exrate->currency,
-                FieldValidator::CURRENCY_CODE_FIELD,
-                $this->line
-            )) {
+            if (
+                !$this->fieldValidator->unique(
+                    $exrate->currency,
+                    FieldValidator::CURRENCY_CODE_FIELD,
+                    $this->line
+                )
+            ) {
                 continue;
             }
             ++$this->line;
@@ -62,12 +64,12 @@ class JsonProcessing implements ProcessingInterface
         return !$this->fieldValidator->hasErrors() ?: $this->fieldValidator->errors();
     }
 
-    public function read(string $path): object
+    public function read(string $path): object|array
     {
         return Schema::import(json_decode(file_get_contents($this->schema)))->in(json_decode(file_get_contents($path)));
     }
 
-    public function process(string $path): object
+    public function process(string $path): object|array
     {
         $json = $this->read($path);
         foreach ($json as $key => $exrate) {
@@ -109,10 +111,12 @@ class JsonProcessing implements ProcessingInterface
 
     public function write(object|array $json, string $hash): void
     {
-        if (!mkdir(
-            directory: $concurrentDirectory = storage_path("app/public/documents/{$hash}"),
-            recursive: true
-        ) && !is_dir($concurrentDirectory)) {
+        if (
+            !mkdir(
+                directory: $concurrentDirectory = storage_path("app/public/documents/{$hash}"),
+                recursive: true
+            ) && !is_dir($concurrentDirectory)
+        ) {
             throw new \RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
         }
 

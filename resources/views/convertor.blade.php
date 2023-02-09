@@ -1,20 +1,62 @@
 @extends('layouts.app')
 
 @section('content')
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+        <symbol id="check-circle-fill" viewBox="0 0 16 16">
+            <path
+                d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+        </symbol>
+        <symbol id="info-fill" viewBox="0 0 16 16">
+            <path
+                d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+        </symbol>
+        <symbol id="exclamation-triangle-fill" viewBox="0 0 16 16">
+            <path
+                d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+        </symbol>
+    </svg>
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-8">
                 @if ($errors->isEmpty() && empty($fileErrors) && !empty($results))
-                    <div class="alert alert-success" role="alert" data-cy=“successAlert”>
-                        {{ __('Successfully!') }}
+                    <div class="alert alert-success" role="alert">
+                        <h4 class="alert-heading">
+                            <svg class="" role="img" width="20px" height="20px" aria-label="Success:">
+                                <use xlink:href="#check-circle-fill"/>
+                            </svg>
+                            {{ __('Successfully!') }}</h4>
+                        <p>The data of the "{{ $document->getClientOriginalName() }}" has been successfully converted
+                            and displayed bellow</p>
                     </div>
                 @endif
                 @if (!empty($fileErrors))
-                    <div class="alert alert-danger" role="alert" data-cy=“errorAlert”>
-                        {{ __('Attention! An error has occurred, see the details below.') }}
+                    <div class="alert alert-danger" role="alert">
+                        <h4 class="alert-heading">
+                            <svg class="" role="img" width="20px" height="20px" aria-label="Error:">
+                                <use xlink:href="#exclamation-triangle-fill"/>
+                            </svg>
+                            {{ __('Validation error!') }}</h4>
+                        <p>{{ __('Attention! An error has occurred, see the details below.') }}</p>
                     </div>
                 @endif
                 @if ($errors->any())
+                        <div class="alert alert-danger" role="alert">
+                            <h4 class="alert-heading">
+                                <svg class="" role="img" width="20px" height="20px" aria-label="Error:">
+                                    <use xlink:href="#exclamation-triangle-fill"/>
+                                </svg>
+                                {{ __('Validation error!') }}</h4>
+                            @error('document')
+                            <div data-cy=“errorMessage”>
+                                <strong>{{ $message }}</strong>
+                            </div>
+                            @enderror
+                            <p>
+                                @error('document')
+                                {{ $message }}
+                                @enderror
+                            </p>
+                        </div>
                     <div class="alert alert-danger" role="alert" data-cy=“errorAlert”>
                         {{ __('Attention! An error has occurred, see the details below.') }}
                         @error('document')
@@ -48,25 +90,26 @@
                                           enctype="multipart/form-data">
                                         @csrf
                                         <div class="row mb-3">
-                                            <label for="file"
-                                                   class="col-md-4 col-form-label text-md-end">
-                                                {{ __('File input') }}
-                                            </label>
+                                            <div class="col-md-8 col-sm-12">
+                                                <label for="file"
+                                                       class="col-form-label">
+                                                    {{ __('File input') }}
+                                                </label>
 
-                                            <div class="col-md-6">
-                                                <input class="form-control @error('document') is-invalid @enderror @if(!empty($fileErrors)) is-invalid @endif"
-                                                       type="file" id="file" name="document"
-                                                       onchange="change()"
-                                                       accept=".xml,.csv,.json">
+                                                <input
+                                                    class="form-control @error('document') is-invalid @enderror @if(!empty($fileErrors)) is-invalid @endif"
+                                                    type="file" id="file" name="document"
+                                                    onchange="change()"
+                                                    accept=".xml,.csv,.json">
                                                 @error('document')
                                                 <div class="invalid-feedback" role="alert" data-cy=“errorMessage”>
                                                     <strong>{{ $message }}</strong>
                                                 </div>
                                                 @enderror
                                                 @if(!empty($fileErrors))
-                                                <div class="invalid-feedback" role="alert" data-cy=“errorMessage”>
-                                                    <strong>{{ __('File has errors, upload file without errors') }}</strong>
-                                                </div>
+                                                    <div class="invalid-feedback" role="alert" data-cy=“errorMessage”>
+                                                        <strong>{{ __('File has errors, upload file without errors') }}</strong>
+                                                    </div>
                                                 @endif
                                                 @if(empty($fileErrors) && $errors->isEmpty())
                                                     <div id="passwordHelpBlock" class="form-text">
@@ -77,12 +120,11 @@
                                             </div>
                                         </div>
                                         <div class="row mb-0" id="xml-processing" style="display:none;">
-                                            <label for="method"
-                                                   class="col-md-4 col-form-label text-md-end">
-                                                {{ __('Choose the method of processing XML') }}
-                                            </label>
-
-                                            <div class="col-md-6">
+                                            <div class="col-md-6 col-sm-12">
+                                                <label for="method"
+                                                       class="col-form-label">
+                                                    {{ __('Choose the method of processing XML') }}
+                                                </label>
 
                                                 <div class="form-check">
                                                     <input class="form-check-input" type="radio" name="reader"
@@ -100,15 +142,15 @@
                                                 </div>
                                                 @error('method')
                                                 <span class="invalid-feedback" role="alert" data-cy=“errorMessage”>
-                                                    <strong>{{ $message }}</strong>
-                                                </span>
+                                                <strong>{{ $message }}</strong>
+                                            </span>
                                                 @enderror
                                             </div>
                                         </div>
 
                                         <div class="row mb-0">
-                                            <div class="col-md-6 offset-md-4">
-                                                <button type="submit" class="btn btn-primary" id="convert-button"
+                                            <div class="col-md-6 col-sm-12">
+                                                <button type="submit" class="btn btn-primary btn-bl" id="convert-button"
                                                         disabled>
                                                     {{ __('Convert') }}
                                                 </button>
@@ -187,23 +229,27 @@
                                                 <table class="table">
                                                     <tbody>
                                                     <tr>
-                                                        <td><a href="{{ $urls['processing_results_simple'] }}" download>processing results.xml
+                                                        <td><a href="{{ $urls['processing_results_simple'] }}" download>processing
+                                                                results.xml
                                                                 (Simple)</a>
                                                             ({{ round($files['processing_results_simple']->getSize() / 1024, 2) }}
                                                             kB)
                                                         </td>
-                                                        <td><a href="{{ $urls['processing_results_writer'] }}" download>processing results.xml
+                                                        <td><a href="{{ $urls['processing_results_writer'] }}" download>processing
+                                                                results.xml
                                                                 (XmlWriter)</a>
                                                             ({{ round($files['processing_results_writer']->getSize() / 1024, 2) }}
                                                             kB)
                                                         </td>
                                                     </tr>
                                                     <tr>
-                                                        <td><a href="{{ $urls['processing_results_json'] }}" download>processing results.json</a>
+                                                        <td><a href="{{ $urls['processing_results_json'] }}" download>processing
+                                                                results.json</a>
                                                             ({{ round($files['processing_results_json']->getSize() / 1024, 2) }}
                                                             kB)
                                                         </td>
-                                                        <td><a href="{{ $urls['processing_results_csv'] }}">processing results.csv</a>
+                                                        <td><a href="{{ $urls['processing_results_csv'] }}">processing
+                                                                results.csv</a>
                                                             ({{ round($files['processing_results_csv']->getSize() / 1024, 2) }}
                                                             kB)
                                                         </td>
@@ -332,7 +378,7 @@
                                                 </td>
                                                 <td>
                                                     <a href="{{ \Storage::url('examples/wrong-file-max.xml') }}"
-                                                       target="_blank" download="">wrong-file-max.csv</a>
+                                                       target="_blank" download="">wrong-file-max.xml</a>
                                                     <span>(485 kB)</span>
                                                 </td>
                                             </tr>

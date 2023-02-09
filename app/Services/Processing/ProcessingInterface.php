@@ -11,7 +11,7 @@ interface ProcessingInterface
 {
     public function validate(string $path): bool|array;
 
-    public function read(string $path): object;
+    public function read(string $path): object|array;
     public function process(string $path): bool|object|array;
 
     public function write(SimpleXMLElement|stdClass|array $data, string $hash): void;

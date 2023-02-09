@@ -70,25 +70,26 @@ class CsvProcessing implements ProcessingInterface
         $updatedRecord = [];
         $records = $csv->getRecords();
         foreach ($records as $key => $record) {
+            $record = $this->mapRecord($record);
             if ($key === 0) {
                 $lastUpdate = Date::today();
             } else {
                 $lastUpdate = $previousLastUpdate->subDay();
             }
-            $previousLastUpdate = Date::createFromFormat('Y-m-d', $record['lastUpdate'] ?? $record[0]);
+            $previousLastUpdate = Date::createFromFormat('Y-m-d', $record['lastUpdate']);
             $rate = round(random_int(0, 1000000) / random_int(2, 100), 5);
             $change = round(random_int(0, (int) $rate) / random_int(2, 100), 5);
             $date = $lastUpdate->format('Y-m-d');
             $record = [
                 'lastUpdate' => $date,
-                'name' => $record['name'] ?? $record[1],
-                'unit' => $record['unit'] ?? $record[2],
-                'currencyCode' => $record['currencyCode'] ?? $record[3],
-                'country' => $record['country'] ?? $record[4],
+                'name' => $record['name'],
+                'unit' => $record['unit'],
+                'currencyCode' => $record['currencyCode'],
+                'country' => $record['country'],
                 'rate' => $rate,
                 'change' => $change,
             ];
-            $updatedRecord[] = $this->mapObject($this->mapRecord($record));
+            $updatedRecord[] = $this->mapObject($record);
         }
 //        $writer = Writer::createFromString('lastUpdate,name,unit,currencyCode,country,rate,change');
 //        $writer->insertAll($updatedRecord);
