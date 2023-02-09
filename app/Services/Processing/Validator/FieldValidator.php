@@ -30,6 +30,10 @@ class FieldValidator
             return preg_replace('/\s+/', ' ', $value);
         }
 
+        if ($field === self::RATE_FIELD || $field === self::CHANGE_FIELD) {
+            $value = Str::replace(',', '.', $value);
+        }
+
         return preg_replace('/\s/', '', $value);
     }
 
