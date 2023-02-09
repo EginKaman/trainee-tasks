@@ -35,7 +35,7 @@ class Rate
 
     public function max(string $value, int $line): bool|Error
     {
-        if ((int) $value > 1000000000) {
+        if ((float) $value > 1000000000) {
             return new Error('Rate must be smaller than 1 000 000 000.', $line);
         }
 

@@ -172,7 +172,7 @@
                                                 </small>
                                                 @foreach($results as $exrate)
                                                     <h4>
-                                                        Date: {{ \Illuminate\Support\Facades\Date::createFromFormat('Y-m-d', $exrate->lastUpdate)->format('Y.m.d') }}
+                                                        Date: {{ \Illuminate\Support\Facades\Date::createFromFormat('Y-m-d', $exrate->lastUpdate)->format('d.m.Y') }}
                                                     </h4>
                                                     <table class="table table-bordered">
                                                         <thead>

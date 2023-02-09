@@ -32,10 +32,18 @@ class Change
         return true;
     }
 
+    public function less(string $value, int $line): true|Error
+    {
+        if ((float) $value >= (float) $this->secondValue) {
+            return new Error('Change must be smaller than rate', $line);
+        }
+
+        return true;
+    }
     public function max(string $value, int $line): true|Error
     {
-        if ((float) $value > (float) $this->secondValue) {
-            return new Error('Change must be smaller than rate', $line);
+        if ((float) $value > 1000000000) {
+            return new Error('Change must be smaller than 1 000 000 000', $line);
         }
 
         return true;
