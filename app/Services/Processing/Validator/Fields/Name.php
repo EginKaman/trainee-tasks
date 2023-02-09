@@ -24,18 +24,14 @@ class Name
         'CAD' => 'canadian dollar',
         'GEL' => 'lari',
         'PHP' => 'peso',
-        'RUB' => 'ruble'
+        'RUB' => 'ruble',
     ];
 
-    /**
-     * @param string $value
-     * @param int $line
-     * @return Error|bool
-     */
     public function correct(string $value, int $line): bool|Error
     {
         if (!preg_match('/^[A-Za-z ]{2,60}$/', $value)) {
             $this->break = true;
+
             return new Error(
                 'The name must be smaller include only latin symbols, space and between 2 to 60 letters.',
                 $line
@@ -45,22 +41,15 @@ class Name
         return true;
     }
 
-    /**
-     * @param string $value
-     * @param int $line
-     * @return bool|Error
-     */
     public function exist(string $value, int $line): bool|Error
     {
         if (
-            (!isset($this->currencies[$this->secondValue]) ||
-            Str::lower($this->currencies[$this->secondValue]) !== Str::lower($value))
+            (!isset($this->currencies[$this->secondValue])
+            || Str::lower($this->currencies[$this->secondValue]) !== Str::lower($value))
         ) {
-            return new Error(
-                'The name must be related to currencyCode.',
-                $line
-            );
+            return new Error('The name must be related to currencyCode.', $line);
         }
+
         return true;
     }
 }

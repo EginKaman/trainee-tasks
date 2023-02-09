@@ -10,7 +10,7 @@ class Unit
 {
     public bool $break = false;
 
-    public function number(string|int $value, $line)
+    public function number(string|int $value, int $line): true|Error
     {
         if (!preg_match('/^\d+$/', $value)) {
             $this->break = true;
@@ -21,7 +21,7 @@ class Unit
         return true;
     }
 
-    public function max($value, $line)
+    public function max(string $value, int $line): true|Error
     {
         if ((int) $value > 1000000) {
             return new Error('The unit must be smaller than 1000000.', $line);
@@ -30,7 +30,7 @@ class Unit
         return true;
     }
 
-    public function min($value, $line)
+    public function min(string $value, int $line): true|Error
     {
         if ((int) $value < 1) {
             return new Error('The unit must be greater than 1.', $line);

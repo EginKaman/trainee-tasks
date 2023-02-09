@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace App\Services\Processing\Validator\Fields;
 
 use App\Services\Processing\Validator\Error;
+use Carbon\Exceptions\InvalidArgumentException;
 use Illuminate\Support\Facades\Date;
-use InvalidArgumentException;
 
 class LastUpdate
 {
     public bool $break = false;
 
-    public function correct(string $value, $line): bool|Error
+    public function correct(string $value, int $line): bool|Error
     {
         try {
             $lastUpdate = Date::createFromFormat('Y-m-d', $value);
@@ -30,7 +30,7 @@ class LastUpdate
         return true;
     }
 
-    public function max(string $value, $line): bool|Error
+    public function max(string $value, int $line): bool|Error
     {
         $lastUpdate = Date::createFromFormat('Y-m-d', $value)->startOfDay();
         $today = Date::today();
@@ -41,7 +41,7 @@ class LastUpdate
         return true;
     }
 
-    public function min(string $value, $line): bool|Error
+    public function min(string $value, int $line): bool|Error
     {
         $lastUpdate = Date::createFromFormat('Y-m-d', $value);
         $minDate = Date::createFromFormat('Y-m-d', '1970-01-01');

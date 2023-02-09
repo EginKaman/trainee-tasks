@@ -13,7 +13,7 @@ class Rate
 
     public bool $break = false;
 
-    public function correct($value, $line): bool|Error
+    public function correct(string $value, int $line): bool|Error
     {
         if (!is_numeric($value)) {
             $this->break = true;
@@ -24,7 +24,7 @@ class Rate
         return true;
     }
 
-    public function min($value, $line): bool|Error
+    public function min(string $value, int $line): bool|Error
     {
         if ((int) $value < 1) {
             return new Error('Rate must be greater than 1 000 000 000.', $line);
@@ -33,7 +33,7 @@ class Rate
         return true;
     }
 
-    public function max($value, $line): bool|Error
+    public function max(string $value, int $line): bool|Error
     {
         if ((int) $value > 1000000000) {
             return new Error('Rate must be smaller than 1 000 000 000.', $line);
@@ -42,7 +42,7 @@ class Rate
         return true;
     }
 
-    public function greater($value, $line): bool|Error
+    public function greater(string $value, int $line): bool|Error
     {
         if ((float) $value < (float) $this->secondValue) {
             return new Error('Rate must be greater than change', $line);

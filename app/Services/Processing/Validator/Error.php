@@ -9,7 +9,7 @@ class Error
     public string $message;
     public int $line;
 
-    public function __construct($message, $line)
+    public function __construct(string $message, int $line)
     {
         $this->message = $message;
         $this->line = $line;
