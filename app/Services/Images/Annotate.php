@@ -9,7 +9,7 @@ use ImagickPixel;
 
 class Annotate
 {
-    public function handle(string $path): void
+    public function handle(string $path, string $filename): void
     {
         $image = new \Imagick($path);
         $draw = new \ImagickDraw();
@@ -22,7 +22,7 @@ class Annotate
             $image->annotateImage($draw, 320, $i * 50, -45, 'Copy ' . now()->format('Y-m-d H:i:s'));
         }
         $image->writeImage(
-            storage_path('app/public/images/') . \Str::random(32) . '.' . Str::lower($image->getImageFormat())
+            storage_path('app/public/images/annotated/' . $filename . '.' . Str::lower($image->getImageFormat()))
         );
     }
 }

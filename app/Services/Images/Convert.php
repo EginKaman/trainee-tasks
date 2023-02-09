@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace App\Services\Images;
 
-use Illuminate\Support\Str;
-
 class Convert
 {
-    public function handle(string $path): array
+    public function handle(string $path, string $filename): array
     {
         $imagick = new \Imagick($path);
-        $imagick->setFilename(Str::random(32));
+        $imagick->setFilename($filename);
         $images = [];
         $images['gif'] = $this->convertToGif($imagick);
         $images['jpeg'] = $this->convertToJpeg($imagick);
