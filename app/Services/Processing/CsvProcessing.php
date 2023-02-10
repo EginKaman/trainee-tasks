@@ -24,8 +24,15 @@ class CsvProcessing implements ProcessingInterface
     public function validate(string $path): bool|array
     {
         $csv = $this->read($path);
+        $data = $this->prepareRecords($csv);
         foreach ($csv->getRecords() as $record) {
             $record = $this->mapRecord($record);
+
+            if (
+                !$this->fieldValidator->unique($data[$record['lastUpdate']]['currencies'], FieldValidator::CURRENCY_CODE_FIELD, $this->line)
+            ) {
+                continue;
+            }
 
             $this->fieldValidator->validate($record, FieldValidator::LAST_UPDATE_FIELD, $this->line);
 
@@ -76,7 +83,7 @@ class CsvProcessing implements ProcessingInterface
             }
             $previousLastUpdate = Date::createFromFormat('Y-m-d', $record['lastUpdate']);
             $rate = round(random_int(0, 1000000) / random_int(2, 100), 5);
-            $change = round(random_int(0, (int) $rate) / random_int(2, 100), 5);
+            $change = round(random_int(0, (int)$rate) / random_int(2, 100), 5);
             $date = $lastUpdate->format('Y-m-d');
             $record = [
                 'lastUpdate' => $date,
@@ -91,15 +98,15 @@ class CsvProcessing implements ProcessingInterface
         }
 //        $writer = Writer::createFromString('lastUpdate,name,unit,currencyCode,country,rate,change');
 //        $writer->insertAll($updatedRecord);
-        return (object) $updatedRecord;
+        return (object)$updatedRecord;
     }
 
     public function write(array|SimpleXMLElement|stdClass $data, string $hash): void
     {
         if (!mkdir(
-            directory: $concurrentDirectory = storage_path("app/public/documents/{$hash}"),
-            recursive: true
-        ) && !is_dir($concurrentDirectory)) {
+                directory: $concurrentDirectory = storage_path("app/public/documents/{$hash}"),
+                recursive: true
+            ) && !is_dir($concurrentDirectory)) {
             throw new \RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
         }
 
@@ -115,35 +122,35 @@ class CsvProcessing implements ProcessingInterface
         foreach ($data as $exrate) {
             $xw->startElement('exrate');
             $xw->startElement('lastUpdate');
-            $xw->text((string) $exrate->lastUpdate);
+            $xw->text((string)$exrate->lastUpdate);
             $xw->endElement();
             foreach ($exrate->currency as $currency) {
                 $xw->startElement('name');
-                $xw->text((string) $currency->name);
+                $xw->text((string)$currency->name);
                 $xw->endElement();
                 $xw->startElement('unit');
-                $xw->text((string) $currency->unit);
+                $xw->text((string)$currency->unit);
                 $xw->endElement();
                 $xw->startElement('currencyCode');
-                $xw->text((string) $currency->currencyCode);
+                $xw->text((string)$currency->currencyCode);
                 $xw->endElement();
                 $xw->startElement('country');
-                $xw->text((string) $currency->country);
+                $xw->text((string)$currency->country);
                 $xw->endElement();
                 $xw->startElement('rate');
-                $xw->text((string) $currency->rate);
+                $xw->text((string)$currency->rate);
                 $xw->endElement();
                 $xw->startElement('change');
-                $xw->text((string) $currency->change);
+                $xw->text((string)$currency->change);
                 $xw->endElement();
                 $writer->insertOne([
-                    'lastUpdate' => (string) $exrate->lastUpdate,
-                    'name' => (string) $currency->name,
-                    'unit' => (string) $currency->unit,
-                    'currencyCode' => (string) $currency->currencyCode,
-                    'country' => (string) $currency->country,
-                    'rate' => (string) $currency->rate,
-                    'change' => (string) $currency->change,
+                    'lastUpdate' => (string)$exrate->lastUpdate,
+                    'name' => (string)$currency->name,
+                    'unit' => (string)$currency->unit,
+                    'currencyCode' => (string)$currency->currencyCode,
+                    'country' => (string)$currency->country,
+                    'rate' => (string)$currency->rate,
+                    'change' => (string)$currency->change,
                 ]);
             }
             $xw->endElement();
@@ -161,31 +168,31 @@ class CsvProcessing implements ProcessingInterface
     {
         return [
             'lastUpdate' => $this->fieldValidator->prepareValue(
-                (string) ($record['lastUpdate'] ?? $record[0] ?? ''),
+                (string)($record['lastUpdate'] ?? $record[0] ?? ''),
                 FieldValidator::LAST_UPDATE_FIELD
             ),
             'name' => $this->fieldValidator->prepareValue(
-                (string) ($record['name'] ?? $record[1] ?? ''),
+                (string)($record['name'] ?? $record[1] ?? ''),
                 FieldValidator::NAME_FIELD
             ),
             'unit' => $this->fieldValidator->prepareValue(
-                (string) ($record['unit'] ?? $record[2] ?? ''),
+                (string)($record['unit'] ?? $record[2] ?? ''),
                 FieldValidator::UNIT_FIELD
             ),
             'currencyCode' => $this->fieldValidator->prepareValue(
-                (string) ($record['currencyCode'] ?? $record[3] ?? ''),
+                (string)($record['currencyCode'] ?? $record[3] ?? ''),
                 FieldValidator::CURRENCY_CODE_FIELD
             ),
             'country' => $this->fieldValidator->prepareValue(
-                (string) ($record['country'] ?? $record[4] ?? ''),
+                (string)($record['country'] ?? $record[4] ?? ''),
                 FieldValidator::COUNTRY_FIELD
             ),
             'rate' => $this->fieldValidator->prepareValue(
-                (string) ($record['rate'] ?? $record[5] ?? ''),
+                (string)($record['rate'] ?? $record[5] ?? ''),
                 FieldValidator::RATE_FIELD
             ),
             'change' => $this->fieldValidator->prepareValue(
-                (string) ($record['change'] ?? $record[6] ?? ''),
+                (string)($record['change'] ?? $record[6] ?? ''),
                 FieldValidator::CHANGE_FIELD
             ),
         ];
@@ -205,5 +212,22 @@ class CsvProcessing implements ProcessingInterface
         $exrate->currency[] = $currency;
 
         return $exrate;
+    }
+
+    protected function prepareRecords(Reader $csv): array
+    {
+        $data = [];
+        foreach ($csv->getRecords() as $record) {
+            $record = $this->mapRecord($record);
+            $data[$record['lastUpdate']]['currencies'][] = [
+                'name' => $record['name'],
+                'unit' => $record['unit'],
+                'currencyCode' => $record['currencyCode'],
+                'country' => $record['country'],
+                'rate' => $record['rate'],
+                'change' => $record['change'],
+            ];
+        }
+        return $data;
     }
 }
