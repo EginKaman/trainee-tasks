@@ -12,12 +12,12 @@ return new class extends Migration {
         Schema::create('images', function (Blueprint $table) {
             $table->id();
             $table->string('filename');
+            $table->string('path');
             $table->string('hash');
             $table->string('mimetype');
             $table->unsignedInteger('size');
             $table->unsignedInteger('height');
             $table->unsignedInteger('width');
-            $table->timestamp('converted_at')->nullable();
             $table->timestamps();
         });
     }

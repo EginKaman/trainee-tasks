@@ -12,7 +12,7 @@ class Image extends Model
     /**
      * @inheritDoc
      */
-    protected $fillable = ['filename', 'hash', 'mimetype', 'height', 'width', 'size', 'converted_at'];
+    protected $fillable = ['filename', 'path', 'hash', 'mimetype', 'height', 'width', 'size', 'converted_at'];
 
     protected $casts = [
         'height' => 'int',

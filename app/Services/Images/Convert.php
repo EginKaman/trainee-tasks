@@ -24,6 +24,7 @@ class Convert
     {
         $imagick->setInterlaceScheme(\Imagick::INTERLACE_PLANE);
         $imagick->setFormat('jpg');
+        $imagick->setImageFormat('jpg');
         $imagick->writeImage(storage_path("app/public/images/{$imagick->getFilename()}.jpg"));
 
         return "public/images/{$imagick->getFilename()}.jpg";
@@ -31,6 +32,7 @@ class Convert
 
     public function convertToWebp(\Imagick $imagick): string
     {
+        $imagick->setFormat('webp');
         $imagick->setImageFormat('webp');
         $imagick->writeImage(storage_path("app/public/images/{$imagick->getFilename()}.webp"));
 
@@ -39,6 +41,7 @@ class Convert
 
     public function convertToPng(\Imagick $imagick): string
     {
+        $imagick->setFormat('png');
         $imagick->setImageFormat('png');
         $imagick->writeImage(storage_path("app/public/images/{$imagick->getFilename()}.png"));
 
@@ -46,6 +49,7 @@ class Convert
     }
     public function convertToGif(\Imagick $imagick): string
     {
+        $imagick->setFormat('gif');
         $imagick->setImageFormat('gif');
         $imagick->writeImage(storage_path("app/public/images/{$imagick->getFilename()}.gif"));
 
@@ -53,6 +57,7 @@ class Convert
     }
     public function convertToBmp(\Imagick $imagick): string
     {
+        $imagick->setFormat('bmp');
         $imagick->setImageFormat('bmp');
         $imagick->writeImage(storage_path("app/public/images/{$imagick->getFilename()}.bmp"));
 

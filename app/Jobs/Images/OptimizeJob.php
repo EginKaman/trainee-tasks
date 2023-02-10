@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Jobs\Images;
 
-use App\Models\Image;
+use App\Models\{Image, ProcessingImage};
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\{InteractsWithQueue, SerializesModels};
+use Illuminate\Support\Facades\Storage;
 
 class OptimizeJob implements ShouldQueue
 {
@@ -18,56 +19,27 @@ class OptimizeJob implements ShouldQueue
     use SerializesModels;
 
     public function __construct(
-        public Image $image
+        public ProcessingImage $processingImage
     ) {
     }
 
     public function handle(): void
     {
         $response = \KrakenIO::upload([
-            'file' => $this->image,
+            'file' => Storage::path($this->processingImage->path),
             'lossy' => true,
-            'quality' => 80,
-            'callback_url' => route('callback'),
             'wait' => true,
-            'resize' => [
-                [
-                    'id' => '500',
-                    'strategy' => 'auto',
-                    'width' => 500,
-                    'height' => 500,
-                ],
-                [
-                    'id' => '350',
-                    'strategy' => 'auto',
-                    'width' => 350,
-                    'height' => 350,
-                ],
-                [
-                    'id' => '200',
-                    'strategy' => 'auto',
-                    'width' => 200,
-                    'height' => 200,
-                ],
-                [
-                    'id' => '150',
-                    'strategy' => 'auto',
-                    'width' => 150,
-                    'height' => 150,
-                ],
-                [
-                    'id' => '100',
-                    'strategy' => 'auto',
-                    'width' => 100,
-                    'height' => 100,
-                ],
-                [
-                    'id' => '50',
-                    'strategy' => 'auto',
-                    'width' => 50,
-                    'height' => 50,
-                ],
-            ],
+            'quality' => 80,
         ]);
+
+        if ($response['success'] === true) {
+            Storage::put($this->processingImage->path, file_get_contents($response['kraked_url']));
+            $this->processingImage->kraked_size = $response['kraked_size'];
+            $this->processingImage->kraked_width = $response['kraked_width'];
+            $this->processingImage->kraked_height = $response['kraked_height'];
+            $this->processingImage->saved_bytes = $response['saved_bytes'];
+            $this->processingImage->status = 'success';
+            $this->processingImage->save();
+        }
     }
 }
