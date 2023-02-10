@@ -75,7 +75,7 @@ class FieldValidator
             if (!isset($uniques[$value])) {
                 $uniques[$value] = $value;
             } else {
-                $this->errorBag->add(new Error("Value of {$field} is existed in this date", ++$line));
+                $this->errorBag->add(new Error("Value of {$field} is existed in this date", $line));
 
                 return false;
             }

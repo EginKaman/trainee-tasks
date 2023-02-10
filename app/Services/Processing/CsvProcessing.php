@@ -29,9 +29,13 @@ class CsvProcessing implements ProcessingInterface
             $record = $this->mapRecord($record);
 
             if (
-                !$this->fieldValidator->unique($data[$record['lastUpdate']]['currencies'], FieldValidator::CURRENCY_CODE_FIELD, $this->line)
+                !$this->fieldValidator->unique(
+                    $data[$record['lastUpdate']]['currencies'],
+                    FieldValidator::CURRENCY_CODE_FIELD,
+                    $this->line
+                )
             ) {
-                continue;
+                break;
             }
 
             $this->fieldValidator->validate($record, FieldValidator::LAST_UPDATE_FIELD, $this->line);
@@ -68,37 +72,41 @@ class CsvProcessing implements ProcessingInterface
     /**
      * @throws Exception
      */
-    public function process(string $path): object
+    public function process(string $path): array
     {
         $csv = $this->read($path);
         $previousLastUpdate = null;
         $updatedRecord = [];
         $records = $csv->getRecords();
-        foreach ($records as $key => $record) {
-            $record = $this->mapRecord($record);
-            if ($key === 0) {
-                $lastUpdate = Date::today();
+        $data = $this->prepareRecords($csv);
+        $loop = 0;
+        foreach ($data as $key => $record) {
+
+            if ($loop === 0) {
+                $record['lastUpdate'] = Date::today()->format('Y-m-d');
             } else {
-                $lastUpdate = $previousLastUpdate->subDay();
+                $record['lastUpdate'] = Date::createFromFormat('Y-m-d', $previousLastUpdate)
+                    ->subDay()
+                    ->format('Y-m-d');
             }
-            $previousLastUpdate = Date::createFromFormat('Y-m-d', $record['lastUpdate']);
-            $rate = round(random_int(0, 1000000) / random_int(2, 100), 5);
-            $change = round(random_int(0, (int)$rate) / random_int(2, 100), 5);
-            $date = $lastUpdate->format('Y-m-d');
-            $record = [
-                'lastUpdate' => $date,
-                'name' => $record['name'],
-                'unit' => $record['unit'],
-                'currencyCode' => $record['currencyCode'],
-                'country' => $record['country'],
-                'rate' => $rate,
-                'change' => $change,
-            ];
-            $updatedRecord[] = $this->mapObject($record);
+            $previousLastUpdate = $key;
+            foreach ($record['currencies'] as $currency) {
+                $rate = round(random_int(0, 1000000) / random_int(2, 100), 5);
+                $change = round(random_int(0, (int)$rate) / random_int(2, 100), 5);
+                $currency = [
+                    'lastUpdate' => $record['lastUpdate'],
+                    'name' => $currency['name'],
+                    'unit' => $currency['unit'],
+                    'currencyCode' => $currency['currencyCode'],
+                    'country' => $currency['country'],
+                    'rate' => $rate,
+                    'change' => $change,
+                ];
+            }
+            $updatedRecord[$record['lastUpdate']] = $record;
+            ++$loop;
         }
-//        $writer = Writer::createFromString('lastUpdate,name,unit,currencyCode,country,rate,change');
-//        $writer->insertAll($updatedRecord);
-        return (object)$updatedRecord;
+        return $this->mapObject($updatedRecord);
     }
 
     public function write(array|SimpleXMLElement|stdClass $data, string $hash): void
@@ -198,20 +206,26 @@ class CsvProcessing implements ProcessingInterface
         ];
     }
 
-    protected function mapObject(array $record): object
+    protected function mapObject($records): array
     {
-        $currency = new stdClass();
-        $currency->name = $record['name'];
-        $currency->unit = $record['unit'];
-        $currency->currencyCode = $record['currencyCode'];
-        $currency->country = $record['country'];
-        $currency->rate = $record['rate'];
-        $currency->change = $record['change'];
-        $exrate = new stdClass();
-        $exrate->lastUpdate = $record['lastUpdate'];
-        $exrate->currency[] = $currency;
+        $data = [];
+        foreach ($records as $record) {
+            $exrate = new stdClass();
+            $exrate->lastUpdate = $record['lastUpdate'];
+            foreach ($record['currencies'] as $currency) {
+                $object = new stdClass();
+                $object->name = $currency['name'];
+                $object->unit = $currency['unit'];
+                $object->currencyCode = $currency['currencyCode'];
+                $object->country = $currency['country'];
+                $object->rate = $currency['rate'];
+                $object->change = $currency['change'];
+                $exrate->currency[] = $object;
+            }
+            $data[] = $exrate;
+        }
 
-        return $exrate;
+        return $data;
     }
 
     protected function prepareRecords(Reader $csv): array
@@ -219,6 +233,7 @@ class CsvProcessing implements ProcessingInterface
         $data = [];
         foreach ($csv->getRecords() as $record) {
             $record = $this->mapRecord($record);
+            $data[$record['lastUpdate']]['lastUpdate'] = $record['lastUpdate'];
             $data[$record['lastUpdate']]['currencies'][] = [
                 'name' => $record['name'],
                 'unit' => $record['unit'],
