@@ -37,7 +37,7 @@ class EmailReport implements ShouldQueue
         $logs = [];
         $filePath = null;
 
-        if (file_exists($file)) {
+        if (!file_exists($file)) {
             $message = 'No log available';
         } else {
             $pattern = '/^\\[(?<date>.*)\\]\\s(?<env>\\w+)\\.(?<type>\\w+):(?<message>.*)/m';
