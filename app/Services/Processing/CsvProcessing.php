@@ -90,7 +90,7 @@ class CsvProcessing implements ProcessingInterface
                     ->format('Y-m-d');
             }
             $previousLastUpdate = $key;
-            foreach ($record['currencies'] as $currency) {
+            foreach ($record['currencies'] as $index => $currency) {
                 $rate = round(random_int(0, 1000000) / random_int(2, 100), 5);
                 $change = round(random_int(0, (int)$rate) / random_int(2, 100), 5);
                 $currency = [
@@ -102,6 +102,7 @@ class CsvProcessing implements ProcessingInterface
                     'rate' => $rate,
                     'change' => $change,
                 ];
+                $record['currencies'][$index] = $currency;
             }
             $updatedRecord[$record['lastUpdate']] = $record;
             ++$loop;
@@ -132,7 +133,9 @@ class CsvProcessing implements ProcessingInterface
             $xw->startElement('lastUpdate');
             $xw->text((string)$exrate->lastUpdate);
             $xw->endElement();
+
             foreach ($exrate->currency as $currency) {
+                $xw->startElement('currency');
                 $xw->startElement('name');
                 $xw->text((string)$currency->name);
                 $xw->endElement();
@@ -160,7 +163,9 @@ class CsvProcessing implements ProcessingInterface
                     'rate' => (string)$currency->rate,
                     'change' => (string)$currency->change,
                 ]);
+                $xw->endElement();
             }
+
             $xw->endElement();
         }
         $xw->endElement();

@@ -131,6 +131,7 @@ class JsonProcessing implements ProcessingInterface
             $xw->text((string) $exrate->lastUpdate);
             $xw->endElement();
             foreach ($exrate->currency as $currency) {
+                $xw->startElement('currency');
                 $xw->startElement('name');
                 $xw->text((string) $currency->name);
                 $xw->endElement();
@@ -158,6 +159,7 @@ class JsonProcessing implements ProcessingInterface
                     'rate' => (string) $currency->rate,
                     'change' => (string) $currency->change,
                 ]);
+                $xw->endElement();
             }
             $xw->endElement();
         }
