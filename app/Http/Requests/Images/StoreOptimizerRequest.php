@@ -35,6 +35,7 @@ class StoreOptimizerRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'image.image' => 'Your image is broken. Upload intact image',
             'image.max' => "Your image is {$this->getSizeImage()} in weight. Select a image less than {$this->getMaxSize()}",
             'image.dimensions' => "Your image is {$this->getDimensions()} in size. Select an image more than 500x500px",
         ];
@@ -52,7 +53,11 @@ class StoreOptimizerRequest extends FormRequest
 
     protected function getDimensions(): string
     {
-        $image = app(Image::class)->readImage($this->image->getRealPath());
+        try {
+            $image = app(Image::class)->readImage($this->image->getRealPath());
+        } catch (\ImagickException $exception) {
+            return '';
+        }
 
         return "{$image->getImageWidth()}x{$image->getImageHeight()}px";
     }

@@ -4,13 +4,19 @@ declare(strict_types=1);
 
 namespace App\Services\Images;
 
+use Imagick;
+use ImagickException;
+
 class Image
 {
     public function __construct(
-        public \Imagick $imagick
+        public Imagick $imagick
     ) {
     }
 
+    /**
+     * @throws ImagickException
+     */
     public function readImage(string $path): static
     {
         $this->imagick->readImage($path);
@@ -26,5 +32,10 @@ class Image
     public function getImageHeight(): int
     {
         return $this->imagick->getImageHeight();
+    }
+
+    public function valid(): bool
+    {
+        return $this->imagick->valid();
     }
 }
