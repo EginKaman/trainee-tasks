@@ -19,6 +19,8 @@ class Kernel extends ConsoleKernel
         $schedule->job(new EmailReport())
             ->daily()
             ->timezone('Europe/Kyiv');
+        $schedule->command('images:clear')->daily()
+            ->timezone('Europe/Kyiv');
     }
 
     /**

@@ -205,5 +205,6 @@ return [
     'aliases' => Facade::defaultAliases()->merge([
         // 'ExampleClass' => App\Example\ExampleClass::class,
         'KrakenIO' => App\Facades\KrakenFacade::class,
+        'FileHelper' => App\Facades\FileHelper::class,
     ])->toArray(),
 ];

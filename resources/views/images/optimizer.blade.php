@@ -2,7 +2,7 @@
 @section('content')
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-8">
+            <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">{{ __('Task 3 - Image') }}</div>
 
@@ -54,13 +54,12 @@
                                         <div class="row mb-3">
                                             <label for="file"
                                                    class="col-md-2 col-form-label text-md-end">
-                                                {{ __('File input') }}
+                                                {{ __('FileHelper input') }}
                                             </label>
 
                                             <div class="col-md-10">
                                                 <input class="form-control @error('image') is-invalid @enderror"
                                                        type="file" id="file" name="image"
-                                                       onchange="change()"
                                                        accept=".webp,.jpg,.png,.gif,.bmp">
                                                 @error('image')
                                                 <div class="invalid-feedback" role="alert" data-cy=“errorMessage”>
@@ -73,35 +72,89 @@
                                                 </div>
                                             </div>
                                         </div>
+                                        <div class="row mb-0" id="processing" style="display:none;">
+                                            <div class="col-md-6 col-sm-12">
+                                                <label for="method"
+                                                       class="col-form-label">
+                                                    {{ __('Choose a validation method') }}
+                                                </label>
 
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="method"
+                                                           id="method-2" value="native" checked>
+                                                    <label class="form-check-label" for="method-2">
+                                                        Native PHP
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="method"
+                                                           id="method-1" value="library">
+                                                    <label class="form-check-label" for="method-1">
+                                                        Library
+                                                    </label>
+                                                </div>
+                                                @error('method')
+                                                <span class="invalid-feedback" role="alert" data-cy=“errorMessage”>
+                                                        <strong>{{ $message }}</strong>
+                                                    </span>
+                                                @enderror
+                                            </div>
+                                        </div>
                                         <div class="row mb-0">
                                             <div class="col-md-6 offset-md-4">
-                                                <button type="submit" class="btn btn-primary" id="convert-button">
+                                                <button type="submit" class="btn btn-primary" id="convert-button"
+                                                        disabled>
                                                     {{ __('Convert') }}
                                                 </button>
                                             </div>
                                         </div>
                                     </form>
-                                    @if(!empty($images))
+                                    @if(!empty($image))
                                         <div class="row mt-4">
                                             <h4>Processing result</h4>
                                             <small class="text-muted">
-                                                The processing image "somefile" weighing 9mb, size 900x900px is protected by a watermark and converted in 5 formats - 4 others and 1 the same, but cropped
+                                                The processing image "{{ $image->filename }}"
+                                                weighing {{ $image->size_for_humans }}, size {{ $image->height }}
+                                                x{{ $image->width }}px is
+                                                protected by a watermark and converted in 5 formats - 4 others and 1 the
+                                                same, but cropped
                                             </small>
                                             <div class="col-md-12 mt-3">
-                                                @foreach($images as $ext=> $image)
+                                                @foreach($processing->all() as $ext => $items)
                                                     <div class="row">
-                                                        <figure class="figure col-12">
-                                                            <img src="{{ Storage::url($image) }}"
-                                                                 class="figure-img img-fluid rounded" alt="...">
-                                                            <figcaption class="figure-caption">filename</figcaption>
-                                                        </figure>
-                                                        @foreach($cropped[$ext] as $size => $thumb)
-                                                            <figure class="figure @if($loop->first) col-3 @else col @endif">
-                                                                <img src="{{ Storage::url($thumb) }}"
-                                                                     class="figure-img img-fluid rounded" alt="...">
-                                                                <figcaption class="figure-caption">filename</figcaption>
-                                                            </figure>
+                                                        @foreach($items as $size => $thumbs)
+                                                            @foreach($thumbs->all() as $thumb)
+                                                                @php
+                                                                    switch ($thumb->original_width) {
+                                                                        case 350:
+                                                                            $col = 4;
+                                                                            break;
+                                                                        case 200:
+                                                                            $col = 3;
+                                                                            break;
+                                                                        case 150:
+                                                                            $col = 2;
+                                                                            break;
+                                                                        case 100:
+                                                                            $col = 2;
+                                                                            break;
+                                                                        case 50:
+                                                                            $col = 1;
+                                                                            break;
+                                                                        default:
+                                                                            $col = 12  / $thumbs->count();
+
+                                                                    }
+                                                                @endphp
+                                                                <figure class="figure col-{{ $col }}">
+                                                                    <img src="{{ Storage::url($thumb->path) }}"
+                                                                         class="figure-img img-fluid rounded" alt="...">
+                                                                    <figcaption class="figure-caption">
+                                                                        {{ $thumb->name }}
+                                                                        ({{ $thumb->size_for_humans }})
+                                                                    </figcaption>
+                                                                </figure>
+                                                            @endforeach
                                                         @endforeach
                                                     </div>
                                                 @endforeach
@@ -141,10 +194,19 @@
                                         <small class="text-muted">
                                             You can see the conversion results
                                         </small>
-                                        <p class="text-start">
-
-                                        </p>
                                     </div>
+                                </div>
+                                <div class="row pt-1">
+                                    @foreach($images as $image)
+                                        <figure class="figure col-3">
+                                            <img src="{{ Storage::url($image->path) }}"
+                                                 class="figure-img img-fluid rounded" alt="...">
+                                            <figcaption class="figure-caption">
+                                                {{ $image->filename }}
+                                                ({{ $image->size_for_humans }})
+                                            </figcaption>
+                                        </figure>
+                                    @endforeach
                                 </div>
                             </div>
                         </div>

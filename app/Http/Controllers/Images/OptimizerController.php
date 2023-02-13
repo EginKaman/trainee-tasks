@@ -19,7 +19,9 @@ class OptimizerController extends Controller
 {
     public function index(): Application|Factory|View
     {
-        return view('images.optimizer');
+        return view('images.optimizer', [
+            'images' => Image::all(),
+        ]);
     }
 
     public function show(Request $request, Image $image): Application|Factory|View
