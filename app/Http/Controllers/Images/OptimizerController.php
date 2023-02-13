@@ -65,7 +65,7 @@ class OptimizerController extends Controller
     public function previous(): Application|Factory|View
     {
         return view('images.previous', [
-            'images' => Image::all(),
+            'images' => Image::latest('created_at')->get(),
         ]);
     }
 
