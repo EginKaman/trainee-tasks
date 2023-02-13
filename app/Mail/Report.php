@@ -15,24 +15,14 @@ class Report extends Mailable
     use Queueable;
     use SerializesModels;
 
-    private string $text;
-    /**
-     * @var array<string>
-     */
-    private array $logs;
-    private ?string $logPath;
-
     /**
      * Create a new message instance.
-     *
-     * @param ?string $logPath
      */
-    public function __construct(string $text, array $logs, ?string $logPath)
-    {
-        $this->text = $text;
-        $this->logs = $logs;
-        $this->logPath = $logPath;
-    }
+    public function __construct(
+        private readonly string $text,
+        private readonly array $logs,
+        private readonly ?string $logPath
+    ) {}
 
     /**
      * Get the message envelope.
