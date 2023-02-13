@@ -35,15 +35,16 @@
                     <div class="card-body">
                         <nav>
                             <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                                <a class="nav-link active" href="{{ route('optimizer') }}">Converter</a>
-                                <a class="nav-link" href="{{ route('optimizer.test') }}">Test data</a>
+                                <a class="nav-link" href="{{ route('optimizer') }}">Converter</a>
+                                <a class="nav-link active" href="{{ route('optimizer.test') }}">Test data</a>
                                 <a class="nav-link" href="{{ route('optimizer.previous') }}">Previous results</a>
                             </div>
+
                         </nav>
                         <div class="tab-content" id="nav-tabContent">
-                            <div class="tab-pane show active" id="nav-converter" role="tabpanel"
-                                 aria-labelledby="nav-converter-tab">
-                                @include('images.includes.converter')
+                            <div class="tab-pane show active" id="nav-test" role="tabpanel"
+                                 aria-labelledby="nav-test-tab">
+                                @include('images.includes.test')
                             </div>
                         </div>
                     </div>

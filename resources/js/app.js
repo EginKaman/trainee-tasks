@@ -12,19 +12,10 @@ window.onload = function () {
             document.getElementById('convert-button').removeAttribute('disabled');
         });
     }
-    if (window.location.hash === '#converter') {
-        let someVarName = document.querySelector('#nav-converter-tab'); // theTabID of the tab you want to open
-        let tab = new bootstrap.Tab(someVarName);
-        tab.show();
-    }
-    if (window.location.hash === '#test') {
-        let someVarName = document.querySelector('#nav-test-tab'); // theTabID of the tab you want to open
-        let tab = new bootstrap.Tab(someVarName);
-        tab.show();
-    }
-    if (window.location.hash === '#previous') {
-        let someVarName = document.querySelector('#nav-previous-tab'); // theTabID of the tab you want to open
-        let tab = new bootstrap.Tab(someVarName);
-        tab.show();
+    let timezone = document.querySelector('input[name=timezone]');
+    if (timezone) {
+        timezone.value = new Date().getTimezoneOffset();
     }
 };
+const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))

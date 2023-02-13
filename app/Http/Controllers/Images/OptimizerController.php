@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Images;
 
 use App\Actions\Image\NewImage;
 use App\Actions\ProcessingImage\NewProcessingImage;
+use App\Facades\FileHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Images\StoreOptimizerRequest;
 use App\Models\Image;
@@ -17,9 +18,53 @@ use Illuminate\Support\Facades\Storage;
 
 class OptimizerController extends Controller
 {
-    public function index(): Application|Factory|View
+    public function index(Request $request): Application|Factory|View
     {
-        return view('images.optimizer', [
+        $image = $request->session()->get('image');
+        $viewData = [];
+        if ($image !== null) {
+            $image->load([
+                'processingImages' => function ($query): void {
+                    $query->orderBy('mimetype', 'desc')->orderBy('original_width', 'desc');
+                },
+            ]);
+            $processing = $image->processingImages->groupBy(['mimetype', 'original_width']);
+            $viewData = [
+                'image' => $image,
+                'processing' => $processing,
+            ];
+        }
+
+        return view('images.optimizer', $viewData);
+    }
+
+    public function test(): Application|Factory|View
+    {
+        $valid = Storage::disk('public')->files('examples/images/valid');
+        foreach ($valid as $key => $item) {
+            $file = new File(storage_path('app/public/' . $item));
+            $valid[$key] = [
+                'path' => $item,
+                'size' => FileHelper::sizeForHumans($file->getSize()),
+                'name' => $file->getFilename(),
+            ];
+        }
+        $invalid = Storage::disk('public')->files('examples/images/invalid');
+        foreach ($invalid as $key => $item) {
+            $file = new File(storage_path('app/public/' . $item));
+            $invalid[$key] = [
+                'path' => $item,
+                'size' => FileHelper::sizeForHumans($file->getSize()),
+                'name' => $file->getFilename(),
+            ];
+        }
+
+        return view('images.test_data', compact('valid', 'invalid'));
+    }
+
+    public function previous(): Application|Factory|View
+    {
+        return view('images.previous', [
             'images' => Image::all(),
         ]);
     }
@@ -33,9 +78,7 @@ class OptimizerController extends Controller
         ]);
         $processing = $image->processingImages->groupBy(['mimetype', 'original_width']);
 
-        $images = Image::all();
-
-        return view('images.optimizer', compact(['image', 'processing', 'images']));
+        return view('images.show', compact(['image', 'processing']));
     }
 
     public function store(
@@ -72,6 +115,6 @@ class OptimizerController extends Controller
             }
         }
 
-        return redirect()->route('optimizer.show', $image);
+        return redirect()->route('optimizer')->with('image', $image);
     }
 }

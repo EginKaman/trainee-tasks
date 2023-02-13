@@ -29,6 +29,7 @@ class StoreOptimizerRequest extends FormRequest
                     ->max($this->maxFileSize)
                     ->dimensions(Rule::dimensions()->minHeight(500)->minWidth(500)),
             ],
+            'timezone' => ['required', 'int'],
         ];
     }
 
@@ -48,7 +49,7 @@ class StoreOptimizerRequest extends FormRequest
 
     protected function getMaxSize(): string
     {
-        return FileHelper::sizeForHumans($this->maxFileSize);
+        return FileHelper::sizeForHumans($this->maxFileSize * 1024);
     }
 
     protected function getDimensions(): string
