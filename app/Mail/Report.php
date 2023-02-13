@@ -25,8 +25,6 @@ class Report extends Mailable
     /**
      * Create a new message instance.
      *
-     * @param string $text
-     * @param array $logs
      * @param ?string $logPath
      */
     public function __construct(string $text, array $logs, ?string $logPath)

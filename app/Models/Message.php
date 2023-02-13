@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class Message extends Model
 {
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
     protected $casts = [
         'success' => 'bool',

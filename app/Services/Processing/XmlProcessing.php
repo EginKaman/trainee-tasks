@@ -7,10 +7,9 @@ namespace App\Services\Processing;
 use App\Exceptions\UnknownProcessingException;
 use App\Services\Processing\Validator\{Error, FieldValidator};
 use DOMDocument;
-use Illuminate\Support\Facades\{Date, Storage};
 use Exception;
-use League\Csv\CannotInsertRecord;
-use League\Csv\Writer;
+use Illuminate\Support\Facades\{Date, Storage};
+use League\Csv\{CannotInsertRecord, Writer};
 use LibXMLError;
 use SimpleXMLElement;
 use stdClass;
@@ -101,6 +100,7 @@ class XmlProcessing implements ProcessingInterface
                 );
             }
         }
+
         return $xml;
     }
 

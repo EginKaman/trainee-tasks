@@ -34,11 +34,7 @@ class JsonProcessing implements ProcessingInterface
             $this->line += 2;
             $this->fieldValidator->validate($exrate, FieldValidator::LAST_UPDATE_FIELD, ++$this->line);
             if (
-                !$this->fieldValidator->unique(
-                    $exrate->currency,
-                    FieldValidator::CURRENCY_CODE_FIELD,
-                    $this->line
-                )
+                !$this->fieldValidator->unique($exrate->currency, FieldValidator::CURRENCY_CODE_FIELD, $this->line)
             ) {
                 continue;
             }
@@ -135,6 +131,7 @@ class JsonProcessing implements ProcessingInterface
             $xw->text((string) $exrate->lastUpdate);
             $xw->endElement();
             foreach ($exrate->currency as $currency) {
+                $xw->startElement('currency');
                 $xw->startElement('name');
                 $xw->text((string) $currency->name);
                 $xw->endElement();
@@ -162,6 +159,7 @@ class JsonProcessing implements ProcessingInterface
                     'rate' => (string) $currency->rate,
                     'change' => (string) $currency->change,
                 ]);
+                $xw->endElement();
             }
             $xw->endElement();
         }
