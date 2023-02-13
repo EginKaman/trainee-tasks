@@ -89,7 +89,7 @@ class CsvProcessing implements ProcessingInterface
                     ->subDay()
                     ->format('Y-m-d');
             }
-            $previousLastUpdate = $key;
+            $previousLastUpdate = $record['lastUpdate'];
             foreach ($record['currencies'] as $index => $currency) {
                 $rate = round(random_int(0, 1000000) / random_int(2, 100), 5);
                 $change = round(random_int(0, (int)$rate) / random_int(2, 100), 5);
