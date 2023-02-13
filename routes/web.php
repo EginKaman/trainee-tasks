@@ -3,6 +3,7 @@
 use App\Http\Controllers\ConvertorController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\Images\OptimizerController;
+use App\Http\Controllers\Images\PreviousController;
 use App\Http\Controllers\Sendgrid\WebhookController;
 use App\Http\Middleware\SignedWebhookMiddleware;
 use Illuminate\Support\Facades\Route;
@@ -37,5 +38,6 @@ Route::get('/schema.xsd', [ConvertorController::class, 'xmlSchema'])
 Route::prefix('images')->group(function () {
     Route::get('optimizer', [OptimizerController::class, 'index'])->name('optimizer');
     Route::get('optimizer/{image:hash}', [OptimizerController::class, 'show'])->name('optimizer.show');
+    Route::get('optimizer/previous/{image:hash}', PreviousController::class)->name('optimizer.previous');
     Route::post('optimizer', [OptimizerController::class, 'store']);
 })->name('images');

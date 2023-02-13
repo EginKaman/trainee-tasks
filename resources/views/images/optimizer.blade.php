@@ -211,12 +211,12 @@
                                 <div class="row pt-1">
                                     @foreach($images as $image)
                                         <figure class="figure col-3">
-                                            <a href="{{ route('optimizer.show', $image) }}" class="btn-link">
+                                            <a href="{{ route('optimizer.previous', $image) }}" class="btn-link">
                                                 <img src="{{ Storage::url($image->path) }}"
                                                      class="figure-img img-fluid rounded" alt="...">
                                             </a>
                                             <figcaption class="figure-caption">
-                                                <a href="{{ route('optimizer.show', $image) }}" class="btn-link">
+                                                <a href="{{ route('optimizer.previous', $image) }}" class="btn-link">
                                                     {{ $image->filename }}
                                                 </a>
                                                 ({{ $image->size_for_humans }})<br><br>
