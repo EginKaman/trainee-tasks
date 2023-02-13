@@ -22,6 +22,8 @@ class Convert
 
     public function convertToJpeg(\Imagick $imagick): string
     {
+        $imagick->setImageBackgroundColor('white');
+        $imagick = $imagick->mergeImageLayers(\Imagick::LAYERMETHOD_FLATTEN);
         $imagick->setInterlaceScheme(\Imagick::INTERLACE_PLANE);
         $imagick->setFormat('jpg');
         $imagick->setImageFormat('jpg');
