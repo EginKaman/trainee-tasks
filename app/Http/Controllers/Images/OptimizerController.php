@@ -33,7 +33,9 @@ class OptimizerController extends Controller
         ]);
         $processing = $image->processingImages->groupBy(['mimetype', 'original_width']);
 
-        return view('images.optimizer', compact(['image', 'processing']));
+        $images = Image::all();
+
+        return view('images.optimizer', compact(['image', 'processing', 'images']));
     }
 
     public function store(
@@ -49,21 +51,24 @@ class OptimizerController extends Controller
         $fileName = $file->getBasename(".{$file->getExtension()}");
 
         //500x500 original image
-        $output = 'public/images/' . $fileName . '_500.' . $file->getExtension();
+        $output = 'public/images/' . $fileName . '.' . $file->getExtension();
         $crop->handle($file->getRealPath(), 500, 500, Storage::path($output));
-        $newProcessingImage->create($image, new File(Storage::path($output)), $output);
 
         //converted images
         $annotate->handle(Storage::path($output), $fileName);
-        $images = $convert->handle(Storage::path($output), $fileName . '_500');
-        $cropped = [];
+        $images = $convert->handle(Storage::path($output), $fileName);
         foreach ($images as $ext => $img) {
-            $newProcessingImage->create($image, new File(Storage::path($img)), $img);
-            foreach ([350, 200, 150, 100, 50] as $size) {
+            $sizes = [350, 200, 150, 100, 50];
+            $isSkipped = false;
+            if (in_array($ext, ['gif', 'jpg', 'png'], true)) {
+                $isSkipped = true;
+                $sizes = [500, 350, 200, 150, 100, 50];
+            }
+            $newProcessingImage->create($image, new File(Storage::path($img)), $img, $isSkipped);
+            foreach ($sizes as $size) {
                 $output = 'public/images/' . $fileName . '_' . $size . '.' . $ext;
                 $crop->handle(Storage::path($img), $size, $size, Storage::path($output));
                 $newProcessingImage->create($image, new File(Storage::path($output)), $output);
-                $cropped[$ext][$size] = $output;
             }
         }
 

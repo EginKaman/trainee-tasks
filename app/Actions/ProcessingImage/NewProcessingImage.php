@@ -11,7 +11,7 @@ use Illuminate\Http\File;
 
 class NewProcessingImage
 {
-    public function create(Image $image, File $file, string $path): void
+    public function create(Image $image, File $file, string $path, bool $isSkipped = false): void
     {
         $processingImage = new ProcessingImage();
         $processingImage->name = $file->getFilename();
@@ -22,12 +22,12 @@ class NewProcessingImage
         $processingImage->original_height = $imagick->getImageHeight();
         $processingImage->original_width = $imagick->getImageWidth();
         $processingImage->image()->associate($image);
-        if (!in_array($file->getMimeType(), ['image/gif', 'image/jpeg', 'image/png'], true)) {
+        if ($isSkipped === true || !in_array($file->getMimeType(), ['image/gif', 'image/jpeg', 'image/png'], true)) {
             $processingImage->status = 'skipped';
         }
         $processingImage->save();
 
-        if ($processingImage->status === 'pending') {
+        if ($isSkipped === false) {
             OptimizeJob::dispatch($processingImage);
         }
     }

@@ -12,7 +12,7 @@ class Convert
         $imagick->setFilename($filename);
         $images = [];
         $images['gif'] = $this->convertToGif($imagick);
-        $images['jpeg'] = $this->convertToJpeg($imagick);
+        $images['jpg'] = $this->convertToJpeg($imagick);
         $images['webp'] = $this->convertToWebp($imagick);
         $images['png'] = $this->convertToPng($imagick);
         $images['bmp'] = $this->convertToBmp($imagick);

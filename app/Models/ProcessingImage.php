@@ -39,6 +39,13 @@ class ProcessingImage extends Model
         );
     }
 
+    public function dimension(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value, $attributes) => "{$attributes['original_width']}x{$attributes['original_height']}px"
+        );
+    }
+
     public function image(): BelongsTo
     {
         return $this->belongsTo(Image::class);

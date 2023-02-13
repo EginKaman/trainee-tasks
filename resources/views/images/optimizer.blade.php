@@ -54,7 +54,7 @@
                                         <div class="row mb-3">
                                             <label for="file"
                                                    class="col-md-2 col-form-label text-md-end">
-                                                {{ __('FileHelper input') }}
+                                                {{ __('File input') }}
                                             </label>
 
                                             <div class="col-md-10">
@@ -114,8 +114,7 @@
                                             <h4>Processing result</h4>
                                             <small class="text-muted">
                                                 The processing image "{{ $image->filename }}"
-                                                weighing {{ $image->size_for_humans }}, size {{ $image->height }}
-                                                x{{ $image->width }}px is
+                                                weighing {{ $image->size_for_humans }}, size {{ $image->dimension }} is
                                                 protected by a watermark and converted in 5 formats - 4 others and 1 the
                                                 same, but cropped
                                             </small>
@@ -151,7 +150,11 @@
                                                                          class="figure-img img-fluid rounded" alt="...">
                                                                     <figcaption class="figure-caption">
                                                                         {{ $thumb->name }}
-                                                                        ({{ $thumb->size_for_humans }})
+                                                                        ({{ $thumb->size_for_humans }}) <br>
+                                                                        {{ $thumb->dimension }}
+                                                                        @if($thumb->status === 'success')
+                                                                            (optimized)
+                                                                        @endif
                                                                     </figcaption>
                                                                 </figure>
                                                             @endforeach
@@ -199,11 +202,16 @@
                                 <div class="row pt-1">
                                     @foreach($images as $image)
                                         <figure class="figure col-3">
-                                            <img src="{{ Storage::url($image->path) }}"
-                                                 class="figure-img img-fluid rounded" alt="...">
+                                            <a href="{{ route('optimizer.show', $image) }}" class="btn-link">
+                                                <img src="{{ Storage::url($image->path) }}"
+                                                     class="figure-img img-fluid rounded" alt="...">
+                                            </a>
                                             <figcaption class="figure-caption">
-                                                {{ $image->filename }}
-                                                ({{ $image->size_for_humans }})
+                                                <a href="{{ route('optimizer.show', $image) }}" class="btn-link">
+                                                    {{ $image->filename }}
+                                                </a>
+                                                ({{ $image->size_for_humans }})<br><br>
+                                                {{ $image->created_at->format('M j H:i') }}
                                             </figcaption>
                                         </figure>
                                     @endforeach

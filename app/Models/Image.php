@@ -31,6 +31,11 @@ class Image extends Model
         return Attribute::make(get: fn ($value, $attributes) => FileHelper::sizeForHumans($attributes['size']));
     }
 
+    public function dimension(): Attribute
+    {
+        return Attribute::make(get: fn ($value, $attributes) => "{$attributes['width']}x{$attributes['height']}px");
+    }
+
     public function processingImages(): HasMany
     {
         return $this->hasMany(ProcessingImage::class);
