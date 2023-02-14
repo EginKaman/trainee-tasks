@@ -42,22 +42,22 @@ class OptimizerController extends Controller
         $valid = Storage::disk('public')->files('examples/images/valid');
         foreach ($valid as $key => $item) {
             $file = new File(storage_path('app/public/' . $item));
-            $imagick = $image->readImage($file->getRealPath());
+            $size = getimagesize($file->getRealPath());
             $valid[$key] = [
                 'path' => $item,
                 'size' => FileHelper::sizeForHumans($file->getSize()),
-                'dimensions' => "{$imagick->getImageWidth()}x{$imagick->getImageHeight()}px",
+                'dimensions' => "{$size[0]}x{$size[1]}px",
                 'name' => $file->getFilename(),
             ];
         }
         $invalid = Storage::disk('public')->files('examples/images/invalid');
         foreach ($invalid as $key => $item) {
             $file = new File(storage_path('app/public/' . $item));
-            $imagick = $image->readImage($file->getRealPath());
+            $size = getimagesize($file->getRealPath());
             $invalid[$key] = [
                 'path' => $item,
                 'size' => FileHelper::sizeForHumans($file->getSize()),
-                'dimensions' => "{$imagick->getImageWidth()}x{$imagick->getImageHeight()}px",
+                'dimensions' => "{$size[0]}x{$size[1]}px",
                 'name' => $file->getFilename(),
             ];
         }
