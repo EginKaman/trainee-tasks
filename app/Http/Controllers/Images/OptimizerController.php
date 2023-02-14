@@ -115,6 +115,6 @@ class OptimizerController extends Controller
             }
         }
 
-        return redirect()->route('optimizer')->with('image', $image);
+        return redirect()->route('optimizer')->with('image', $image)->with('success', true);
     }
 }

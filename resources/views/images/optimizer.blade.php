@@ -17,6 +17,16 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-12">
+                @if (session('success'))
+                    <div class="alert alert-success" role="alert">
+                        <h4 class="alert-heading">
+                            <svg class="" role="img" width="20px" height="20px" aria-label="Success:">
+                                <use xlink:href="#check-circle-fill"/>
+                            </svg>
+                            {{ __('Successfully!') }}</h4>
+                        <p>The image has been successfully converted and displayed below</p>
+                    </div>
+                @endif
                 @if ($errors->any())
                     <div class="alert alert-danger" role="alert">
                         <h4 class="alert-heading">
