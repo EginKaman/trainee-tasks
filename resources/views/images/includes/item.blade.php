@@ -34,8 +34,22 @@
                             <img src="{{ Storage::url($thumb->path) }}"
                                  class="figure-img img-fluid rounded" alt="...">
                             <figcaption class="figure-caption">
-                                {{ $thumb->name }}
-                                ({{ $thumb->size_for_humans }}) <br>
+                                @if(\Illuminate\Support\Str::length($thumb->name) > 24)
+                                    <a href="{{ Storage::url($thumb->path) }}"
+                                       class="btn-link"
+                                       data-bs-placement="top"
+                                       data-bs-toggle="tooltip"
+                                       data-bs-title="{{ $thumb->name }}"
+                                       title="{{ $thumb->name }}" download="">
+                                        {{ Str::limit($thumb->name, 24) }}
+                                    </a>
+                                @else
+                                    <a href="{{ Storage::url($thumb->path) }}"
+                                       class="btn-link" download="">
+                                        {{ $thumb->name }}
+                                    </a>
+                                @endif
+({{ $thumb->size_for_humans }}) <br>
                                 {{ $thumb->dimension }}
                                 @if($thumb->status === 'success')
                                     (optimized)

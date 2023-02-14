@@ -58,14 +58,20 @@
                                                             <img src="{{ Storage::url($thumb->path) }}"
                                                                  class="figure-img img-fluid rounded" alt="...">
                                                             <figcaption class="figure-caption">
-                                                                @if(\Illuminate\Support\Str::length($thumb->name) > 12)
-                                                                    <span data-bs-toggle="tooltip"
-                                                                          data-bs-title="{{ $thumb->name }}"
-                                                                          title="{{ $thumb->name }}">
-                                                                        {{ Str::limit($thumb->name, 12) }}
-                                                                    </span>
+                                                                @if(\Illuminate\Support\Str::length($thumb->name) > 24)
+                                                                    <a href="{{ Storage::url($thumb->path) }}"
+                                                                       class="btn-link"
+                                                                       data-bs-placement="top"
+                                                                       data-bs-toggle="tooltip"
+                                                                       data-bs-title="{{ $thumb->name }}"
+                                                                       title="{{ $thumb->v }}" download="">
+                                                                        {{ Str::limit($thumb->name, 24) }}
+                                                                    </a>
                                                                 @else
-                                                                    {{ $thumb->name }}
+                                                                    <a href="{{ Storage::url($thumb->path) }}"
+                                                                       class="btn-link" download="">
+                                                                        {{ $thumb->name }}
+                                                                    </a>
                                                                 @endif
                                                                 ({{ $thumb->size_for_humans }}) <br>
                                                                 {{ $thumb->dimension }}
