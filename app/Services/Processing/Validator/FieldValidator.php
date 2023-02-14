@@ -37,7 +37,7 @@ class FieldValidator
         return preg_replace('/\s/', '', $value);
     }
 
-    public function validate(string|object|array $object, string $field, ?int $line): static
+    public function validate(object|array $object, string $field, ?int $line): static
     {
         if ($this->isExistProperty($object, $field)) {
             $fieldClass = 'App\Services\Processing\Validator\Fields\\' . Str::studly($field);
@@ -49,16 +49,19 @@ class FieldValidator
                     }
                     $fieldClass = $this->second($fieldClass, $object);
                 }
-                $answer = $fieldClass->{$method}((string) $this->getProperty($object, $field), $line);
+
+                $answer = $fieldClass->{$method}((string)$this->getProperty($object, $field), $line);
+
                 if (!is_bool($answer)) {
-                    $this->errorBag->add($answer);
+                    $this->addError($answer);
                 }
+
                 if ($fieldClass->break) {
                     break;
                 }
             }
         } else {
-            $this->errorBag->add($this->propertyNotExistError($field, $line));
+            $this->addError($this->propertyNotExistError($field, $line));
         }
 
         return $this;
@@ -75,13 +78,18 @@ class FieldValidator
             if (!isset($uniques[$value])) {
                 $uniques[$value] = $value;
             } else {
-                $this->errorBag->add(new Error("Value of {$field} is existed in this date", $line));
+                $this->addError(new Error("Value of {$field} is existed in this date", $line));
 
                 return false;
             }
         }
 
         return true;
+    }
+
+    public function addError(Error $error): void
+    {
+        $this->errorBag->add($error);
     }
 
     public function hasErrors(): bool
@@ -106,13 +114,13 @@ class FieldValidator
         return property_exists($object, $property);
     }
 
-    protected function getProperty(object|array $object, string $property): array|string|null
+    protected function getProperty(object|array $object, string $property): array|string
     {
         if (is_array($object)) {
-            return $this->prepareValue((string) $object[$property], $property);
+            return $this->prepareValue((string)$object[$property], $property);
         }
 
-        return $this->prepareValue((string) $object->{$property}, $property);
+        return $this->prepareValue((string)$object->{$property}, $property);
     }
 
     protected function getMethods(object|string $class): array
@@ -135,7 +143,7 @@ class FieldValidator
 
     protected function second(object $fieldClass, object|array $object): object
     {
-        $fieldClass->secondValue = $this->getProperty($object, (string) $fieldClass->secondField);
+        $fieldClass->secondValue = $this->getProperty($object, (string)$fieldClass->secondField);
 
         return $fieldClass;
     }
