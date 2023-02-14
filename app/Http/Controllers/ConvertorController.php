@@ -20,7 +20,11 @@ class ConvertorController extends Controller
     {
         $json = new File(resource_path('schemas/schema.json'));
         $xml = new File(resource_path('schemas/schema.xsd'));
-        $results = json_decode($request->session()->get('results'));
+        $results = [];
+        if ($request->session()->has('results')) {
+            $results = $request->session()->get('results');
+            $results = json_decode($results);
+        }
         $fileErrors = $request->session()->get('fileErrors');
         $files = $request->session()->get('files');
         $urls = $request->session()->get('urls');
