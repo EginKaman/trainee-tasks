@@ -21,5 +21,5 @@ interface ProcessingInterface
 
     public function process(string $path): void;
 
-    public function write(SimpleXMLElement|stdClass|array $data, string $hash): void;
+    public function write(array $data, string $hash): void;
 }

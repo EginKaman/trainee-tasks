@@ -13,10 +13,11 @@ use Illuminate\Support\Str;
 
 class NewDocument
 {
+    protected string $hash;
+    protected string $path;
     public function __construct(
-        public Processing $processing,
-        public string $hash,
-        public string $path
+        protected Processing $processing,
+
     ) {
         $this->hash = Str::random(32);
     }
@@ -59,18 +60,10 @@ class NewDocument
     public function getFiles(): array
     {
         return [
-            'processing_results_simple' => new File(
-                storage_path("app/public/documents/{$this->hash}/processing results simple.xml")
-            ),
-            'processing_results_writer' => new File(
-                storage_path("app/public/documents/{$this->hash}/processing results writer.xml")
-            ),
-            'processing_results_json' => new File(
-                storage_path("app/public/documents/{$this->hash}/processing results.json")
-            ),
-            'processing_results_csv' => new File(
-                storage_path("app/public/documents/{$this->hash}/processing results.csv")
-            ),
+            'processing_results_simple' => Storage::disk('public')->size("documents/{$this->hash}/processing results simple.xml"),
+            'processing_results_writer' => Storage::disk('public')->size("/documents/{$this->hash}/processing results writer.xml"),
+            'processing_results_json' => Storage::disk('public')->size("documents/{$this->hash}/processing results.json"),
+            'processing_results_csv' =>Storage::disk('public')->size("documents/{$this->hash}/processing results.csv"),
         ];
     }
 

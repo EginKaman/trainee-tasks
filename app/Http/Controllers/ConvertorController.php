@@ -20,19 +20,22 @@ class ConvertorController extends Controller
     {
         $json = new File(resource_path('schemas/schema.json'));
         $xml = new File(resource_path('schemas/schema.xsd'));
-        $results = $request->session()->get('results');
+        $results = json_decode($request->session()->get('results'));
         $fileErrors = $request->session()->get('fileErrors');
         $files = $request->session()->get('files');
         $urls = $request->session()->get('urls');
-        $document = $request->session()->get('document');
-        return view('convertor', compact(['json', 'xml', 'fileErrors', 'document', 'results', 'files', 'urls']));
+        $originalName = $request->session()->get('originalName');
+        return view('convertor', compact(['json', 'xml', 'fileErrors', 'originalName', 'results', 'files', 'urls']));
     }
 
     public function store(ConverterRequest $request, NewDocument $newDocument): RedirectResponse
     {
         $document = $request->document;
+        $originalName = $request->document->getClientOriginalName();
         $results = [];
         $fileErrors = [];
+        $files = [];
+        $urls = [];
         try {
             $newDocument->store($document);
         } catch (UnknownProcessingException $exception) {
@@ -40,13 +43,13 @@ class ConvertorController extends Controller
             return redirect()->route('convertor')->with('failure', true);
         }
         if ($newDocument->isValid()) {
-            $results = $newDocument->results();
+            $results = json_encode($newDocument->results());
+            $files = $newDocument->getFiles();
+            $urls = $newDocument->getUrls();
         } else {
             $fileErrors = $newDocument->getErrors();
         }
-        $files = $newDocument->getFiles();
-        $urls = $newDocument->getUrls();
-        return redirect()->route('convertor')->with(compact(['fileErrors', 'document', 'results', 'files', 'urls']));
+        return redirect()->route('convertor')->with(compact(['fileErrors', 'originalName', 'results', 'files', 'urls']));
     }
 
     public function jsonSchema(): BinaryFileResponse

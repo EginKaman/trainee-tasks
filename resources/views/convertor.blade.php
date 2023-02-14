@@ -25,7 +25,7 @@
                                 <use xlink:href="#check-circle-fill"/>
                             </svg>
                             {{ __('Successfully!') }}</h4>
-                        <p>The data of the "{{ $document->getClientOriginalName() }}" has been successfully converted
+                        <p>The data of the "{{ $originalName }}" has been successfully converted
                             and displayed bellow</p>
                     </div>
                 @endif
@@ -146,7 +146,7 @@
                                         <div class="row">
                                             <div class="col-12">
                                                 <h3>The following errors were found in
-                                                    the {{ $document->getClientOriginalName() }} file</h3>
+                                                    the {{ $originalName }} file</h3>
                                                 <small class="text-muted">
                                                     For a success conversion, upload the file without errors
                                                 </small>
@@ -208,7 +208,7 @@
                                                 <h3>Processing results for download</h3>
                                                 <small class="text-muted">
                                                     Download the results of processing the
-                                                    file "{{ $document->getClientOriginalName() }}" by clicking on the
+                                                    file "{{ $originalName }}" by clicking on the
                                                     link below
                                                 </small>
                                                 <table class="table">
@@ -217,25 +217,25 @@
                                                         <td><a href="{{ $urls['processing_results_simple'] }}" download>processing
                                                                 results.xml
                                                                 (Simple)</a>
-                                                            ({{ round($files['processing_results_simple']->getSize() / 1024, 2) }}
+                                                            ({{ round($files['processing_results_simple'] / 1024, 2) }}
                                                             kB)
                                                         </td>
                                                         <td><a href="{{ $urls['processing_results_writer'] }}" download>processing
                                                                 results.xml
                                                                 (XmlWriter)</a>
-                                                            ({{ round($files['processing_results_writer']->getSize() / 1024, 2) }}
+                                                            ({{ round($files['processing_results_writer'] / 1024, 2) }}
                                                             kB)
                                                         </td>
                                                     </tr>
                                                     <tr>
                                                         <td><a href="{{ $urls['processing_results_json'] }}" download>processing
                                                                 results.json</a>
-                                                            ({{ round($files['processing_results_json']->getSize() / 1024, 2) }}
+                                                            ({{ round($files['processing_results_json'] / 1024, 2) }}
                                                             kB)
                                                         </td>
                                                         <td><a href="{{ $urls['processing_results_csv'] }}">processing
                                                                 results.csv</a>
-                                                            ({{ round($files['processing_results_csv']->getSize() / 1024, 2) }}
+                                                            ({{ round($files['processing_results_csv'] / 1024, 2) }}
                                                             kB)
                                                         </td>
                                                     </tr>

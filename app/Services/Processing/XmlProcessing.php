@@ -124,7 +124,7 @@ class XmlProcessing implements ProcessingInterface
     /**
      * @throws Exception
      */
-    public function process(string $path): SimpleXMLElement|bool
+    public function process(string $path): void
     {
         $xml = $this->read($path);
         $loop = 0;
@@ -160,12 +160,12 @@ class XmlProcessing implements ProcessingInterface
                 $currency->rate = round(random_int(0, 1000000) / random_int(2, 100), 5);
                 $currency->change = round(random_int(0, (int)$currency->rate) / random_int(2, 100), 5);
             }
-
+            $this->results[] = $exrate;
             ++$loop;
         }
     }
 
-    public function write(SimpleXMLElement|array|stdClass $data, string $hash): void
+    public function write(array $data, string $hash): void
     {
         if (!mkdir(
                 directory: $concurrentDirectory = storage_path("app/public/documents/{$hash}"),
@@ -174,17 +174,41 @@ class XmlProcessing implements ProcessingInterface
             throw new \RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
         }
 
-        $data->saveXML(storage_path("app/public/documents/{$hash}/processing results simple.xml"));
-        $data->saveXML(storage_path("app/public/documents/{$hash}/processing results writer.xml"));
-
-        Storage::put("public/documents/{$hash}/processing results.json", json_encode($data));
+        Storage::put("public/documents/{$hash}/processing results writer.xml", '');
         Storage::put("public/documents/{$hash}/processing results.csv", '');
 
         $writer = Writer::createFromPath(storage_path("app/public/documents/{$hash}/processing results.csv"));
         $writer->insertOne(['lastUpdate', 'name', 'unit', 'currencyCode', 'country', 'rate', 'change']);
+        $xw = new \XMLWriter();
+        $xw->openUri(storage_path("app/public/documents/{$hash}/processing results writer.xml"));
+        $xw->startDocument('1.0', 'UTF-8');
+        $xw->startElement('currencies');
 
-        foreach ($data->exrate as $exrate) {
+        foreach ($data as $exrate) {
+            $xw->startElement('exrate');
+            $xw->startElement('lastUpdate');
+            $xw->text((string)$exrate->lastUpdate);
+            $xw->endElement();
             foreach ($exrate->currency as $currency) {
+                $xw->startElement('currency');
+                $xw->startElement('name');
+                $xw->text((string)$currency->name);
+                $xw->endElement();
+                $xw->startElement('unit');
+                $xw->text((string)$currency->unit);
+                $xw->endElement();
+                $xw->startElement('currencyCode');
+                $xw->text((string)$currency->currencyCode);
+                $xw->endElement();
+                $xw->startElement('country');
+                $xw->text((string)$currency->country);
+                $xw->endElement();
+                $xw->startElement('rate');
+                $xw->text((string)$currency->rate);
+                $xw->endElement();
+                $xw->startElement('change');
+                $xw->text((string)$currency->change);
+                $xw->endElement();
                 $writer->insertOne([
                     'lastUpdate' => (string)$exrate->lastUpdate,
                     'name' => (string)$currency->name,
@@ -194,13 +218,26 @@ class XmlProcessing implements ProcessingInterface
                     'rate' => (string)$currency->rate,
                     'change' => (string)$currency->change,
                 ]);
+                $xw->endElement();
             }
+            $xw->endElement();
         }
+        $xw->endElement();
+        $xw->endDocument();
+        $xw->flush();
+
+        Storage::put(
+            "public/documents/{$hash}/processing results simple.xml",
+            file_get_contents(storage_path("app/public/documents/{$hash}/processing results writer.xml"))
+        );
+
+        Storage::put("public/documents/{$hash}/processing results.json", json_encode($data));
+
     }
 
     public function errors(): array
     {
-        $this->fieldValidator->errors();
+        return $this->fieldValidator->errors();
     }
 
     public function results(): array

@@ -15,6 +15,7 @@ class JsonProcessing implements ProcessingInterface
     private string $schema;
     private int $line = 1;
     private FieldValidator $fieldValidator;
+    private array $results;
 
     public function __construct(FieldValidator $fieldValidator)
     {
@@ -22,12 +23,13 @@ class JsonProcessing implements ProcessingInterface
         $this->fieldValidator = $fieldValidator;
     }
 
-    public function validate(string $path): bool|array
+    public function validate(string $path): void
     {
         try {
             $json = $this->read($path);
         } catch (Exception $exception) {
-            return [new Error($exception->getMessage(), 1)];
+            $this->fieldValidator->addError(new Error($exception->getMessage(), 1));
+            return;
         }
 
         foreach ($json as $key => $exrate) {
@@ -58,8 +60,6 @@ class JsonProcessing implements ProcessingInterface
             }
             ++$this->line;
         }
-
-        return !$this->fieldValidator->hasErrors() ?: $this->fieldValidator->errors();
     }
 
     public function read(string $path): object|array
@@ -67,7 +67,7 @@ class JsonProcessing implements ProcessingInterface
         return Schema::import(json_decode(file_get_contents($this->schema)))->in(json_decode(file_get_contents($path)));
     }
 
-    public function process(string $path): object|array
+    public function process(string $path): void
     {
         $json = $this->read($path);
         foreach ($json as $key => $exrate) {
@@ -86,28 +86,28 @@ class JsonProcessing implements ProcessingInterface
 
             foreach ($exrate->currency as $currency) {
                 $currency->name = $this->fieldValidator->prepareValue(
-                    (string) $currency->name,
+                    (string)$currency->name,
                     FieldValidator::NAME_FIELD
                 );
                 $currency->unit = $this->fieldValidator->prepareValue(
-                    (string) $currency->unit,
+                    (string)$currency->unit,
                     FieldValidator::UNIT_FIELD
                 );
                 $currency->currencyCode = $this->fieldValidator->prepareValue(
-                    (string) $currency->currencyCode,
+                    (string)$currency->currencyCode,
                     FieldValidator::CURRENCY_CODE_FIELD
                 );
                 $currency->country = $this->fieldValidator->prepareValue(
-                    (string) $currency->country,
+                    (string)$currency->country,
                     FieldValidator::COUNTRY_FIELD
                 );
 
                 $currency->rate = round(random_int(0, 1000000) / random_int(2, 100), 5);
-                $currency->change = round(random_int(0, (int) $currency->rate) / random_int(2, 100), 5);
+                $currency->change = round(random_int(0, (int)$currency->rate) / random_int(2, 100), 5);
             }
         }
 
-        return $json;
+        $this->results = $json;
     }
 
     public function write(object|array $data, string $hash): void
@@ -136,36 +136,36 @@ class JsonProcessing implements ProcessingInterface
         foreach ($data as $exrate) {
             $xw->startElement('exrate');
             $xw->startElement('lastUpdate');
-            $xw->text((string) $exrate->lastUpdate);
+            $xw->text((string)$exrate->lastUpdate);
             $xw->endElement();
             foreach ($exrate->currency as $currency) {
                 $xw->startElement('currency');
                 $xw->startElement('name');
-                $xw->text((string) $currency->name);
+                $xw->text((string)$currency->name);
                 $xw->endElement();
                 $xw->startElement('unit');
-                $xw->text((string) $currency->unit);
+                $xw->text((string)$currency->unit);
                 $xw->endElement();
                 $xw->startElement('currencyCode');
-                $xw->text((string) $currency->currencyCode);
+                $xw->text((string)$currency->currencyCode);
                 $xw->endElement();
                 $xw->startElement('country');
-                $xw->text((string) $currency->country);
+                $xw->text((string)$currency->country);
                 $xw->endElement();
                 $xw->startElement('rate');
-                $xw->text((string) $currency->rate);
+                $xw->text((string)$currency->rate);
                 $xw->endElement();
                 $xw->startElement('change');
-                $xw->text((string) $currency->change);
+                $xw->text((string)$currency->change);
                 $xw->endElement();
                 $writer->insertOne([
-                    'lastUpdate' => (string) $exrate->lastUpdate,
-                    'name' => (string) $currency->name,
-                    'unit' => (string) $currency->unit,
-                    'currencyCode' => (string) $currency->currencyCode,
-                    'country' => (string) $currency->country,
-                    'rate' => (string) $currency->rate,
-                    'change' => (string) $currency->change,
+                    'lastUpdate' => (string)$exrate->lastUpdate,
+                    'name' => (string)$currency->name,
+                    'unit' => (string)$currency->unit,
+                    'currencyCode' => (string)$currency->currencyCode,
+                    'country' => (string)$currency->country,
+                    'rate' => (string)$currency->rate,
+                    'change' => (string)$currency->change,
                 ]);
                 $xw->endElement();
             }
@@ -179,5 +179,20 @@ class JsonProcessing implements ProcessingInterface
             "public/documents/{$hash}/processing results simple.xml",
             file_get_contents(storage_path("app/public/documents/{$hash}/processing results writer.xml"))
         );
+    }
+
+    public function isValid(): bool
+    {
+        return $this->fieldValidator->hasErrors();
+    }
+
+    public function errors(): array
+    {
+        return $this->fieldValidator->errors();
+    }
+
+    public function results(): array
+    {
+        return $this->results;
     }
 }

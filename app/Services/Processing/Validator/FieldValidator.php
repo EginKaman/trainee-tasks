@@ -94,7 +94,7 @@ class FieldValidator
 
     public function hasErrors(): bool
     {
-        return $this->errorBag->isNotEmpty();
+        return !$this->errorBag->isNotEmpty();
     }
 
     /**
