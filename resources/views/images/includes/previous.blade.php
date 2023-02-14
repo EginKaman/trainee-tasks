@@ -27,7 +27,7 @@
                     </a>
                 @endif
             ({{ $image->size_for_humans }})<br><br>
-                {{ $image->created_at->format('M j H:i') }}
+                {{ $image->created_at->format('M j, H:i') }}
             </figcaption>
         </figure>
     @endforeach

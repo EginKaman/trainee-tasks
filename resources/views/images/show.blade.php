@@ -29,7 +29,7 @@
                                         protected by a watermark and converted in 5 formats - 4 others and 1 the
                                         same, but cropped
                                     </small>
-                                    <p class="text-start">{{ $image->created_at->format('M j H:i') }}</p>
+                                    <p class="text-start">{{ $image->created_at->format('M j, H:i') }}</p>
                                     <div class="col-md-12 mt-3">
                                         @foreach($processing->all() as $ext => $items)
                                             <div class="row">
@@ -84,6 +84,11 @@
                                                 @endforeach
                                             </div>
                                         @endforeach
+                                    </div>
+                                </div>
+                                <div class="row pt-3">
+                                    <div class="col-12">
+                                        <a href="{{ route('optimizer.previous') }}" class="btn btn-primary">Back</a>
                                     </div>
                                 </div>
                             </div>
