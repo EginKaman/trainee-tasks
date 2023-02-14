@@ -11,7 +11,8 @@
                          class="figure-img img-fluid rounded" alt="...">
                     <figcaption class="figure-caption">
                         <a href="{{ Storage::url($item['path']) }}" class="btn-link" download="">{{ $item['name'] }}</a>
-                        ({{ $item['size'] }})
+                        ({{ $item['size'] }})<br><br>
+                        {{ $item['dimensions'] }}
                     </figcaption>
                 </figure>
             @endforeach
@@ -31,7 +32,8 @@
                          class="figure-img img-fluid rounded" alt="...">
                     <figcaption class="figure-caption">
                         <a href="{{ Storage::url($item['path']) }}" class="btn-link" download="">{{ $item['name'] }}</a>
-                        ({{ $item['size'] }})
+                        ({{ $item['size'] }})<br><br>
+                        {{ $item['dimensions'] }}
                     </figcaption>
                 </figure>
             @endforeach
