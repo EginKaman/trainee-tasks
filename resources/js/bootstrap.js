@@ -1,6 +1,14 @@
 import _ from 'lodash';
 window._ = _;
 
+import $ from 'jquery'
+window.$ = window.jQuery = $;
+
+import 'overlayscrollbars/overlayscrollbars.css';
+import { OverlayScrollbars } from 'overlayscrollbars';
+window.OverlayScrollbars = OverlayScrollbars;
+
+import '../../vendor/almasaeed2010/adminlte/dist/js/adminlte';
 /**
  * We'll load the axios HTTP library which allows us to easily issue requests
  * to our Laravel back-end. This library automatically handles sending the
