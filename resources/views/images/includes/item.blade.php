@@ -9,7 +9,7 @@
     <div class="col-md-12 mt-3">
         @foreach($processing->all() as $ext => $items)
             <div class="row">
-                <h5>{{ $ext }}</h5>
+                <h5>{{ $items->first()->first()->type }}</h5>
                 @foreach($items as $size => $thumbs)
                     @foreach($thumbs->all() as $thumb)
                         @php

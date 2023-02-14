@@ -46,6 +46,20 @@ class ProcessingImage extends Model
         );
     }
 
+    public function type(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value, $attributes) => match ($attributes['mimetype']) {
+                'image/x-ms-bmp' => 'bmp',
+                'image/webp' => 'webp',
+                'image/png' => 'png',
+                'image/jpeg' => 'jpg',
+                'image/gif' => 'gif',
+                default => ''
+            }
+        );
+    }
+
     public function image(): BelongsTo
     {
         return $this->belongsTo(Image::class);
