@@ -16,6 +16,11 @@ class Crop
     {
         $imagick = new Imagick($path);
         $imagick = $this->autoRotateImage($imagick);
+
+        if ($imagick->getImageMimeType() === 'image/gif') {
+            $imagick = $this->delay($imagick);
+        }
+
         $imagick->thumbnailImage($width, $height);
         $imagick->writeImage($output);
     }
@@ -49,5 +54,19 @@ class Crop
         $imagick->setImageOrientation(Imagick::ORIENTATION_TOPLEFT);
 
         return $imagick;
+    }
+
+    protected function delay(Imagick $imagick): Imagick
+    {
+        $imagick = $imagick->coalesceImages();
+
+        $frameCount = 0;
+
+        foreach ($imagick as $frame) {
+            $imagick->setImageDelay((($frameCount % 11) * 5));
+            ++$frameCount;
+        }
+
+        return $imagick->deconstructImages();
     }
 }
