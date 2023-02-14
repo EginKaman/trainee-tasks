@@ -33,11 +33,13 @@ class JsonProcessing implements ProcessingInterface
         foreach ($json as $key => $exrate) {
             $this->line += 2;
             $this->fieldValidator->validate($exrate, FieldValidator::LAST_UPDATE_FIELD, ++$this->line);
+
             if (
                 !$this->fieldValidator->unique($exrate->currency, FieldValidator::CURRENCY_CODE_FIELD, $this->line)
             ) {
                 continue;
             }
+
             ++$this->line;
             foreach ($exrate->currency as $currency) {
                 ++$this->line;
@@ -73,6 +75,7 @@ class JsonProcessing implements ProcessingInterface
                 $exrate->lastUpdate,
                 FieldValidator::LAST_UPDATE_FIELD
             );
+
             if ($key === 0) {
                 $exrate->lastUpdate = Date::today()->format('Y-m-d');
             } else {
@@ -80,6 +83,7 @@ class JsonProcessing implements ProcessingInterface
                     ->subDay()
                     ->format('Y-m-d');
             }
+
             foreach ($exrate->currency as $currency) {
                 $currency->name = $this->fieldValidator->prepareValue(
                     (string) $currency->name,
@@ -97,6 +101,7 @@ class JsonProcessing implements ProcessingInterface
                     (string) $currency->country,
                     FieldValidator::COUNTRY_FIELD
                 );
+
                 $currency->rate = round(random_int(0, 1000000) / random_int(2, 100), 5);
                 $currency->change = round(random_int(0, (int) $currency->rate) / random_int(2, 100), 5);
             }
@@ -105,7 +110,7 @@ class JsonProcessing implements ProcessingInterface
         return $json;
     }
 
-    public function write(object|array $json, string $hash): void
+    public function write(object|array $data, string $hash): void
     {
         if (
             !mkdir(
@@ -116,16 +121,19 @@ class JsonProcessing implements ProcessingInterface
             throw new \RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
         }
 
-        Storage::put("public/documents/{$hash}/processing results.json", json_encode($json));
+        Storage::put("public/documents/{$hash}/processing results.json", json_encode($data));
         Storage::put("public/documents/{$hash}/processing results.csv", '');
         Storage::put("public/documents/{$hash}/processing results writer.xml", '');
+
         $writer = Writer::createFromPath(storage_path("app/public/documents/{$hash}/processing results.csv"));
         $writer->insertOne(['lastUpdate', 'name', 'unit', 'currencyCode', 'country', 'rate', 'change']);
+
         $xw = new \XMLWriter();
         $xw->openUri(storage_path("app/public/documents/{$hash}/processing results writer.xml"));
         $xw->startDocument('1.0', 'UTF-8');
         $xw->startElement('currencies');
-        foreach ($json as $exrate) {
+
+        foreach ($data as $exrate) {
             $xw->startElement('exrate');
             $xw->startElement('lastUpdate');
             $xw->text((string) $exrate->lastUpdate);
@@ -166,6 +174,7 @@ class JsonProcessing implements ProcessingInterface
         $xw->endElement();
         $xw->endDocument();
         $xw->flush();
+
         Storage::put(
             "public/documents/{$hash}/processing results simple.xml",
             file_get_contents(storage_path("app/public/documents/{$hash}/processing results writer.xml"))

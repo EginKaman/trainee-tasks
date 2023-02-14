@@ -7,15 +7,13 @@ namespace App\Services;
 use App\Exceptions\UnknownProcessingException;
 use App\Services\Processing\{CsvProcessing, JsonProcessing, ProcessingInterface, XmlProcessing};
 
-class Processing
+class Processing implements ProcessingInterface
 {
     private string $mimeType;
     private ProcessingInterface $processing;
 
     /**
      * @throws UnknownProcessingException
-     *
-     * @return $this
      */
     public function setMimeType(string $mimeType): static
     {
@@ -23,24 +21,6 @@ class Processing
         $this->selectProcessing();
 
         return $this;
-    }
-
-    public function validate(string $path): bool|array
-    {
-        return $this->processing->validate($path);
-    }
-
-    /**
-     * @return object
-     */
-    public function process(string $path): object|array
-    {
-        return $this->processing->process($path);
-    }
-
-    public function write(object|array $data, string $hash): void
-    {
-        $this->processing->write($data, $hash);
     }
 
     /**
@@ -54,5 +34,40 @@ class Processing
             'text/csv' => app(CsvProcessing::class),
             default => throw new UnknownProcessingException(),
         };
+    }
+
+    public function validate(string $path): void
+    {
+        $this->processing->validate($path);
+    }
+
+    public function isValid(): bool
+    {
+        return $this->processing->isValid();
+    }
+
+    public function errors(): array
+    {
+        return $this->processing->errors();
+    }
+
+    public function read(string $path): object|array
+    {
+        return $this->processing->read($path);
+    }
+
+    public function results(): array
+    {
+        return $this->processing->results();
+    }
+
+    public function process(string $path): void
+    {
+        $this->processing->process($path);
+    }
+
+    public function write(object|array $data, string $hash): void
+    {
+        $this->processing->write($data, $hash);
     }
 }
