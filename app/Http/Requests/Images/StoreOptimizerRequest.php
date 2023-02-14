@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Requests\Images;
 
 use App\Facades\FileHelper;
+use App\Rules\BrokenImageRule;
 use App\Services\Images\Image;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\UploadedFile;
@@ -23,6 +24,7 @@ class StoreOptimizerRequest extends FormRequest
         return [
             'image' => [
                 'required',
+                new BrokenImageRule(),
                 'image',
                 'mimes:jpg,jpeg,png,gif,bmp,webp',
                 File::image()
@@ -36,7 +38,6 @@ class StoreOptimizerRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'image.image' => 'Your image is broken. Upload intact image',
             'image.max' => "Your image is {$this->getSizeImage()} in weight. Select a image less than {$this->getMaxSize()}",
             'image.dimensions' => "Your image is {$this->getDimensions()} in size. Select an image more than 500x500px",
         ];
