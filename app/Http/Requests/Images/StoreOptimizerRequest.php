@@ -45,6 +45,10 @@ class StoreOptimizerRequest extends FormRequest
 
     protected function getSizeImage(): string
     {
+        if ($this->image === null) {
+            return '';
+        }
+
         return FileHelper::sizeForHumans($this->image->getSize());
     }
 
