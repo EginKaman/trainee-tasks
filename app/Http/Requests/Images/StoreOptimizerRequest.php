@@ -6,7 +6,6 @@ namespace App\Http\Requests\Images;
 
 use App\Facades\FileHelper;
 use App\Rules\BrokenImageRule;
-use App\Services\Images\Image;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Validation\Rule;
@@ -59,12 +58,11 @@ class StoreOptimizerRequest extends FormRequest
 
     protected function getDimensions(): string
     {
-        try {
-            $image = app(Image::class)->readImage($this->image->getRealPath());
-        } catch (\ImagickException $exception) {
+        $image = getimagesize($this->image->getRealPath());
+        if (!$image) {
             return '';
         }
 
-        return "{$image->getImageWidth()}x{$image->getImageHeight()}px";
+        return "{$image[0]}x{$image[1]}px";
     }
 }
