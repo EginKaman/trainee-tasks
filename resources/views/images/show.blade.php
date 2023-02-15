@@ -29,11 +29,11 @@
                                         protected by a watermark and converted in 5 formats - 4 others and 1 the
                                         same, but cropped
                                     </small>
-                                    <p class="text-start">{{ $image->created_at->format('M j H:i') }}</p>
+                                    <p class="text-start">{{ $image->created_at->format('M j, H:i') }}</p>
                                     <div class="col-md-12 mt-3">
                                         @foreach($processing->all() as $ext => $items)
                                             <div class="row">
-                                                <h5>{{ $ext }}</h5>
+                                                <h5>{{ $items->first()->first()->type }}</h5>
                                                 @foreach($items as $size => $thumbs)
                                                     @foreach($thumbs->all() as $thumb)
                                                         @php
@@ -58,14 +58,20 @@
                                                             <img src="{{ Storage::url($thumb->path) }}"
                                                                  class="figure-img img-fluid rounded" alt="...">
                                                             <figcaption class="figure-caption">
-                                                                @if(\Illuminate\Support\Str::length($thumb->name) > 12)
-                                                                    <span data-bs-toggle="tooltip"
-                                                                          data-bs-title="{{ $thumb->name }}"
-                                                                          title="{{ $thumb->name }}">
-                                                                        {{ Str::limit($thumb->name, 12) }}
-                                                                    </span>
+                                                                @if(\Illuminate\Support\Str::length($thumb->name) > 24)
+                                                                    <a href="{{ Storage::url($thumb->path) }}"
+                                                                       class="btn-link"
+                                                                       data-bs-placement="top"
+                                                                       data-bs-toggle="tooltip"
+                                                                       data-bs-title="{{ $thumb->name }}"
+                                                                       title="{{ $thumb->v }}" download="">
+                                                                        {{ Str::limit($thumb->name, 24) }}
+                                                                    </a>
                                                                 @else
-                                                                    {{ $thumb->name }}
+                                                                    <a href="{{ Storage::url($thumb->path) }}"
+                                                                       class="btn-link" download="">
+                                                                        {{ $thumb->name }}
+                                                                    </a>
                                                                 @endif
                                                                 ({{ $thumb->size_for_humans }}) <br>
                                                                 {{ $thumb->dimension }}
@@ -78,6 +84,11 @@
                                                 @endforeach
                                             </div>
                                         @endforeach
+                                    </div>
+                                </div>
+                                <div class="row pt-3">
+                                    <div class="col-12">
+                                        <a href="{{ route('optimizer.previous') }}" class="btn btn-primary">Back</a>
                                     </div>
                                 </div>
                             </div>

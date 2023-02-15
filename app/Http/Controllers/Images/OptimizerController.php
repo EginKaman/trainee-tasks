@@ -10,15 +10,14 @@ use App\Facades\FileHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Images\StoreOptimizerRequest;
 use App\Models\Image;
-use App\Services\Images\{Annotate, Convert, Crop};
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\View\{Factory, View};
+use App\Services\Images\{Annotate, Convert, Crop, Image as Imagick};
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\{File, RedirectResponse, Request};
 use Illuminate\Support\Facades\Storage;
 
 class OptimizerController extends Controller
 {
-    public function index(Request $request): Application|Factory|View
+    public function index(Request $request): View
     {
         $image = $request->session()->get('image');
         $viewData = [];
@@ -38,23 +37,27 @@ class OptimizerController extends Controller
         return view('images.optimizer', $viewData);
     }
 
-    public function test(): Application|Factory|View
+    public function test(Imagick $image): View
     {
         $valid = Storage::disk('public')->files('examples/images/valid');
         foreach ($valid as $key => $item) {
             $file = new File(storage_path('app/public/' . $item));
+            $size = getimagesize($file->getRealPath());
             $valid[$key] = [
                 'path' => $item,
                 'size' => FileHelper::sizeForHumans($file->getSize()),
+                'dimensions' => "{$size[0]}x{$size[1]}px",
                 'name' => $file->getFilename(),
             ];
         }
         $invalid = Storage::disk('public')->files('examples/images/invalid');
         foreach ($invalid as $key => $item) {
             $file = new File(storage_path('app/public/' . $item));
+            $size = getimagesize($file->getRealPath());
             $invalid[$key] = [
                 'path' => $item,
                 'size' => FileHelper::sizeForHumans($file->getSize()),
+                'dimensions' => "{$size[0]}x{$size[1]}px",
                 'name' => $file->getFilename(),
             ];
         }
@@ -62,14 +65,14 @@ class OptimizerController extends Controller
         return view('images.test_data', compact('valid', 'invalid'));
     }
 
-    public function previous(): Application|Factory|View
+    public function previous(): View
     {
         return view('images.previous', [
             'images' => Image::latest('created_at')->get(),
         ]);
     }
 
-    public function show(Request $request, Image $image): Application|Factory|View
+    public function show(Image $image): View
     {
         $image->load([
             'processingImages' => function ($query): void {
@@ -115,6 +118,6 @@ class OptimizerController extends Controller
             }
         }
 
-        return redirect()->route('optimizer')->with('image', $image);
+        return redirect()->route('optimizer')->with('image', $image)->with('success', true);
     }
 }

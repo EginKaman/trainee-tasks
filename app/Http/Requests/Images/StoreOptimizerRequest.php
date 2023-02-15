@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Requests\Images;
 
 use App\Facades\FileHelper;
-use App\Services\Images\Image;
+use App\Rules\BrokenImageRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Validation\Rule;
@@ -23,6 +23,7 @@ class StoreOptimizerRequest extends FormRequest
         return [
             'image' => [
                 'required',
+                new BrokenImageRule(),
                 'image',
                 'mimes:jpg,jpeg,png,gif,bmp,webp',
                 File::image()
@@ -36,7 +37,6 @@ class StoreOptimizerRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'image.image' => 'Your image is broken. Upload intact image',
             'image.max' => "Your image is {$this->getSizeImage()} in weight. Select a image less than {$this->getMaxSize()}",
             'image.dimensions' => "Your image is {$this->getDimensions()} in size. Select an image more than 500x500px",
         ];
@@ -44,6 +44,10 @@ class StoreOptimizerRequest extends FormRequest
 
     protected function getSizeImage(): string
     {
+        if ($this->image === null) {
+            return '';
+        }
+
         return FileHelper::sizeForHumans($this->image->getSize());
     }
 
@@ -54,12 +58,11 @@ class StoreOptimizerRequest extends FormRequest
 
     protected function getDimensions(): string
     {
-        try {
-            $image = app(Image::class)->readImage($this->image->getRealPath());
-        } catch (\ImagickException $exception) {
+        $image = getimagesize($this->image->getRealPath());
+        if (!$image) {
             return '';
         }
 
-        return "{$image->getImageWidth()}x{$image->getImageHeight()}px";
+        return "{$image[0]}x{$image[1]}px";
     }
 }
