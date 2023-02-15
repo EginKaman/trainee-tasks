@@ -20,15 +20,21 @@ class ConvertorController extends Controller
     {
         $json = new File(resource_path('schemas/schema.json'));
         $xml = new File(resource_path('schemas/schema.xsd'));
+
         $results = [];
         if ($request->session()->has('results')) {
             $results = $request->session()->get('results');
             $results = json_decode($results);
         }
+
         $fileErrors = $request->session()->get('fileErrors');
+
         $files = $request->session()->get('files');
+
         $urls = $request->session()->get('urls');
+
         $originalName = $request->session()->get('originalName');
+
         return view('convertor', compact(['json', 'xml', 'fileErrors', 'originalName', 'results', 'files', 'urls']));
     }
 
@@ -36,16 +42,19 @@ class ConvertorController extends Controller
     {
         $document = $request->document;
         $originalName = $request->document->getClientOriginalName();
+
         $results = [];
         $fileErrors = [];
         $files = [];
         $urls = [];
+
         try {
             $newDocument->store($document);
         } catch (UnknownProcessingException $exception) {
             Log::error($exception->getMessage(), $exception->getTrace());
             return redirect()->route('convertor')->with('failure', true);
         }
+
         if ($newDocument->isValid()) {
             $results = json_encode($newDocument->results());
             $files = $newDocument->getFiles();
@@ -53,6 +62,7 @@ class ConvertorController extends Controller
         } else {
             $fileErrors = $newDocument->getErrors();
         }
+
         return redirect()->route('convertor')->with(compact(['fileErrors', 'originalName', 'results', 'files', 'urls']));
     }
 
