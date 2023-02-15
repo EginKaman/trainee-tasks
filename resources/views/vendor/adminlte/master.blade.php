@@ -8,9 +8,16 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="robots" content="noindex,nofollow">
 
     {{-- Custom Meta Tags --}}
     @yield('meta_tags')
+
+    <link rel="icon" href="/images/favicon_24x24.svg" sizes="24x24">
+    <link rel="icon" href="/images/favicon_32x32.svg" sizes="32x32">
+    <link rel="icon" href="/images/favicon_48x48.svg" sizes="48x48">
+    <link rel="icon" href="/images/favicon_64x64.svg" sizes="64x64">
+    <link rel="icon" href="/images/favicon_128x128.svg" sizes="128x128">
 
     {{-- Title --}}
     <title>

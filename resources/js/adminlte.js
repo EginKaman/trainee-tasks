@@ -1,11 +1,33 @@
 import _ from 'lodash';
+
 window._ = _;
 
 import * as $ from 'jquery'
+
 window.$ = window.jQuery = $;
 
 import 'overlayscrollbars/overlayscrollbars.css';
-import { OverlayScrollbars } from 'overlayscrollbars';
+import {OverlayScrollbars} from 'overlayscrollbars';
+
 window.OverlayScrollbars = OverlayScrollbars;
 
 import 'admin-lte';
+
+let container = document.querySelector('#info-form');
+const delegate = (selector) => (cb) => (e) => e.target.matches(selector) && cb(e);
+
+const inputDelegate = delegate('input');
+
+container.addEventListener('keyup', inputDelegate(function (el) {
+    if (document.getElementById('length-' + el.target.name)) {
+        return document.getElementById('length-' + el.target.name).textContent = el.target.value.length;
+    }
+}));
+
+const textareaDelegate = delegate('textarea');
+
+container.addEventListener('keyup', textareaDelegate(function (el) {
+    if (document.getElementById('length-' + el.target.name)) {
+        return document.getElementById('length-' + el.target.name).textContent = el.target.value.length;
+    }
+}));
