@@ -24,10 +24,28 @@ class StoreFormRequest extends FormRequest
             ],
             'additional_phone' => [
                 'nullable',
-                'regex:/\\+?\\d{1,4}?[\\s]?\\d{1,3}?[\\s]?\\d{1,4}[\\s]?\\d{1,4}[\\s]?\\d{1,9}[ ,;]?[ ]+?/',
+                'regex:/\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\\s]?\d{1,4}[-.\s]?\d{1,9}[ ,;]?/',
             ],
             'pincode' => ['required', 'regex:/^\d{4}-?\d{4}$/'],
             'description' => ['nullable', 'max:500', 'regex:/.{0,500}/'],
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'id' => [
+                'regex' => 'For ID, we use only Latin in lower case, numbers, the sign "_"',
+            ],
+            'pincode' => [
+                'regex' => 'Pincode is valid only in the format ххххххх, хххх-хххх, where х are numbers only',
+            ],
+            'name' => [
+                'regex' => 'Only Latin and spaces are used for the name',
+            ],
+            'phone' => [
+                'regex' => 'The phone format is invalid',
+            ],
         ];
     }
 }

@@ -17,6 +17,8 @@ class FormController extends Controller
 
     public function store(StoreFormRequest $request): RedirectResponse
     {
-        return redirect()->route('form.index')->withInput($request->validated())->with('success', true);
+        return redirect()->route('form.index')
+            ->withInput($request->validated())
+            ->with('success', true);
     }
 }

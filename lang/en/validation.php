@@ -175,7 +175,16 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'name' => 'Name',
+        'phone' => 'Phone',
+        'additional_phone' => 'Phone',
+        'email' => 'Email',
+        'email_rfc' => 'Email RFC',
+        'pincode' => 'Pin code',
+        'id' => 'ID',
+        'description' => 'Description',
+    ],
 
     'fields' => [
         'text' => 'message',

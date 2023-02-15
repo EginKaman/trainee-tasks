@@ -1,3 +1,10 @@
 {
-    "text": "message"
+    "text": "message",
+    "name": "Name*",
+    "phone": "Phone*",
+    "additional_phone": "Phone",
+    "email": "Email*",
+    "email_rfc": "Email RFC",
+    "pincode": "Pin code*",
+    "description": "Description"
 }
