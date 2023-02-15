@@ -18,15 +18,15 @@ const delegate = (selector) => (cb) => (e) => e.target.matches(selector) && cb(e
 
 const inputDelegate = delegate('input');
 
-container.addEventListener('keyup', inputDelegate(function (el) {
+const textareaDelegate = delegate('textarea');
+
+container.addEventListener('input', inputDelegate(function (el) {
     if (document.getElementById('length-' + el.target.name)) {
         return document.getElementById('length-' + el.target.name).textContent = el.target.value.length;
     }
 }));
 
-const textareaDelegate = delegate('textarea');
-
-container.addEventListener('keyup', textareaDelegate(function (el) {
+container.addEventListener('input', textareaDelegate(function (el) {
     if (document.getElementById('length-' + el.target.name)) {
         return document.getElementById('length-' + el.target.name).textContent = el.target.value.length;
     }

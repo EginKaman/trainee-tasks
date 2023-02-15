@@ -14,7 +14,8 @@
     @endif
     @if($errors->isNotEmpty())
         <x-adminlte-alert theme="danger" title="Danger">
-            Please correct data in next fields: {{ implode(', ', Arr::map($errors->keys(), fn ($value) => __($value))) }}
+            Please correct data in next
+            fields: {{ implode(', ', Arr::map($errors->keys(), fn ($value) => __($value))) }}
         </x-adminlte-alert>
     @endif
     <div class="row">
@@ -29,13 +30,8 @@
                             <div class="row">
                                 <x-adminlte-input type="text" name="name" label="Name *" placeholder="Name"
                                                   value="{{ old('name') }}"
-                                                  fgroup-class="col-md-6" disable-feedback>
+                                                  fgroup-class="col-md-6" enable-old-support>
                                     <x-slot name="bottomSlot">
-                                        @error('name')
-                                            <span class="text-sm text-red">
-                                                <strong>{{ $message }}</strong>
-                                            </span>
-                                        @enderror
                                         <span class="text-sm text-gray float-right">
                                             <span id="length-name">0</span> / 128
                                         </span>
@@ -44,34 +40,25 @@
                             </div>
                             <div class="row">
                                 <x-adminlte-input type="text" name="phone" label="Phone *" placeholder="Phone"
-                                                  value="{{ old('phone') }}"
-                                                  fgroup-class="col-md-6" disable-feedback>
-                                    <x-slot name="bottomSlot">
-                                        @error('phone')
-                                            <span class="text-sm text-red">
-                                                <strong>{{ $message }}</strong>
-                                            </span>
-                                        @else
+                                                  error-key="phone"
+                                                  fgroup-class="col-md-6" enable-old-support>
+                                    @if(!$errors->has('phone'))
+                                        <x-slot name="bottomSlot">
                                             <span class="text-sm text-gray">
                                                 +38 (xxx) xxx - xx - xx
                                             </span>
-                                        @enderror
-
-                                    </x-slot>
+                                        </x-slot>
+                                    @endif
                                 </x-adminlte-input>
                                 <x-adminlte-input type="text" name="additional_phone" label="Phone" placeholder="Phone"
-                                                  value="{{ old('additional_phone') }}"
-                                                  fgroup-class="col-md-6" disable-feedback>
+                                                  error-key="additional_phone"
+                                                  fgroup-class="col-md-6" enable-old-support>
                                     <x-slot name="bottomSlot">
-                                        @error('additional_phone')
-                                            <span class="text-sm text-red">
-                                                <strong>{{ $message }}</strong>
-                                            </span>
-                                        @else
+                                        @if(!$errors->has('additional_phone'))
                                             <span class="text-sm text-gray">
                                                 Enter your phone number
                                             </span>
-                                        @enderror
+                                        @endif
 
                                         <span class="text-sm text-gray float-right">
                                             <span id="length-additional_phone">0</span> / 256
@@ -81,19 +68,14 @@
                             </div>
                             <div class="row">
                                 <x-adminlte-input type="text" name="email" label="Email *" placeholder="Email"
-                                                  value="{{ old('email') }}"
-                                                  fgroup-class="col-md-6" disable-feedback>
+                                                  error-key="email"
+                                                  fgroup-class="col-md-6" enable-old-support>
                                     <x-slot name="bottomSlot">
-                                        @error('email')
-                                            <span class="text-sm text-red">
-                                                <strong>{{ $message }}</strong>
-                                            </span>
-                                        @else
-
+                                        @if(!$errors->has('email'))
                                             <span class="text-sm text-gray">
                                                 Enter your email address
                                             </span>
-                                        @enderror
+                                        @endif
 
                                         <span class="text-sm text-gray float-right">
                                             <span id="length-email">0</span> / 254
@@ -101,18 +83,14 @@
                                     </x-slot>
                                 </x-adminlte-input>
                                 <x-adminlte-input type="text" name="email_rfc" label="Email RFC" placeholder="Email RFC"
-                                                  value="{{ old('email_rfc') }}"
-                                                  fgroup-class="col-md-6" disable-feedback>
+                                                  error-key="email_rfc"
+                                                  fgroup-class="col-md-6" enable-old-support>
                                     <x-slot name="bottomSlot">
-                                        @error('email_rfc')
-                                            <span class="text-sm text-red">
-                                                <strong>{{ $message }}</strong>
-                                            </span>
-                                        @else
+                                        @if(!$errors->has('email_rfc'))
                                             <span class="text-sm text-gray">
                                                 Enter your email address
                                             </span>
-                                        @enderror
+                                        @endif
 
                                         <span class="text-sm text-gray float-right">
                                             <span id="length-email_rfc">0</span> / 254
@@ -123,33 +101,25 @@
                             <h4>Additional info</h4>
                             <div class="row">
                                 <x-adminlte-input type="text" name="pincode" label="Pin code *" placeholder="Pin code"
-                                                  value="{{ old('pincode') }}"
-                                                  fgroup-class="col-md-6" disable-feedback>
+                                                  error-key="pincode"
+                                                  fgroup-class="col-md-6" enable-old-support>
                                     <x-slot name="bottomSlot">
-                                        @error('pincode')
-                                            <span class="text-sm text-red">
-                                                <strong>{{ $message }}</strong>
-                                            </span>
-                                        @else
+                                        @if(!$errors->has('pincode'))
                                             <span class="text-sm text-gray">
                                                 xxxx-xxxx
                                             </span>
-                                        @enderror
+                                        @endif
                                     </x-slot>
                                 </x-adminlte-input>
                                 <x-adminlte-input type="text" name="id" label="ID" placeholder="ID"
-                                                  value="{{ old('id') }}"
-                                                  fgroup-class="col-md-6" disable-feedback>
+                                                  error-key="id"
+                                                  fgroup-class="col-md-6" enable-old-support>
                                     <x-slot name="bottomSlot">
-                                        @error('id')
-                                            <span class="text-sm text-red">
-                                                <strong>{{ $message }}</strong>
-                                            </span>
-                                        @else
+                                        @if(!$errors->has('id'))
                                             <span class="text-sm text-gray">
                                             Enter your ID
                                         </span>
-                                        @enderror
+                                        @endif
                                         <span class="text-sm text-gray float-right">
                                             <span id="length-id">0</span> / 128
                                         </span>
@@ -159,17 +129,14 @@
                             <h4>Comment</h4>
                             <div class="row">
                                 <x-adminlte-textarea name="description" label="Description" placeholder="Description"
+                                                     error-key="description"
                                                      fgroup-class="col-md-12">{{ old('description') }}
                                     <x-slot name="bottomSlot">
-                                        @error('description')
-                                            <span class="text-sm text-red">
-                                                <strong>{{ $message }}</strong>
-                                            </span>
-                                        @else
+                                        @if(!$errors->has('description'))
                                             <span class="text-sm text-gray">
                                                 Add a short comment
                                             </span>
-                                        @enderror
+                                        @endif
                                         <span class="text-sm text-gray float-right">
                                             <span id="length-description">0</span> / 500
                                         </span>
