@@ -17,12 +17,13 @@ class Crop
         $imagick = new Imagick($path);
         $imagick = $this->autoRotateImage($imagick);
 
-        if ($imagick->getImageMimeType() === 'image/gif') {
+        if ($imagick->getImageMimeType() === 'image/gif' && $imagick->getNumberImages() > 1) {
             $imagick = $this->delay($imagick);
         }
 
         $imagick->thumbnailImage($width, $height);
         $imagick->writeImage($output);
+        $imagick->clear();
     }
 
     public function autoRotateImage(Imagick $imagick): Imagick

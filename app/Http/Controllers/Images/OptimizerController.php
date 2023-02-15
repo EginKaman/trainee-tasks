@@ -19,6 +19,7 @@ class OptimizerController extends Controller
 {
     public function index(Request $request): View
     {
+        /** @var Image $image */
         $image = $request->session()->get('image');
         $viewData = [];
         if ($image !== null) {
@@ -68,7 +69,7 @@ class OptimizerController extends Controller
     public function previous(): View
     {
         return view('images.previous', [
-            'images' => Image::latest('created_at')->get(),
+            'images' => Image::has('processingImages')->latest('created_at')->get(),
         ]);
     }
 
