@@ -17,6 +17,8 @@ class Convert
         $images['png'] = $this->convertToPng($imagick);
         $images['bmp'] = $this->convertToBmp($imagick);
 
+        $imagick->clear();
+
         return $images;
     }
 

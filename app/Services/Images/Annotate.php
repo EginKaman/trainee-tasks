@@ -28,5 +28,6 @@ class Annotate
         $image->writeImage(
             storage_path('app/public/images/annotated/' . $filename . '.' . Str::lower($image->getImageFormat()))
         );
+        $image->clear();
     }
 }
