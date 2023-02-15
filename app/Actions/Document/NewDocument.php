@@ -6,8 +6,7 @@ namespace App\Actions\Document;
 
 use App\Exceptions\UnknownProcessingException;
 use App\Services\Processing;
-use Illuminate\Http\File;
-use Illuminate\Http\UploadedFile;
+use Illuminate\Http\{File, UploadedFile};
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -18,7 +17,6 @@ class NewDocument
 
     public function __construct(
         private readonly Processing $processing,
-
     ) {
         $this->hash = Str::random(32);
     }
@@ -56,7 +54,6 @@ class NewDocument
 
         return $results;
     }
-
 
     public function getFiles(): array
     {

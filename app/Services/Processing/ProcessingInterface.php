@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services\Processing;
 
-use SimpleXMLElement;
-use stdClass;
-
 interface ProcessingInterface
 {
     public function validate(string $path): void;
@@ -20,6 +17,4 @@ interface ProcessingInterface
     public function read(string $path): object|array;
 
     public function process(string $path): void;
-
-    public function write(array $data, string $hash): void;
 }

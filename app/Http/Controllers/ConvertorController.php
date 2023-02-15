@@ -8,9 +8,7 @@ use App\Actions\Document\NewDocument;
 use App\Exceptions\UnknownProcessingException;
 use App\Http\Requests\ConverterRequest;
 use Illuminate\Contracts\View\View;
-use Illuminate\Http\File;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
+use Illuminate\Http\{File, RedirectResponse, Request};
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -52,6 +50,7 @@ class ConvertorController extends Controller
             $newDocument->store($document);
         } catch (UnknownProcessingException $exception) {
             Log::error($exception->getMessage(), $exception->getTrace());
+
             return redirect()->route('convertor')->with('failure', true);
         }
 
@@ -63,20 +62,22 @@ class ConvertorController extends Controller
             $fileErrors = $newDocument->getErrors();
         }
 
-        return redirect()->route('convertor')->with(compact(['fileErrors', 'originalName', 'results', 'files', 'urls']));
+        return redirect()->route('convertor')->with(
+            compact(['fileErrors', 'originalName', 'results', 'files', 'urls'])
+        );
     }
 
     public function jsonSchema(): BinaryFileResponse
     {
         return response()->download(resource_path('schemas/schema.json'), 'schema.json', [
-            'Content-Type: application/json'
+            'Content-Type: application/json',
         ]);
     }
 
     public function xmlSchema(): BinaryFileResponse
     {
         return response()->download(resource_path('schemas/schema.xsd'), 'schema.xsd', [
-            'Content-Type: application/xml'
+            'Content-Type: application/xml',
         ]);
     }
 }

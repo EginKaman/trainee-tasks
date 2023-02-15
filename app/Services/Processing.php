@@ -5,12 +5,17 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Exceptions\UnknownProcessingException;
-use App\Services\Processing\{CsvProcessing, JsonProcessing, ProcessingInterface, XmlProcessing};
+use App\Services\Processing\{CsvProcessing, JsonProcessing, ProcessingInterface, WriteResult, XmlProcessing};
 
 class Processing implements ProcessingInterface
 {
     private string $mimeType;
     private ProcessingInterface $processing;
+
+    public function __construct(
+        private readonly WriteResult $writeResult
+    ) {
+    }
 
     /**
      * @throws UnknownProcessingException
@@ -21,19 +26,6 @@ class Processing implements ProcessingInterface
         $this->selectProcessing();
 
         return $this;
-    }
-
-    /**
-     * @throws UnknownProcessingException
-     */
-    protected function selectProcessing(): void
-    {
-        $this->processing = match ($this->mimeType) {
-            'text/xml', 'application/xml' => app(XmlProcessing::class),
-            'text/json', 'application/json' => app(JsonProcessing::class),
-            'text/csv' => app(CsvProcessing::class),
-            default => throw new UnknownProcessingException(),
-        };
     }
 
     public function validate(string $path): void
@@ -68,6 +60,19 @@ class Processing implements ProcessingInterface
 
     public function write(object|array $data, string $hash): void
     {
-        $this->processing->write($data, $hash);
+        $this->writeResult->write($data, $hash);
+    }
+
+    /**
+     * @throws UnknownProcessingException
+     */
+    protected function selectProcessing(): void
+    {
+        $this->processing = match ($this->mimeType) {
+            'text/xml', 'application/xml' => app(XmlProcessing::class),
+            'text/json', 'application/json' => app(JsonProcessing::class),
+            'text/csv' => app(CsvProcessing::class),
+            default => throw new UnknownProcessingException(),
+        };
     }
 }

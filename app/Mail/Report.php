@@ -22,7 +22,8 @@ class Report extends Mailable
         private readonly string $text,
         private readonly array $logs,
         private readonly ?string $logPath
-    ) {}
+    ) {
+    }
 
     /**
      * Get the message envelope.

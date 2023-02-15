@@ -14,11 +14,7 @@ class CurrencyCode
     public string $secondField = 'country';
     public bool $break = false;
 
-    /**
-     * @param string $value
-     * @param int $line
-     */
-    public function correct($value, $line): bool|Error
+    public function correct(string $value, int $line): bool|Error
     {
         if (!preg_match('/^[A-Z]{3}$/', $value)) {
             $this->break = true;
@@ -29,11 +25,7 @@ class CurrencyCode
         return true;
     }
 
-    /**
-     * @param string $value
-     * @param int $line
-     */
-    public function equal($value, $line): bool|Error
+    public function equal(string $value, int $line): bool|Error
     {
         try {
             $data = (new ISO3166())->alpha3($this->secondValue);

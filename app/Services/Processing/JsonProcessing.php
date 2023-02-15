@@ -7,7 +7,6 @@ namespace App\Services\Processing;
 use App\Services\Processing\Validator\{Error, FieldValidator};
 use Exception;
 use Illuminate\Support\Facades\{Date, Storage};
-use League\Csv\Writer;
 use Swaggest\JsonSchema\Schema;
 
 class JsonProcessing implements ProcessingInterface
@@ -29,6 +28,7 @@ class JsonProcessing implements ProcessingInterface
             $json = $this->read($path);
         } catch (Exception $exception) {
             $this->fieldValidator->addError(new Error($exception->getMessage(), 1));
+
             return;
         }
 
@@ -86,99 +86,28 @@ class JsonProcessing implements ProcessingInterface
 
             foreach ($exrate->currency as $currency) {
                 $currency->name = $this->fieldValidator->prepareValue(
-                    (string)$currency->name,
+                    (string) $currency->name,
                     FieldValidator::NAME_FIELD
                 );
                 $currency->unit = $this->fieldValidator->prepareValue(
-                    (string)$currency->unit,
+                    (string) $currency->unit,
                     FieldValidator::UNIT_FIELD
                 );
                 $currency->currencyCode = $this->fieldValidator->prepareValue(
-                    (string)$currency->currencyCode,
+                    (string) $currency->currencyCode,
                     FieldValidator::CURRENCY_CODE_FIELD
                 );
                 $currency->country = $this->fieldValidator->prepareValue(
-                    (string)$currency->country,
+                    (string) $currency->country,
                     FieldValidator::COUNTRY_FIELD
                 );
 
                 $currency->rate = round(random_int(0, 1000000) / random_int(2, 100), 5);
-                $currency->change = round(random_int(0, (int)$currency->rate) / random_int(2, 100), 5);
+                $currency->change = round(random_int(0, (int) $currency->rate) / random_int(2, 100), 5);
             }
         }
 
         $this->results = $json;
-    }
-
-    public function write(object|array $data, string $hash): void
-    {
-        if (
-            !mkdir(
-                directory: $concurrentDirectory = storage_path("app/public/documents/{$hash}"),
-                recursive: true
-            ) && !is_dir($concurrentDirectory)
-        ) {
-            throw new \RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
-        }
-
-        Storage::put("public/documents/{$hash}/processing results.json", json_encode($data));
-        Storage::put("public/documents/{$hash}/processing results.csv", '');
-        Storage::put("public/documents/{$hash}/processing results writer.xml", '');
-
-        $writer = Writer::createFromPath(storage_path("app/public/documents/{$hash}/processing results.csv"));
-        $writer->insertOne(['lastUpdate', 'name', 'unit', 'currencyCode', 'country', 'rate', 'change']);
-
-        $xw = new \XMLWriter();
-        $xw->openUri(storage_path("app/public/documents/{$hash}/processing results writer.xml"));
-        $xw->startDocument('1.0', 'UTF-8');
-        $xw->startElement('currencies');
-
-        foreach ($data as $exrate) {
-            $xw->startElement('exrate');
-            $xw->startElement('lastUpdate');
-            $xw->text((string)$exrate->lastUpdate);
-            $xw->endElement();
-            foreach ($exrate->currency as $currency) {
-                $xw->startElement('currency');
-                $xw->startElement('name');
-                $xw->text((string)$currency->name);
-                $xw->endElement();
-                $xw->startElement('unit');
-                $xw->text((string)$currency->unit);
-                $xw->endElement();
-                $xw->startElement('currencyCode');
-                $xw->text((string)$currency->currencyCode);
-                $xw->endElement();
-                $xw->startElement('country');
-                $xw->text((string)$currency->country);
-                $xw->endElement();
-                $xw->startElement('rate');
-                $xw->text((string)$currency->rate);
-                $xw->endElement();
-                $xw->startElement('change');
-                $xw->text((string)$currency->change);
-                $xw->endElement();
-                $writer->insertOne([
-                    'lastUpdate' => (string)$exrate->lastUpdate,
-                    'name' => (string)$currency->name,
-                    'unit' => (string)$currency->unit,
-                    'currencyCode' => (string)$currency->currencyCode,
-                    'country' => (string)$currency->country,
-                    'rate' => (string)$currency->rate,
-                    'change' => (string)$currency->change,
-                ]);
-                $xw->endElement();
-            }
-            $xw->endElement();
-        }
-        $xw->endElement();
-        $xw->endDocument();
-        $xw->flush();
-
-        Storage::put(
-            "public/documents/{$hash}/processing results simple.xml",
-            file_get_contents(storage_path("app/public/documents/{$hash}/processing results writer.xml"))
-        );
     }
 
     public function isValid(): bool

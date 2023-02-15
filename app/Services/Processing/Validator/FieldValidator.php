@@ -50,7 +50,7 @@ class FieldValidator
                     $fieldClass = $this->second($fieldClass, $object);
                 }
 
-                $answer = $fieldClass->{$method}((string)$this->getProperty($object, $field), $line);
+                $answer = $fieldClass->{$method}((string) $this->getProperty($object, $field), $line);
 
                 if (!is_bool($answer)) {
                     $this->addError($answer);
@@ -117,10 +117,10 @@ class FieldValidator
     protected function getProperty(object|array $object, string $property): array|string
     {
         if (is_array($object)) {
-            return $this->prepareValue((string)$object[$property], $property);
+            return $this->prepareValue((string) $object[$property], $property);
         }
 
-        return $this->prepareValue((string)$object->{$property}, $property);
+        return $this->prepareValue((string) $object->{$property}, $property);
     }
 
     protected function getMethods(object|string $class): array
@@ -143,7 +143,7 @@ class FieldValidator
 
     protected function second(object $fieldClass, object|array $object): object
     {
-        $fieldClass->secondValue = $this->getProperty($object, (string)$fieldClass->secondField);
+        $fieldClass->secondValue = $this->getProperty($object, (string) $fieldClass->secondField);
 
         return $fieldClass;
     }
