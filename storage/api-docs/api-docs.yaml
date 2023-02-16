@@ -1,0 +1,458 @@
+openapi: 3.0.3
+info:
+  title: Swagger
+  description: Swagger
+  version: '0.1'
+servers:
+  - url: 'https://test2023-backend_ivan_t.abztrainee.com/api/v1'
+paths:
+  /users:
+    get:
+      tags:
+        - users
+      description: Get all users
+      parameters:
+        - in: header
+          name: Accept-Language
+          description: Set interface language (en, de)
+          schema:
+            type: string
+            example: en
+        - name: page
+          in: query
+          description: Number page for getting users
+          style: form
+          schema:
+            type: integer
+        - name: per_page
+          in: query
+          description: Size page for getting users
+          style: form
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Users response
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/Users'
+        422:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
+
+    post:
+      tags:
+        - users
+      description: Create new User (Register). After register go to POST /login for authorization
+      parameters:
+        - in: header
+          name: Accept-Language
+          description: Set interface language (en, de)
+          schema:
+            type: string
+            example: en
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NewUser'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewUser'
+      responses:
+        201:
+          description: Created success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        422:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        409:
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Conflict'
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
+
+  /users/{user}:
+    get:
+      tags:
+        - users
+      description: Get one user
+      parameters:
+        - in: header
+          name: Accept-Language
+          description: Set interface language (en, de)
+          schema:
+            type: string
+            example: en
+        - name: user
+          in: query
+          required: true
+          description: Id this user
+          style: form
+          schema:
+            type: integer
+      responses:
+        200:
+          description: One user response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        404:
+          description: Not found response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
+
+    patch:
+      tags:
+        - users
+      description: Update user
+      parameters:
+        - in: header
+          name: Accept-Language
+          description: Set interface language (en, de)
+          schema:
+            type: string
+            example: en
+        - name: user
+          in: query
+          required: true
+          description: Id this user
+          style: form
+          schema:
+            type: integer
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UpdateUser'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUser'
+      responses:
+        200:
+          description: Updated success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        422:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        404:
+          description: Not found response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        409:
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Conflict'
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
+
+    delete:
+      tags:
+        - users
+      description: Delete user
+      parameters:
+        - in: header
+          name: Accept-Language
+          description: Set interface language (en, de)
+          schema:
+            type: string
+            example: en
+        - name: user
+          in: query
+          required: true
+          description: Id this user
+          style: form
+          schema:
+            type: integer
+      responses:
+        204:
+          description: Deleted success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deleted'
+        404:
+          description: Not found response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
+components:
+  schemas:
+    #  Users properties
+    UserName:
+      type: string
+      example: John
+      nullable: false
+      description: User name, may contain only lattice letters and symbols space, -
+      minLength: 2
+      maxLength: 60
+    UserEmail:
+      type: string
+      example: example@gmail.com
+      description: User email, must be a valid according to RFC
+      nullable: false
+      minLength: 6
+      maxLength: 254
+    UserPhone:
+      type: string
+      example: "+380930400000"
+      description: User phone, must be a valid according to +380000000000 (Ukraine format)
+      nullable: false
+      minLength: 1
+    UserPhoto:
+      type: string
+      format: binary
+      description: User image, must be a jpg, jpeg format. Min height and min width must be a 70px, and size image smaller 5Mb
+    UserPhotoResponse:
+      type: string
+      example: https://test2023-backend-ivan-t.abztrainee.com/storage/users/dzsfd32NJdpsdvDJcko9dssdc.jpg
+      description: Link for user image. If image is small, file name -> dzsfd32NJdpsdvDJcko9dssdc_small.jpg
+    UserId:
+      type: integer
+      example: 1
+      description: User id
+      minLength: 1
+
+    # Paginate properties
+    CurrentPage:
+      type: integer
+      example: 1
+    FirstPageUrl:
+      type: string
+      example: https://test2023-backend-ivan-t.abztrainee.com/api/V1/users?page=1&per_page=15
+    LastPage:
+      type: integer
+      example: 4
+    LastPageUrl:
+      type: string
+      example: https://test2023-backend-ivan-t.abztrainee.com/api/V1/users?page=1&per_page=15
+    PerPage:
+      type: integer
+      example: 10
+    Total:
+      type: integer
+      example: 15
+    PrevLink:
+      type: string
+      example: https://test2023-backend-ivan-t.abztrainee.com/api/V1/users?page=1&per_page=15
+    NextLink:
+      type: string
+      example: https://test2023-backend-ivan-t.abztrainee.com/api/V1/users?page=2&per_page=15
+
+
+    # Users Responses and RequestBody
+    Users:
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        meta:
+          $ref: '#/components/schemas/Paginate'
+    User:
+      required:
+        - id
+        - name
+        - email
+        - phone
+        - photo_sm
+        - photo_big
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/UserId'
+        name:
+          $ref: '#/components/schemas/UserName'
+        email:
+          $ref: '#/components/schemas/UserEmail'
+        phone:
+          $ref: '#/components/schemas/UserPhone'
+        photo_sm:
+          $ref: '#/components/schemas/UserPhotoResponse'
+        photo_big:
+          $ref: '#/components/schemas/UserPhotoResponse'
+    NewUser:
+      type: object
+      required:
+        - name
+        - email
+        - phone
+        - photo
+      properties:
+        name:
+          $ref: '#/components/schemas/UserName'
+        email:
+          $ref: '#/components/schemas/UserEmail'
+        phone:
+          $ref: '#/components/schemas/UserPhone'
+        photo:
+          $ref: '#/components/schemas/UserPhoto'
+    UpdateUser:
+      type: object
+      required:
+        - name
+        - email
+        - phone
+      properties:
+        name:
+          $ref: '#/components/schemas/UserName'
+        email:
+          $ref: '#/components/schemas/UserEmail'
+        phone:
+          $ref: '#/components/schemas/UserPhone'
+        photo:
+          $ref: '#/components/schemas/UserPhoto'
+
+    # Paginate Response
+    Paginate:
+      required:
+        - current_page
+        - first_page_url
+        - last_page
+        - last_page_url
+        - per_page
+        - total
+        - prev_link
+        - next_link
+      properties:
+        current_page:
+          $ref: '#/components/schemas/CurrentPage'
+        first_page_url:
+          $ref: '#/components/schemas/FirstPageUrl'
+        last_page:
+          $ref: '#/components/schemas/LastPage'
+        last_page_url:
+          $ref: '#/components/schemas/LastPageUrl'
+        per_page:
+          $ref: '#/components/schemas/PerPage'
+        total:
+          $ref: '#/components/schemas/Total'
+        prev_link:
+          $ref: '#/components/schemas/PrevLink'
+        next_link:
+          $ref: '#/components/schemas/NextLink'
+
+    # Errors
+    NotFound:
+      title: Not found
+      type: object
+      properties:
+        message:
+          type: string
+          example: 'Not found'
+    Unauthorized:
+      title: Unauthorized
+      type: object
+      properties:
+        message:
+          type: string
+          example: 'Unauthorized'
+    Forbidden:
+      title: Forbidden
+      type: object
+      properties:
+        message:
+          type: string
+          example: Forbidden
+    BadRequest:
+      type: object
+      title: Bad request
+      properties:
+        message:
+          type: string
+          example: 'The phone format is invalid.'
+        errors:
+          type: object
+          properties:
+            phone:
+              type: array
+              items:
+                example: "The phone format is invalid."
+    Conflict:
+      type: object
+      title: Conflict
+      properties:
+        message:
+          type: string
+          example: 'The email has already been taken.'
+    Created:
+      type: object
+      title: Created
+      properties:
+        message:
+          type: string
+          example: 'Created success'
+        status:
+          type: integer
+          example: 201
+    Deleted:
+      type: object
+      title: Deleted
+      properties:
+        message:
+          type: string
+          example: 'Deleted success'
+        status:
+          type: integer
+          example: 204
+    SomethingWentWrong:
+      type: object
+      title: Something Went Wrong
+      properties:
+        message:
+          type: string
+          example: 'Something went wrong'
