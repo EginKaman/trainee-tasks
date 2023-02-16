@@ -5,7 +5,9 @@
 @section('content_header')
     <h1>Task 4 - ReGex, AdminLTE and forms</h1>
 @endsection
-
+@push('js')
+    @vite(['resources/js/form.js'])
+@endpush
 @section('content')
     @if(session('success'))
         <x-adminlte-alert theme="success" title="Successfully">

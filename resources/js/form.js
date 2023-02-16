@@ -1,18 +1,3 @@
-import _ from 'lodash';
-
-window._ = _;
-
-import * as $ from 'jquery'
-
-window.$ = window.jQuery = $;
-
-import 'overlayscrollbars/overlayscrollbars.css';
-import {OverlayScrollbars} from 'overlayscrollbars';
-
-window.OverlayScrollbars = OverlayScrollbars;
-
-import 'admin-lte';
-
 let container = document.querySelector('#info-form');
 const delegate = (selector) => (cb) => (e) => e.target.matches(selector) && cb(e);
 
