@@ -31,7 +31,7 @@ class StoreFormRequest extends FormRequest
         ];
     }
 
-    public function messages()
+    public function messages(): array
     {
         return [
             'id' => [
