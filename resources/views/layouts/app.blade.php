@@ -6,7 +6,7 @@
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
-
+    <meta name="robots" content="noindex,nofollow">
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <link rel="icon" href="/images/favicon_24x24.svg" sizes="24x24">
@@ -39,7 +39,9 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <!-- Left Side Of Navbar -->
                 <ul class="navbar-nav me-auto">
-
+                    <li class="nav-item">
+                        <a href="{{ route('convertor') }}" class="nav-link">Task 2</a>
+                    </li>
                 </ul>
 
                 <!-- Right Side Of Navbar -->

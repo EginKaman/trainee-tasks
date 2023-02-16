@@ -4,12 +4,12 @@ includes:
 parameters:
   paths:
     - app
-    - modules
     - config
     - database/factories
     - database/seeders
-    - resources/lang
+    - lang
     - routes
     - tests
   level: 6 # (0-8)
+  tmpDir: bootstrap/cache/phpstan
   checkMissingIterableValueType: false

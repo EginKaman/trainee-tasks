@@ -17,16 +17,13 @@ class Report extends Mailable
 
     /**
      * Create a new message instance.
-     *
-     * @param string $text
-     * @param array<string> $logs
-     * @param ?string $logPath
      */
     public function __construct(
         private readonly string $text,
         private readonly array $logs,
         private readonly ?string $logPath
-    ) {}
+    ) {
+    }
 
     /**
      * Get the message envelope.
@@ -34,8 +31,8 @@ class Report extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            from: new Address((string)config('mail.from.address'), (string)config('mail.from.address')),
-            to: new Address((string)config('mail.from.address'), (string)config('mail.from.address')),
+            from: new Address((string) config('mail.from.address'), (string) config('mail.from.address')),
+            to: [new Address((string) config('mail.from.address'), (string) config('mail.from.address'))],
             subject: 'Report ' . Date::yesterday()->format('Y-m-d')
         );
     }

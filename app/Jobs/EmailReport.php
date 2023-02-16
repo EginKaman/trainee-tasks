@@ -32,12 +32,12 @@ class EmailReport implements ShouldQueue
     public function handle(): void
     {
         $date = Date::yesterday()->format('Y-m-d');
-        $file = storage_path('logs/laravel-' . $date);
+        $file = storage_path('logs/laravel-' . $date . '.log');
         $message = 'Errors was found with selected date ' . $date;
         $logs = [];
         $filePath = null;
 
-        if (file_exists($file)) {
+        if (!file_exists($file)) {
             $message = 'No log available';
         } else {
             $pattern = '/^\\[(?<date>.*)\\]\\s(?<env>\\w+)\\.(?<type>\\w+):(?<message>.*)/m';

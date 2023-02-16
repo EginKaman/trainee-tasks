@@ -21,3 +21,13 @@ Route::get('/feedback', [\App\Http\Controllers\FeedbackController::class, 'index
 Route::post('/feedback', [\App\Http\Controllers\FeedbackController::class, 'store']);
 Route::post('/sendgrid/webhook', [\App\Http\Controllers\Sendgrid\WebhookController::class, 'update'])
     ->middleware(\App\Http\Middleware\SignedWebhookMiddleware::class);
+
+Route::get('/convertor', [\App\Http\Controllers\ConvertorController::class, 'index'])
+    ->name('convertor');
+Route::post('/convertor', [\App\Http\Controllers\ConvertorController::class, 'store']);
+Route::get('/schema.json', [\App\Http\Controllers\ConvertorController::class, 'jsonSchema'])->name(
+    'convertor.json-schema'
+);
+Route::get('/schema.xsd', [\App\Http\Controllers\ConvertorController::class, 'xmlSchema'])->name(
+    'convertor.xml-schema'
+);
