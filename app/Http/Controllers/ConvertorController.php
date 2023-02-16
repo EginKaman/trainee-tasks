@@ -4,78 +4,70 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Actions\Document\NewDocument;
+use App\Actions\Document\TestData;
 use App\Exceptions\UnknownProcessingException;
 use App\Http\Requests\ConverterRequest;
-use App\Services\Processing;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\View\{Factory, View};
-use Illuminate\Http\{File, RedirectResponse};
-use Illuminate\Support\Facades\{Log, Storage};
-use Illuminate\Support\Str;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\{File, RedirectResponse, Request};
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ConvertorController extends Controller
 {
-    public function index(): Application|Factory|View
+    public function index(Request $request): View
     {
         $json = new File(resource_path('schemas/schema.json'));
         $xml = new File(resource_path('schemas/schema.xsd'));
 
-        return view('convertor', compact('json', 'xml'));
+        $results = [];
+        if ($request->session()->has('results')) {
+            $results = $request->session()->get('results');
+            $results = json_decode($results);
+        }
+
+        $fileErrors = $request->session()->get('fileErrors');
+
+        $files = $request->session()->get('files');
+
+        $urls = $request->session()->get('urls');
+
+        $originalName = $request->session()->get('originalName');
+
+        $testData = app(TestData::class)->files();
+
+        return view('convertor', compact(['json', 'xml', 'fileErrors', 'originalName', 'results', 'files', 'urls', 'testData']));
     }
 
-    public function store(ConverterRequest $request, Processing $processing): Application|Factory|View|RedirectResponse
+    public function store(ConverterRequest $request, NewDocument $newDocument): RedirectResponse
     {
         $document = $request->document;
+        $originalName = $request->document->getClientOriginalName();
+
+        $results = [];
+        $fileErrors = [];
+        $files = [];
+        $urls = [];
 
         try {
-            $processing->setMimeType($document->getMimeType());
+            $newDocument->store($document);
         } catch (UnknownProcessingException $exception) {
             Log::error($exception->getMessage(), $exception->getTrace());
 
             return redirect()->route('convertor')->with('failure', true);
         }
-        $path = $document->store('documents');
-        $validateFile = $processing->validate(Storage::path($path));
-        $fileErrors = [];
-        $results = [];
-        $files = [];
-        $urls = [];
-        if ($validateFile !== true) {
-            $fileErrors = $validateFile;
-        }
-        if ($validateFile === true) {
-            $results = $processing->process(Storage::path($path));
-            $hash = Str::random(32);
 
-            $processing->write($results, $hash);
-
-            $files = [
-                'processing_results_simple' => new File(
-                    storage_path("app/public/documents/{$hash}/processing results simple.xml")
-                ),
-                'processing_results_writer' => new File(
-                    storage_path("app/public/documents/{$hash}/processing results writer.xml")
-                ),
-                'processing_results_json' => new File(
-                    storage_path("app/public/documents/{$hash}/processing results.json")
-                ),
-                'processing_results_csv' => new File(
-                    storage_path("app/public/documents/{$hash}/processing results.csv")
-                ),
-            ];
-            $urls = [
-                'processing_results_simple' => Storage::url("documents/{$hash}/processing results simple.xml"),
-                'processing_results_writer' => Storage::url("documents/{$hash}/processing results writer.xml"),
-                'processing_results_json' => Storage::url("documents/{$hash}/processing results.json"),
-                'processing_results_csv' => Storage::url("documents/{$hash}/processing results.csv"),
-            ];
+        if ($newDocument->isValid()) {
+            $results = json_encode($newDocument->results());
+            $files = $newDocument->getFiles();
+            $urls = $newDocument->getUrls();
+        } else {
+            $fileErrors = $newDocument->getErrors();
         }
 
-        $json = new File(resource_path('schemas/schema.json'));
-        $xml = new File(resource_path('schemas/schema.xsd'));
-
-        return view('convertor', compact(['fileErrors', 'document', 'results', 'json', 'xml', 'files', 'urls']));
+        return redirect()->route('convertor')->with(
+            compact(['fileErrors', 'originalName', 'results', 'files', 'urls'])
+        );
     }
 
     public function jsonSchema(): BinaryFileResponse

@@ -9,6 +9,7 @@ use Illuminate\Http\UploadedFile;
 
 /**
  * @property UploadedFile $document
+ * @property string $reader
  */
 class ConverterRequest extends FormRequest
 {

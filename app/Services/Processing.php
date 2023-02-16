@@ -5,17 +5,20 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Exceptions\UnknownProcessingException;
-use App\Services\Processing\{CsvProcessing, JsonProcessing, ProcessingInterface, XmlProcessing};
+use App\Services\Processing\{CsvProcessing, JsonProcessing, ProcessingInterface, WriteResult, XmlProcessing};
 
-class Processing
+class Processing implements ProcessingInterface
 {
     private string $mimeType;
     private ProcessingInterface $processing;
 
+    public function __construct(
+        private readonly WriteResult $writeResult
+    ) {
+    }
+
     /**
      * @throws UnknownProcessingException
-     *
-     * @return $this
      */
     public function setMimeType(string $mimeType): static
     {
@@ -25,22 +28,39 @@ class Processing
         return $this;
     }
 
-    public function validate(string $path): bool|array
+    public function validate(string $path): void
     {
-        return $this->processing->validate($path);
+        $this->processing->validate($path);
     }
 
-    /**
-     * @return object
-     */
-    public function process(string $path): object|array
+    public function isValid(): bool
     {
-        return $this->processing->process($path);
+        return $this->processing->isValid();
+    }
+
+    public function errors(): array
+    {
+        return $this->processing->errors();
+    }
+
+    public function read(string $path): object|array
+    {
+        return $this->processing->read($path);
+    }
+
+    public function results(): array
+    {
+        return $this->processing->results();
+    }
+
+    public function process(string $path): void
+    {
+        $this->processing->process($path);
     }
 
     public function write(object|array $data, string $hash): void
     {
-        $this->processing->write($data, $hash);
+        $this->writeResult->write($data, $hash);
     }
 
     /**

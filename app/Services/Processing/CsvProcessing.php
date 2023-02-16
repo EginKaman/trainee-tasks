@@ -5,29 +5,25 @@ declare(strict_types=1);
 namespace App\Services\Processing;
 
 use App\Services\Processing\Validator\FieldValidator;
-use Exception;
-use Illuminate\Support\Facades\{Date, Storage};
-use League\Csv\{Reader, Writer};
-use SimpleXMLElement;
+use Illuminate\Support\Facades\Date;
+use League\Csv\Reader;
 use stdClass;
 
 class CsvProcessing implements ProcessingInterface
 {
     private int $line = 1;
-    private FieldValidator $fieldValidator;
 
-    public function __construct(FieldValidator $fieldValidator)
-    {
-        $this->fieldValidator = $fieldValidator;
+    private array $results = [];
+
+    public function __construct(
+        private readonly FieldValidator $fieldValidator
+    ) {
     }
 
-    public function validate(string $path): bool|array
+    public function validate(string $path): void
     {
-        $csv = $this->read($path);
-        $data = $this->prepareRecords($csv);
-        foreach ($csv->getRecords() as $record) {
-            $record = $this->mapRecord($record);
-
+        $data = $this->read($path);
+        foreach ($data as $record) {
             if (
                 !$this->fieldValidator->unique(
                     $data[$record['lastUpdate']]['currencies'],
@@ -51,13 +47,12 @@ class CsvProcessing implements ProcessingInterface
             $this->fieldValidator->validate($record, FieldValidator::RATE_FIELD, $this->line);
 
             $this->fieldValidator->validate($record, FieldValidator::CHANGE_FIELD, $this->line);
+
             ++$this->line;
         }
-
-        return !$this->fieldValidator->hasErrors() ?: $this->fieldValidator->errors();
     }
 
-    public function read(string $path): Reader
+    public function read(string $path): array
     {
         $csv = Reader::createFromPath($path);
         $csv->setDelimiter(',');
@@ -66,21 +61,18 @@ class CsvProcessing implements ProcessingInterface
             ++$this->line;
         }
 
-        return $csv;
+        return $this->prepareRecords($csv);
     }
 
-    /**
-     * @throws Exception
-     */
-    public function process(string $path): array
+    public function process(string $path): void
     {
-        $csv = $this->read($path);
         $previousLastUpdate = null;
         $updatedRecord = [];
-        $records = $csv->getRecords();
-        $data = $this->prepareRecords($csv);
+
+        $data = $this->read($path);
         $loop = 0;
-        foreach ($data as $key => $record) {
+
+        foreach ($data as $record) {
             if ($loop === 0) {
                 $record['lastUpdate'] = Date::today()->format('Y-m-d');
             } else {
@@ -89,9 +81,11 @@ class CsvProcessing implements ProcessingInterface
                     ->format('Y-m-d');
             }
             $previousLastUpdate = $record['lastUpdate'];
+
             foreach ($record['currencies'] as $index => $currency) {
                 $rate = round(random_int(0, 1000000) / random_int(2, 100), 5);
                 $change = round(random_int(0, (int) $rate) / random_int(2, 100), 5);
+
                 $currency = [
                     'lastUpdate' => $record['lastUpdate'],
                     'name' => $currency['name'],
@@ -103,78 +97,28 @@ class CsvProcessing implements ProcessingInterface
                 ];
                 $record['currencies'][$index] = $currency;
             }
+
             $updatedRecord[$record['lastUpdate']] = $record;
+
             ++$loop;
         }
 
-        return $this->mapObject($updatedRecord);
+        $this->mapObject($updatedRecord);
     }
 
-    public function write(array|SimpleXMLElement|stdClass $data, string $hash): void
+    public function isValid(): bool
     {
-        if (!mkdir(
-            directory: $concurrentDirectory = storage_path("app/public/documents/{$hash}"),
-            recursive: true
-        ) && !is_dir($concurrentDirectory)) {
-            throw new \RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
-        }
+        return $this->fieldValidator->hasErrors();
+    }
 
-        Storage::put("public/documents/{$hash}/processing results.json", json_encode($data));
-        Storage::put("public/documents/{$hash}/processing results.csv", '');
-        Storage::put("public/documents/{$hash}/processing results_writer.xml", '');
-        $writer = Writer::createFromPath(storage_path("app/public/documents/{$hash}/processing results.csv"));
-        $writer->insertOne(['lastUpdate', 'name', 'unit', 'currencyCode', 'country', 'rate', 'change']);
-        $xw = new \XMLWriter();
-        $xw->openUri(storage_path("app/public/documents/{$hash}/processing results writer.xml"));
-        $xw->startDocument('1.0', 'UTF-8');
-        $xw->startElement('currencies');
-        foreach ($data as $exrate) {
-            $xw->startElement('exrate');
-            $xw->startElement('lastUpdate');
-            $xw->text((string) $exrate->lastUpdate);
-            $xw->endElement();
+    public function errors(): array
+    {
+        return $this->fieldValidator->errors();
+    }
 
-            foreach ($exrate->currency as $currency) {
-                $xw->startElement('currency');
-                $xw->startElement('name');
-                $xw->text((string) $currency->name);
-                $xw->endElement();
-                $xw->startElement('unit');
-                $xw->text((string) $currency->unit);
-                $xw->endElement();
-                $xw->startElement('currencyCode');
-                $xw->text((string) $currency->currencyCode);
-                $xw->endElement();
-                $xw->startElement('country');
-                $xw->text((string) $currency->country);
-                $xw->endElement();
-                $xw->startElement('rate');
-                $xw->text((string) $currency->rate);
-                $xw->endElement();
-                $xw->startElement('change');
-                $xw->text((string) $currency->change);
-                $xw->endElement();
-                $writer->insertOne([
-                    'lastUpdate' => (string) $exrate->lastUpdate,
-                    'name' => (string) $currency->name,
-                    'unit' => (string) $currency->unit,
-                    'currencyCode' => (string) $currency->currencyCode,
-                    'country' => (string) $currency->country,
-                    'rate' => (string) $currency->rate,
-                    'change' => (string) $currency->change,
-                ]);
-                $xw->endElement();
-            }
-
-            $xw->endElement();
-        }
-        $xw->endElement();
-        $xw->endDocument();
-        $xw->flush();
-        Storage::put(
-            "public/documents/{$hash}/processing results simple.xml",
-            file_get_contents(storage_path("app/public/documents/{$hash}/processing results writer.xml"))
-        );
+    public function results(): array
+    {
+        return $this->results;
     }
 
     protected function mapRecord(array $record): array
@@ -211,9 +155,8 @@ class CsvProcessing implements ProcessingInterface
         ];
     }
 
-    protected function mapObject(array $records): array
+    protected function mapObject(array $records): void
     {
-        $data = [];
         foreach ($records as $record) {
             $exrate = new stdClass();
             $exrate->lastUpdate = $record['lastUpdate'];
@@ -227,10 +170,8 @@ class CsvProcessing implements ProcessingInterface
                 $object->change = $currency['change'];
                 $exrate->currency[] = $object;
             }
-            $data[] = $exrate;
+            $this->results[] = $exrate;
         }
-
-        return $data;
     }
 
     protected function prepareRecords(Reader $csv): array
