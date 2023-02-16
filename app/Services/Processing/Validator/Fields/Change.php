@@ -40,6 +40,7 @@ class Change
 
         return true;
     }
+
     public function max(string $value, int $line): true|Error
     {
         if ((float) $value > 1000000000) {
