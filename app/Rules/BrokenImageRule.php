@@ -9,15 +9,10 @@ use Illuminate\Contracts\Validation\Rule;
 
 class BrokenImageRule implements Rule
 {
-    public function __construct(
-        private readonly Image $image
-    ) {
-    }
-
     public function passes($attribute, $value): bool
     {
         try {
-            $image = $this->image->readImage($value->getRealPath());
+            $image = app(Image::class)->readImage($value->getRealPath());
         } catch (\ImagickException $exception) {
             return false;
         }

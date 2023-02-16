@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Images;
 
-use App\Actions\Image\NewImage;
-use App\Actions\ProcessingImage\NewProcessingImage;
-use App\Facades\FileHelper;
+use App\Actions\Image\{ConvertImage, NewImage, PrepareImage, TestImage};
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Images\StoreOptimizerRequest;
 use App\Models\Image;
@@ -38,32 +36,11 @@ class OptimizerController extends Controller
         return view('images.optimizer', $viewData);
     }
 
-    public function test(Imagick $image): View
+    public function test(TestImage $testImage): View
     {
-        $valid = Storage::disk('public')->files('examples/images/valid');
-        foreach ($valid as $key => $item) {
-            $file = new File(storage_path('app/public/' . $item));
-            $size = getimagesize($file->getRealPath());
-            $valid[$key] = [
-                'path' => $item,
-                'size' => FileHelper::sizeForHumans($file->getSize()),
-                'dimensions' => "{$size[0]}x{$size[1]}px",
-                'name' => $file->getFilename(),
-            ];
-        }
-        $invalid = Storage::disk('public')->files('examples/images/invalid');
-        foreach ($invalid as $key => $item) {
-            $file = new File(storage_path('app/public/' . $item));
-            $size = getimagesize($file->getRealPath());
-            $invalid[$key] = [
-                'path' => $item,
-                'size' => FileHelper::sizeForHumans($file->getSize()),
-                'dimensions' => "{$size[0]}x{$size[1]}px",
-                'name' => $file->getFilename(),
-            ];
-        }
-
-        return view('images.test_data', compact('valid', 'invalid'));
+        return view('images.test_data', [
+            'files' => $testImage->files(),
+        ]);
     }
 
     public function previous(): View
@@ -87,37 +64,20 @@ class OptimizerController extends Controller
 
     public function store(
         StoreOptimizerRequest $request,
-        Annotate $annotate,
-        Convert $convert,
-        Crop $crop,
-        NewProcessingImage $newProcessingImage
+        NewImage $newImage,
+        PrepareImage $prepareImage,
+        ConvertImage $convertImage
     ): RedirectResponse {
         $image = $request->image;
-        $image = app(NewImage::class)->create($image);
+        $image = $newImage->create($image);
         $file = new File(Storage::path($image->path));
-        $fileName = $file->getBasename(".{$file->getExtension()}");
+        $filename = $file->getBasename(".{$file->getExtension()}");
 
         //500x500 original image
-        $output = 'public/images/' . $fileName . '.' . $file->getExtension();
-        $crop->handle($file->getRealPath(), 500, 500, Storage::path($output));
+        $output = $prepareImage->prepare($file->getRealPath(), $filename, $file->getExtension());
 
         //converted images
-        $annotate->handle(Storage::path($output), $fileName);
-        $images = $convert->handle(Storage::path($output), $fileName);
-        foreach ($images as $ext => $img) {
-            $sizes = [350, 200, 150, 100, 50];
-            $isSkipped = false;
-            if (in_array($ext, ['gif', 'jpg', 'png'], true)) {
-                $isSkipped = true;
-                $sizes = [500, 350, 200, 150, 100, 50];
-            }
-            $newProcessingImage->create($image, new File(Storage::path($img)), $img, $isSkipped);
-            foreach ($sizes as $size) {
-                $output = 'public/images/' . $fileName . '_' . $size . '.' . $ext;
-                $crop->handle(Storage::path($img), $size, $size, Storage::path($output));
-                $newProcessingImage->create($image, new File(Storage::path($output)), $output);
-            }
-        }
+        $convertImage->convert($image, Storage::path($output), $filename);
 
         return redirect()->route('optimizer')->with('image', $image)->with('success', true);
     }
