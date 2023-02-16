@@ -8,9 +8,6 @@ class ErrorBag
 {
     public array $errors = [];
 
-    /**
-     * @return $this
-     */
     public function add(Error $error): static
     {
         $this->errors[] = $error;
