@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Actions\Document\NewDocument;
+use App\Actions\Document\TestData;
 use App\Exceptions\UnknownProcessingException;
 use App\Http\Requests\ConverterRequest;
 use Illuminate\Contracts\View\View;
@@ -33,7 +34,9 @@ class ConvertorController extends Controller
 
         $originalName = $request->session()->get('originalName');
 
-        return view('convertor', compact(['json', 'xml', 'fileErrors', 'originalName', 'results', 'files', 'urls']));
+        $testData = app(TestData::class)->files();
+
+        return view('convertor', compact(['json', 'xml', 'fileErrors', 'originalName', 'results', 'files', 'urls', 'testData']));
     }
 
     public function store(ConverterRequest $request, NewDocument $newDocument): RedirectResponse
