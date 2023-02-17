@@ -27,6 +27,7 @@
         "laravel/tinker": "^2.7",
         "league/csv": "^9.8",
         "league/iso3166": "^4.2",
+        "mcamara/laravel-localization": "^1.7",
         "predis/predis": "^2.1",
         "s-ichikawa/laravel-sendgrid-driver": "^4.0",
         "sendgrid/sendgrid": "^8.0"
@@ -44,7 +45,8 @@
         "phpunit/phpunit": "^9.5.10",
         "spatie/laravel-ignition": "^1.0",
         "squizlabs/php_codesniffer": "^3.7",
-        "symplify/easy-coding-standard": "^11.2"
+        "symplify/easy-coding-standard": "^11.2",
+        "xvladqt/faker-lorem-flickr": "^1.0"
     },
     "autoload": {
         "psr-4": {

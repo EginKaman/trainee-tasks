@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
+use Xvladqt\Faker\LoremFlickrProvider;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
@@ -15,26 +17,32 @@ class UserFactory extends Factory
      *
      * @return array<string, mixed>
      */
-    public function definition()
+    public function definition(): array
     {
-        return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
-            'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
-            'remember_token' => Str::random(10),
-        ];
-    }
+        fake()->addProvider(new LoremFlickrProvider(fake()));
 
-    /**
-     * Indicate that the model's email address should be unverified.
-     *
-     * @return static
-     */
-    public function unverified()
-    {
-        return $this->state(fn (array $attributes) => [
-            'email_verified_at' => null,
-        ]);
+        return [
+            'name' => fake()->firstName() . ' ' . fake()->lastName(),
+            'email' => fake()->unique()->safeEmail(),
+            'phone' => fake('uk_UA')->e164PhoneNumber(),
+            'photo_small' => 'public/users/' . fake()->image(
+                storage_path('app/public/users'),
+                30,
+                30,
+                ['man', 'woman'],
+                false,
+                false
+            ),
+            'photo_big' => 'public/users/' . fake()->image(
+                storage_path('app/public/users'),
+                70,
+                70,
+                ['man', 'woman'],
+                false,
+                false
+            ),
+            'updated_user_id' => 1,
+            'created_used_id' => 1,
+        ];
     }
 }

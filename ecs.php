@@ -221,6 +221,7 @@ return static function (ECSConfig $containerConfigurator): void {
         __DIR__ . '/app',
         __DIR__ . '/config',
         __DIR__ . '/lang',
+        __DIR__ . '/database',
     ]);
 
     $services = $containerConfigurator->services();
