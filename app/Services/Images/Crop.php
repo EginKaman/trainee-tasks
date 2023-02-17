@@ -12,18 +12,13 @@ class Crop
     /**
      * @throws ImagickException
      */
-    public function handle(string $path, int $width, int $height, string $output): void
+    public function handle(Imagick $imagick, int $width, int $height): Imagick
     {
-        $imagick = new Imagick($path);
         $imagick = $this->autoRotateImage($imagick);
 
-        if ($imagick->getImageMimeType() === 'image/gif' && $imagick->getNumberImages() > 1) {
-            $imagick = $this->delay($imagick);
-        }
-
         $imagick->thumbnailImage($width, $height);
-        $imagick->writeImage($output);
-        $imagick->clear();
+
+        return $imagick;
     }
 
     public function autoRotateImage(Imagick $imagick): Imagick
@@ -55,19 +50,5 @@ class Crop
         $imagick->setImageOrientation(Imagick::ORIENTATION_TOPLEFT);
 
         return $imagick;
-    }
-
-    protected function delay(Imagick $imagick): Imagick
-    {
-        $imagick = $imagick->coalesceImages();
-
-        $frameCount = 0;
-
-        foreach ($imagick as $frame) {
-            $imagick->setImageDelay((($frameCount % 11) * 5));
-            ++$frameCount;
-        }
-
-        return $imagick->deconstructImages();
     }
 }
