@@ -70,14 +70,16 @@ class OptimizerController extends Controller
     ): RedirectResponse {
         $image = $request->image;
         $image = $newImage->create($image);
+        $data = $request->validated();
         $file = new File(Storage::path($image->path));
         $filename = $file->getBasename(".{$file->getExtension()}");
 
         //500x500 original image
-        $output = $prepareImage->prepare($file->getRealPath(), $filename, $file->getExtension());
+        $output = 'public/images/' . $filename . '.' . $file->getExtension();
+        $prepareImage->prepare($data['method'], $file->getRealPath(), $output);
 
         //converted images
-        $convertImage->convert($image, Storage::path($output), $filename);
+        $convertImage->convert($image, Storage::path($output), $filename, $data['method']);
 
         return redirect()->route('optimizer')->with('image', $image)->with('success', true);
     }

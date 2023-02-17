@@ -6,36 +6,47 @@ namespace App\Actions\Image;
 
 use App\Actions\ProcessingImage\NewProcessingImage;
 use App\Models\Image;
-use App\Services\Images\{Annotate, Convert, Crop};
+use App\Services\Images\{Annotate, Convert, Crop, Optimizer};
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Storage;
 
 class ConvertImage
 {
     public function __construct(
-        private Annotate $annotate,
-        private Convert $convert,
-        private Crop $crop,
+        private Optimizer $optimizer,
         private NewProcessingImage $newProcessingImage
     ) {
     }
 
-    public function convert(Image $image, string $output, string $filename): void
+    public function convert(Image $image, string $output, string $filename, string $method): void
     {
-        $this->annotate->handle($output, $filename);
-        $images = $this->convert->handle($output, $filename);
-        foreach ($images as $ext => $img) {
-            $sizes = [350, 200, 150, 100, 50];
+        foreach (['bmp', 'gif', 'png', 'jpg', 'webp'] as $format) {
+            $formatted = $this->optimizer->init($output, $method);
+            $formatted = $formatted->encode($format);
+
+            $path = "public/images/{$filename}.{$format}";
+            $fullpath = Storage::path($path);
+
+            $formatted->save($fullpath);
+
             $isSkipped = false;
-            if (in_array($ext, ['gif', 'jpg', 'png'], true)) {
+            $sizes = config('image.sizes.defaults');
+
+            if (in_array($format, ['gif', 'jpg', 'png'], true)) {
                 $isSkipped = true;
-                $sizes = [500, 350, 200, 150, 100, 50];
+                $sizes = config('image.sizes.optimized');
             }
-            $this->newProcessingImage->create($image, new File(Storage::path($img)), $img, $isSkipped);
+
+            $this->newProcessingImage->create($image, new File($fullpath), $path, $isSkipped);
+
             foreach ($sizes as $size) {
-                $output = 'public/images/' . $filename . '_' . $size . '.' . $ext;
-                $this->crop->handle(Storage::path($img), $size, $size, Storage::path($output));
-                $this->newProcessingImage->create($image, new File(Storage::path($output)), $output);
+                $path = 'public/images/' . $filename . '_' . $size . '.' . $format;
+                $fullpath = Storage::path($path);
+
+                $formatted->resize($size, $size);
+                $formatted->save($fullpath);
+
+                $this->newProcessingImage->create($image, new File($fullpath), $path);
             }
         }
     }

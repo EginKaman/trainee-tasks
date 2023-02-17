@@ -18,6 +18,7 @@
         "ext-xmlwriter": "*",
         "guzzlehttp/guzzle": "^7.2",
         "henriqueramos/laravel_json_schema_validator": "^1.0",
+        "intervention/image": "^2.7",
         "josiasmontag/laravel-recaptchav3": "^1.0",
         "kraken-io/kraken-php": "^1.6",
         "laravel/framework": "^9.19",
