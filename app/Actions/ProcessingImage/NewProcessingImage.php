@@ -13,18 +13,21 @@ class NewProcessingImage
 {
     public function create(Image $image, File $file, string $path, bool $isSkipped = false): void
     {
+        $imagick = new \Imagick($file->getRealPath());
         $processingImage = new ProcessingImage();
+
         $processingImage->name = $file->getFilename();
         $processingImage->path = $path;
         $processingImage->mimetype = $file->getMimeType();
         $processingImage->original_size = $file->getSize();
-        $imagick = new \Imagick($file->getRealPath());
         $processingImage->original_height = $imagick->getImageHeight();
         $processingImage->original_width = $imagick->getImageWidth();
         $processingImage->image()->associate($image);
+
         if ($isSkipped === true || !in_array($file->getMimeType(), ['image/gif', 'image/jpeg', 'image/png'], true)) {
             $processingImage->status = 'skipped';
         }
+
         $processingImage->save();
 
         if ($isSkipped === false) {

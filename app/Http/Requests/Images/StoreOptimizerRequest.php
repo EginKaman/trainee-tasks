@@ -31,6 +31,7 @@ class StoreOptimizerRequest extends FormRequest
                     ->dimensions(Rule::dimensions()->minHeight(500)->minWidth(500)),
             ],
             'timezone' => ['required', 'int'],
+            'method' => ['required', 'in:library,native'],
         ];
     }
 

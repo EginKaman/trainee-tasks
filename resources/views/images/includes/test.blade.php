@@ -5,12 +5,12 @@
             Here you can download files for testing the converter with positive answers
         </small>
         <div class="row">
-            @foreach($valid as $item)
+            @foreach($files['valid'] as $item)
                 <figure class="figure col-3">
-                    <img src="{{ Storage::url($item['path']) }}"
+                    <img src="{{ $item['url'] }}"
                          class="figure-img img-fluid rounded" alt="...">
                     <figcaption class="figure-caption">
-                        <a href="{{ Storage::url($item['path']) }}" class="btn-link" download="">{{ $item['name'] }}</a>
+                        <a href="{{ $item['url'] }}" class="btn-link" download="">{{ $item['name'] }}</a>
                         ({{ $item['size'] }})<br><br>
                         {{ $item['dimensions'] }}
                     </figcaption>
@@ -26,12 +26,12 @@
             Here you can download files for testing the converter with negative answers
         </small>
         <div class="row">
-            @foreach($invalid as $item)
+            @foreach($files['invalid'] as $item)
                 <figure class="figure col-3">
-                    <img src="{{ Storage::url($item['path']) }}"
+                    <img src="{{ $item['url'] }}"
                          class="figure-img img-fluid rounded" alt="...">
                     <figcaption class="figure-caption">
-                        <a href="{{ Storage::url($item['path']) }}" class="btn-link" download="">{{ $item['name'] }}</a>
+                        <a href="{{ $item['url'] }}" class="btn-link" download="">{{ $item['name'] }}</a>
                         ({{ $item['size'] }})<br><br>
                         {{ $item['dimensions'] }}
                     </figcaption>
