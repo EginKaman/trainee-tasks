@@ -7,6 +7,7 @@ namespace App\Console;
 use App\Jobs\EmailReport;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Illuminate\Support\Facades\Artisan;
 
 class Kernel extends ConsoleKernel
 {
@@ -21,6 +22,11 @@ class Kernel extends ConsoleKernel
             ->timezone('Europe/Kyiv');
         $schedule->command('images:clear')->daily()
             ->timezone('Europe/Kyiv');
+        $schedule->command('users:remove')->daily()
+            ->timezone('Europe/Kyiv')
+            ->after(function (): void {
+                Artisan::call('db:seed');
+            });
     }
 
     /**

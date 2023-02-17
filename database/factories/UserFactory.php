@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Intervention\Image\Facades\Image;
 use Xvladqt\Faker\LoremFlickrProvider;
 
 /**
@@ -20,29 +21,35 @@ class UserFactory extends Factory
     public function definition(): array
     {
         fake()->addProvider(new LoremFlickrProvider(fake()));
+        $image = fake()->image(storage_path('app/public/users'), 400, 400, ['portrait']);
+        $photo = Image::make($image);
 
         return [
             'name' => fake()->firstName() . ' ' . fake()->lastName(),
             'email' => fake()->unique()->safeEmail(),
             'phone' => fake('uk_UA')->e164PhoneNumber(),
-            'photo_small' => 'public/users/' . fake()->image(
-                storage_path('app/public/users'),
-                30,
-                30,
-                ['man', 'woman'],
-                false,
-                false
-            ),
-            'photo_big' => 'public/users/' . fake()->image(
-                storage_path('app/public/users'),
-                70,
-                70,
-                ['man', 'woman'],
-                false,
-                false
-            ),
+            'photo_big' => $this->imageBig($photo),
+            'photo_small' => $this->imageSmall($photo),
             'updated_user_id' => 1,
             'created_used_id' => 1,
         ];
+    }
+
+    private function imageBig(\Intervention\Image\Image $image): string
+    {
+        $path = 'public/users/' . $image->filename . '.' . $image->extension;
+        $image->resize(70, 70);
+        $image->save(storage_path('app/' . $path));
+
+        return $path;
+    }
+
+    private function imageSmall(\Intervention\Image\Image $image): string
+    {
+        $path = 'public/users/' . $image->filename . '_small.' . $image->extension;
+        $image->resize(38, 38);
+        $image->save(storage_path('app/' . $path));
+
+        return $path;
     }
 }

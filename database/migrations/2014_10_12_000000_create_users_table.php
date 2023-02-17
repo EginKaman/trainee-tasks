@@ -21,6 +21,7 @@ return new class() extends Migration {
             $table->string('photo_big')->nullable();
             $table->string('created_used_id');
             $table->string('updated_user_id');
+            $table->softDeletes();
             $table->timestamps();
         });
     }
