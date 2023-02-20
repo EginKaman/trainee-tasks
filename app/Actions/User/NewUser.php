@@ -6,6 +6,7 @@ namespace App\Actions\User;
 
 use App\Http\Requests\StoreUserRequest;
 use App\Models\User;
+use Illuminate\Support\Facades\Cache;
 
 class NewUser
 {
@@ -24,6 +25,8 @@ class NewUser
         $user->updatedUser()->associate(1);
 
         $user->save();
+
+        Cache::tags('users')->flush();
 
         return $user;
     }

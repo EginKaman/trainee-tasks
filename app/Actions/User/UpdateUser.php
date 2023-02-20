@@ -6,6 +6,7 @@ namespace App\Actions\User;
 
 use App\Http\Requests\{StoreUserRequest, UpdateUserRequest};
 use App\Models\User;
+use Illuminate\Support\Facades\Cache;
 
 class UpdateUser
 {
@@ -20,6 +21,7 @@ class UpdateUser
         }
         if ($user->isDirty()) {
             $user->save();
+            Cache::tags('users')->flush();
         }
 
         return $user;

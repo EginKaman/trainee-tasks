@@ -9,16 +9,18 @@ use App\Http\Requests\{IndexUserRequest, StoreUserRequest, UpdateUserRequest};
 use App\Http\Resources\{UserCollection, UserResource};
 use App\Models\User;
 use Illuminate\Http\{Request, Response};
+use Illuminate\Support\Facades\Cache;
 
 class UserController extends Controller
 {
     public function index(IndexUserRequest $request): UserCollection
     {
-        return new UserCollection(
-            User::query()->with('role')->paginate(
-                perPage: $request->validated('per_page'),
-                page: $request->validated('page')
-            )
+        $per_page = $request->validated('per_page', 15);
+        $page = $request->validated('page', 1);
+
+        return Cache::tags('users')->rememberForever(
+            "users.index.{$per_page}.{$page}",
+            fn () => new UserCollection(User::query()->with('role')->paginate(perPage: $per_page, page: $page))
         );
     }
 
@@ -31,7 +33,10 @@ class UserController extends Controller
 
     public function show(User $user): UserResource
     {
-        return new UserResource($user->load('role'));
+        return Cache::tags('users')->rememberForever(
+            "users.show.{$user->id}",
+            fn () => new UserResource($user->load('role'))
+        );
     }
 
     public function update(UpdateUserRequest $request, User $user, UpdateUser $updateUser): UserResource
