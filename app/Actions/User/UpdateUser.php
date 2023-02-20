@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Actions\User;
 
-use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\{StoreUserRequest, UpdateUserRequest};
 use App\Models\User;
 
 class UpdateUser
 {
-    public function update(StoreUserRequest $request, User $user): User
+    public function update(UpdateUserRequest $request, User $user): User
     {
         $user->fill($request->validated());
         if ($request->hasFile('photo')) {

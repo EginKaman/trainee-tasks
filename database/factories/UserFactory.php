@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Models\Role;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Intervention\Image\Facades\Image;
 use Xvladqt\Faker\LoremFlickrProvider;
@@ -25,13 +26,14 @@ class UserFactory extends Factory
         $photo = Image::make($image);
 
         return [
+            'role_id' => fake()->numberBetween(1, Role::count()),
             'name' => fake()->firstName() . ' ' . fake()->lastName(),
             'email' => fake()->unique()->safeEmail(),
             'phone' => fake('uk_UA')->e164PhoneNumber(),
             'photo_big' => $this->imageBig($photo),
             'photo_small' => $this->imageSmall($photo),
             'updated_user_id' => 1,
-            'created_used_id' => 1,
+            'created_user_id' => 1,
         ];
     }
 

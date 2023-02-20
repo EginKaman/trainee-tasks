@@ -4,28 +4,30 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
+use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\File;
+use Illuminate\Validation\Rules\{File, Unique};
 
 /**
+ * @property User $user
  * @property string $name
  * @property string $email
  * @property string $phone
  * @property UploadedFile $photo
  * @property int $role_id
  */
-class StoreUserRequest extends FormRequest
+class UpdateUserRequest extends FormRequest
 {
     public function rules(): array
     {
         return [
             'name' => ['required', 'string', 'min:2', 'max:60'],
-            'email' => ['required', 'email:rfc', 'unique:users,email', 'min:6', 'max:128'],
+            'email' => ['required', 'email:rfc', Rule::unique('users')->ignore($this->user->id), 'min:6', 'max:128'],
             'phone' => ['required', 'phone:INTERNATIONAL,UA'],
             'photo' => [
-                'required',
+                'nullable',
                 'mimes:jpg',
                 File::image()
                     ->max(5128)

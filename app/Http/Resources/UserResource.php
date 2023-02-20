@@ -24,6 +24,7 @@ class UserResource extends JsonResource
             'phone' => $this->phone,
             'photo_big' => $this->photo_big,
             'photo_small' => $this->photo_small,
+            'role' => $this->whenLoaded('role', $this->role->title),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

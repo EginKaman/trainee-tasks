@@ -5,7 +5,35 @@ info:
   version: '0.1'
 servers:
   - url: 'https://test2023-backend_ivan_t.abztrainee.com/api/v1'
+  - url: 'http://localhost/api/v1'
 paths:
+  /roles:
+    get:
+      parameters:
+        - in: header
+          name: Accept-Language
+          description: Set interface language (en, de)
+          schema:
+            type: string
+            example: en
+      tags:
+        - roles
+      description: Get all roles
+      responses:
+        200:
+          description: Users response
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/Role'
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
+
   /users:
     get:
       tags:
@@ -109,10 +137,9 @@ paths:
             type: string
             example: en
         - name: user
-          in: query
+          in: path
           required: true
           description: Id this user
-          style: form
           schema:
             type: integer
       responses:
@@ -147,10 +174,9 @@ paths:
             type: string
             example: en
         - name: user
-          in: query
+          in: path
           required: true
           description: Id this user
-          style: form
           schema:
             type: integer
       requestBody:
@@ -205,10 +231,9 @@ paths:
             type: string
             example: en
         - name: user
-          in: query
+          in: path
           required: true
           description: Id this user
-          style: form
           schema:
             type: integer
       responses:
@@ -262,37 +287,72 @@ components:
       example: https://test2023-backend-ivan-t.abztrainee.com/storage/users/dzsfd32NJdpsdvDJcko9dssdc.jpg
       description: Link for user image. If image is small, file name -> dzsfd32NJdpsdvDJcko9dssdc_small.jpg
     UserId:
+      title: 'User'
       type: integer
       example: 1
       description: User id
       minLength: 1
 
+    # Role properties
+    RoleId:
+      type: integer
+      example: 1
+      description: Role id
+      minLength: 1
+    RoleTitle:
+      type: string
+      example: Developer
+      description: Role title
+      minLength: 1
+
+    #links properties
+    LinksFirst:
+      type: string
+      example: https://test2023-backend-ivan-t.abztrainee.com/api/V1/users?page=1
+    LinksLast:
+      type: string
+      example: https://test2023-backend-ivan-t.abztrainee.com/api/V1/users?page=3
+    LinksPrev:
+      type: string
+      example: https://test2023-backend-ivan-t.abztrainee.com/api/V1/users?page=1
+    LinksNext:
+      type: string
+      example: https://test2023-backend-ivan-t.abztrainee.com/api/V1/users?page=2
+
     # Paginate properties
     CurrentPage:
       type: integer
       example: 1
-    FirstPageUrl:
-      type: string
-      example: https://test2023-backend-ivan-t.abztrainee.com/api/V1/users?page=1&per_page=15
+    From:
+      type: integer
+      example: 1
     LastPage:
       type: integer
       example: 4
-    LastPageUrl:
+    MetaLinks:
+      type: array
+      example:
+        - url: https://test2023-backend-ivan-t.abztrainee.com/api/V1/users?page=1
+          label: '1'
+          active: false
+        - url: https://test2023-backend-ivan-t.abztrainee.com/api/V1/users?page=2
+          label: '2'
+          active: true
+        - url: https://test2023-backend-ivan-t.abztrainee.com/api/V1/users?page=3
+          label: '3'
+          active: true
+    Path:
       type: string
-      example: https://test2023-backend-ivan-t.abztrainee.com/api/V1/users?page=1&per_page=15
+      example: https://test2023-backend-ivan-t.abztrainee.com/api/V1/users
     PerPage:
       type: integer
-      example: 10
+      example: 15
     Total:
       type: integer
+      example: 45
+    To:
+      type: integer
       example: 15
-    PrevLink:
-      type: string
-      example: https://test2023-backend-ivan-t.abztrainee.com/api/V1/users?page=1&per_page=15
-    NextLink:
-      type: string
-      example: https://test2023-backend-ivan-t.abztrainee.com/api/V1/users?page=2&per_page=15
-
 
     # Users Responses and RequestBody
     Users:
@@ -301,6 +361,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/User'
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/Links'
         meta:
           $ref: '#/components/schemas/Paginate'
     User:
@@ -325,6 +389,8 @@ components:
           $ref: '#/components/schemas/UserPhotoResponse'
         photo_big:
           $ref: '#/components/schemas/UserPhotoResponse'
+        role:
+          $ref: '#/components/schemas/RoleTitle'
     NewUser:
       type: object
       required:
@@ -332,6 +398,7 @@ components:
         - email
         - phone
         - photo
+        - role_id
       properties:
         name:
           $ref: '#/components/schemas/UserName'
@@ -341,12 +408,15 @@ components:
           $ref: '#/components/schemas/UserPhone'
         photo:
           $ref: '#/components/schemas/UserPhoto'
+        role_id:
+          $ref: '#/components/schemas/RoleId'
     UpdateUser:
       type: object
       required:
         - name
         - email
         - phone
+        - role_id
       properties:
         name:
           $ref: '#/components/schemas/UserName'
@@ -356,35 +426,63 @@ components:
           $ref: '#/components/schemas/UserPhone'
         photo:
           $ref: '#/components/schemas/UserPhoto'
+        role_id:
+          $ref: '#/components/schemas/RoleId'
 
+    # Role Responses
+    Roles:
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Role'
+    Role:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/RoleId'
+        title:
+          $ref: '#/components/schemas/RoleTitle'
+
+    Links:
+      type: object
+      properties:
+        first:
+          $ref: '#/components/schemas/LinksFirst'
+        last:
+          $ref: '#/components/schemas/LinksLast'
+        prev:
+          $ref: '#/components/schemas/LinksPrev'
+        next:
+          $ref: '#/components/schemas/LinksNext'
     # Paginate Response
     Paginate:
       required:
         - current_page
-        - first_page_url
+        - from
         - last_page
-        - last_page_url
+        - links
+        - path
         - per_page
+        - to
         - total
-        - prev_link
-        - next_link
       properties:
         current_page:
           $ref: '#/components/schemas/CurrentPage'
-        first_page_url:
-          $ref: '#/components/schemas/FirstPageUrl'
+        from:
+          $ref: '#/components/schemas/From'
         last_page:
           $ref: '#/components/schemas/LastPage'
-        last_page_url:
-          $ref: '#/components/schemas/LastPageUrl'
+        links:
+          $ref: '#/components/schemas/MetaLinks'
+        path:
+          $ref: '#/components/schemas/Path'
         per_page:
           $ref: '#/components/schemas/PerPage'
+        to:
+          $ref: '#/components/schemas/To'
         total:
           $ref: '#/components/schemas/Total'
-        prev_link:
-          $ref: '#/components/schemas/PrevLink'
-        next_link:
-          $ref: '#/components/schemas/NextLink'
 
     # Errors
     NotFound:

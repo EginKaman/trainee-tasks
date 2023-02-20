@@ -14,12 +14,13 @@ return new class() extends Migration {
     {
         Schema::create('users', function (Blueprint $table): void {
             $table->id();
+            $table->foreignId('role_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('name');
             $table->string('email')->unique();
-            $table->string('phone')->unique();
+            $table->string('phone');
             $table->string('photo_small')->nullable();
             $table->string('photo_big')->nullable();
-            $table->string('created_used_id');
+            $table->string('created_user_id');
             $table->string('updated_user_id');
             $table->softDeletes();
             $table->timestamps();

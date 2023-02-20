@@ -19,7 +19,7 @@ class NewUser
             $user->photo_big = app(ResizePhoto::class)->resize($photo, 70, 70);
             $user->photo_small = app(ResizePhoto::class)->resize($photo, 38, 38, 'small');
         }
-
+        $user->role()->associate($request->validated('role_id'));
         $user->createdUser()->associate(1);
         $user->updatedUser()->associate(1);
 

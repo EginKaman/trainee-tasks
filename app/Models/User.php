@@ -39,16 +39,21 @@ class User extends Authenticatable
      * @var array<string, string>
      */
     protected $casts = [
-        'phone' => E164PhoneNumberCast::class . ':UK',
+        'phone' => E164PhoneNumberCast::class . ':UA',
     ];
+
+    public function role(): BelongsTo
+    {
+        return $this->belongsTo(Role::class);
+    }
 
     public function createdUser(): BelongsTo
     {
-        return $this->belongsTo(__CLASS__, 'created_used_id');
+        return $this->belongsTo(__CLASS__, 'created_user_id');
     }
 
     public function updatedUser(): BelongsTo
     {
-        return $this->belongsTo(__CLASS__, 'updated_used_id');
+        return $this->belongsTo(__CLASS__, 'updated_user_id');
     }
 }
