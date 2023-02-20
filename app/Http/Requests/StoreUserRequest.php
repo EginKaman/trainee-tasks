@@ -5,21 +5,37 @@ declare(strict_types=1);
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use OpenApi\Annotations as OA;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\File;
 
 /**
- * @OA\Schema(
- *
- *     @OA\Property(property="name", type="string", format="email", description="User name"),
- *     @OA\Property(property="email", type="string", format="email", description="User email"),
- *     @OA\Property(property="phone", type="string", format="url", description="User phone number"),
- *     @OA\Property(property="photo", type="string", format="binary", description="User photo"),
- * )
+ * @property string $name
+ * @property string $email
+ * @property string $phone
+ * @property UploadedFile $photo
  */
 class StoreUserRequest extends FormRequest
 {
     public function rules(): array
     {
-        return [];
+        return [
+            'name' => ['required', 'string', 'min:2', 'max:60'],
+            'email' => ['required', 'email:rfc', 'min:6', 'max:128'],
+            'phone' => ['required', 'phone:INTERNATIONAL,UK'],
+            'photo' => [
+                'nullable',
+                'mimes:jpg',
+                File::image()
+                    ->max(5128)
+                    ->dimensions(
+                        Rule::dimensions()
+                            ->minWidth(70)
+                            ->minWidth(70)
+                            ->maxHeight(5000)
+                            ->maxHeight(5000)
+                    ),
+            ],
+        ];
     }
 }

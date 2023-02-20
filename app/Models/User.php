@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Propaganistas\LaravelPhone\Casts\E164PhoneNumberCast;
 
 class User extends Authenticatable
 {
@@ -37,6 +39,16 @@ class User extends Authenticatable
      * @var array<string, string>
      */
     protected $casts = [
-        'email_verified_at' => 'datetime',
+        'phone' => E164PhoneNumberCast::class . ':UK',
     ];
+
+    public function createdUser(): BelongsTo
+    {
+        return $this->belongsTo(__CLASS__, 'created_used_id');
+    }
+
+    public function updatedUser(): BelongsTo
+    {
+        return $this->belongsTo(__CLASS__, 'updated_used_id');
+    }
 }

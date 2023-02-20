@@ -309,7 +309,7 @@ components:
         - name
         - email
         - phone
-        - photo_sm
+        - photo_small
         - photo_big
       type: object
       properties:
@@ -321,7 +321,7 @@ components:
           $ref: '#/components/schemas/UserEmail'
         phone:
           $ref: '#/components/schemas/UserPhone'
-        photo_sm:
+        photo_small:
           $ref: '#/components/schemas/UserPhotoResponse'
         photo_big:
           $ref: '#/components/schemas/UserPhotoResponse'

@@ -30,6 +30,7 @@
         "league/iso3166": "^4.2",
         "mcamara/laravel-localization": "^1.7",
         "predis/predis": "^2.1",
+        "propaganistas/laravel-phone": "^5.0",
         "s-ichikawa/laravel-sendgrid-driver": "^4.0",
         "sendgrid/sendgrid": "^8.0"
     },
