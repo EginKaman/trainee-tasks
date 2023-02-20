@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace App\Services\Images;
 
 use Carbon\CarbonTimeZone;
-use Illuminate\Support\Str;
+use Imagick;
 use ImagickPixel;
 
 class Annotate
 {
-    public function handle(string $path, string $filename): void
+    public function handle(Imagick $imagick, string $text): Imagick
     {
-        $image = new \Imagick($path);
         $draw = new \ImagickDraw();
         $draw->setFillColor(new ImagickPixel('red'));
         $draw->setFont('Courier');
@@ -22,12 +21,10 @@ class Annotate
             CarbonTimeZone::createFromMinuteOffset((int) request()->post('timezone') * -1)
         )->format('Y-m-d H:i:s');
         for ($i = 1; $i <= 20; ++$i) {
-            $image->annotateImage($draw, 10, $i * 50, -45, 'Copy ' . $date);
-            $image->annotateImage($draw, 320, $i * 50, -45, 'Copy ' . $date);
+            $imagick->annotateImage($draw, 10, $i * 50, -45, 'Copy ' . $date);
+            $imagick->annotateImage($draw, 320, $i * 50, -45, 'Copy ' . $date);
         }
-        $image->writeImage(
-            storage_path('app/public/images/annotated/' . $filename . '.' . Str::lower($image->getImageFormat()))
-        );
-        $image->clear();
+
+        return $imagick;
     }
 }
