@@ -10,12 +10,12 @@
 @endpush
 @section('content')
     @if(session('success'))
-        <x-adminlte-alert theme="success" title="Successfully">
+        <x-adminlte-alert theme="success" title="Successfully!">
             Your data has been sent successfully
         </x-adminlte-alert>
     @endif
     @if($errors->isNotEmpty())
-        <x-adminlte-alert theme="danger" title="Danger">
+        <x-adminlte-alert theme="danger" title="Validation error!">
             Please correct data in next
             fields: {{ implode(', ', Arr::map($errors->keys(), fn ($value) => __($value))) }}
         </x-adminlte-alert>
