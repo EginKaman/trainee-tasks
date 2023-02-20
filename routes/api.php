@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::prefix('v1')->middleware(['localize'])->group(function () {
+Route::prefix('v1')->middleware(['localization'])->group(function () {
     Route::apiResource('users', \App\Http\Controllers\UserController::class);
     Route::get('roles', \App\Http\Controllers\RoleController::class);
 });
