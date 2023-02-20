@@ -16,20 +16,25 @@ class StoreFormRequest extends FormRequest
             'email_rfc' => [
                 'nullable',
                 'string',
+                'min:6',
+                'max:254',
                 "regex:/^(?:[a-z0-9!#$%&'*+\\/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+\\/=?^_`{|}~-]+)*|\"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9]{2,}(?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\\])$/",
             ],
             'id' => ['nullable', 'string', 'min:2', 'max:128', 'regex:/^[a-z0-9][a-z0-9_]{2,128}[a-z0-9]$/'],
             'phone' => [
                 'required',
                 'string',
+                'min:12',
                 'regex:/^\+38?[-.\s]?\(?0\d{1,2}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/',
             ],
             'additional_phone' => [
                 'nullable',
                 'string',
+                'min:7',
+                'max:256',
                 'regex:/\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\\s]?\d{1,4}[-.\s]?\d{1,9}[ ,;]?/',
             ],
-            'pincode' => ['required', 'string', 'regex:/^\d{4}-?\d{4}$/'],
+            'pincode' => ['required', 'string', 'min:8', 'max:9', 'regex:/^\d{4}-?\d{4}$/'],
             'description' => ['nullable', 'string', 'max:500', 'regex:/.{0,500}/'],
         ];
     }
