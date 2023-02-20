@@ -27,6 +27,8 @@ class Kernel extends ConsoleKernel
             ->after(function (): void {
                 Artisan::call('db:seed');
             });
+        $schedule->command('backup:run')->daily()
+            ->timezone('Europe/Kyiv');
     }
 
     /**
