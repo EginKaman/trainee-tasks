@@ -69,8 +69,8 @@ class OptimizerController extends Controller
         ConvertImage $convertImage
     ): RedirectResponse {
         $image = $request->image;
-        $image = $newImage->create($image);
         $data = $request->validated();
+        $image = $newImage->create($image, $data['method']);
         $file = new File(Storage::path($image->path));
         $filename = $file->getBasename(".{$file->getExtension()}");
 
