@@ -17,7 +17,7 @@ class BrokenImageRule implements Rule
             return false;
         }
 
-        return !($image->getImageHeight() <= 0 || $image->getImageWidth() <= 0);
+        return !($image->getHeight() <= 0 || $image->getWidth() <= 0);
     }
 
     public function message(): string
