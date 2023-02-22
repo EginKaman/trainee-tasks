@@ -12,7 +12,7 @@ class ImagesClearCommand extends Command
 {
     protected $signature = 'images:clear';
 
-    protected $description = 'Command description';
+    protected $description = 'Cleans images older than two days';
 
     public function handle(): void
     {

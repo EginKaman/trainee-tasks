@@ -12,7 +12,7 @@ class ImagesOptimizeCommand extends Command
 {
     protected $signature = 'images:optimize';
 
-    protected $description = 'Command description';
+    protected $description = 'Run image optimization with "pending" status.';
 
     public function handle(): void
     {
