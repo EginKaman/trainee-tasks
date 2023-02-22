@@ -48,7 +48,7 @@ class StoreFormRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'id.regex' => 'For ID, we use only Latin in lower case, numbers, the sign "_"',
+            'id.regex' => 'Use only Latin in lower case, numbers, the sign "_"',
             'pincode.regex' => 'Pincode is valid only in the format ххххххх, хххх-хххх, where х are numbers only',
             'name.regex' => 'Only Latin and spaces are used for the name',
             'phone.regex' => 'The phone format is invalid',
