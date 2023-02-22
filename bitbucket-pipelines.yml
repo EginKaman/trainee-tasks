@@ -20,7 +20,7 @@ definitions:
         script:
           - apt-get update && apt-get install -y libfreetype6-dev libjpeg62-turbo-dev libpng-dev git zip
           - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-          - composer install --optimize-autoloader --no-dev
+          - composer install --optimize-autoloader --no-dev --ignore-platform-req=ext-gd --ignore-platform-req=ext-imagick
         caches:
           - composer
         artifacts:

@@ -13,3 +13,4 @@ parameters:
   level: 6 # (0-8)
   tmpDir: bootstrap/cache/phpstan
   checkMissingIterableValueType: false
+  checkGenericClassInNonGenericObjectType: false

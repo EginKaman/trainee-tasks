@@ -12,7 +12,7 @@ class TestData
     {
         $files = [
             'positive' => [],
-            'negative' => []
+            'negative' => [],
         ];
         $examples = \Storage::disk('public')->allFiles('examples');
 
@@ -21,16 +21,15 @@ class TestData
                 $files['positive'][] = [
                     'url' => \Storage::url($example),
                     'size' => round(\Storage::disk('public')->size($example) / 1024, 2),
-                    'name' => Str::replace('examples/', '', $example)
+                    'name' => Str::replace('examples/', '', $example),
                 ];
             } elseif (Str::startsWith($example, ['examples/wrong-', 'examples/invalid-'])) {
                 $files['negative'][] = [
                     'url' => \Storage::url($example),
                     'size' => round(\Storage::disk('public')->size($example) / 1024, 2),
-                    'name' => Str::replace('examples/', '', $example)
+                    'name' => Str::replace('examples/', '', $example),
                 ];
             }
-
         }
 
         return $files;
