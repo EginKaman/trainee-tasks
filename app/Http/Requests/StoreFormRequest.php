@@ -51,7 +51,7 @@ class StoreFormRequest extends FormRequest
             'id.regex' => 'Use only Latin in lower case, numbers, the sign "_"',
             'pincode.regex' => 'Pincode is valid only in the format ххххххх, хххх-хххх, where х are numbers only',
             'name.regex' => 'Only Latin and spaces are used for the name',
-            'phone.regex' => 'The phone format is invalid',
+            'phone.regex' => 'The phone format +38 (xxx) xxx-xx-xx',
         ];
     }
 }
