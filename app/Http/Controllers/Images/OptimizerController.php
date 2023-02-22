@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Images;
 
-use App\Actions\Image\{NewImage, TestImage};
+use App\Actions\Image\{LoadImage, NewImage, TestImage};
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Images\StoreOptimizerRequest;
 use App\Models\Image;
@@ -13,22 +13,13 @@ use Illuminate\Http\{RedirectResponse, Request};
 
 class OptimizerController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request, LoadImage $loadImage): View
     {
         /** @var Image $image */
         $image = $request->session()->get('image');
         $viewData = [];
         if ($image !== null) {
-            $image->load([
-                'processingImages' => function ($query): void {
-                    $query->orderBy('mimetype', 'desc')->orderBy('original_width', 'desc');
-                },
-            ]);
-            $processing = $image->processingImages->groupBy(['mimetype', 'original_width']);
-            $viewData = [
-                'image' => $image,
-                'processing' => $processing,
-            ];
+            $viewData = $loadImage->load($image);
         }
 
         return view('images.optimizer', $viewData);
@@ -48,16 +39,9 @@ class OptimizerController extends Controller
         ]);
     }
 
-    public function show(Image $image): View
+    public function show(Image $image, LoadImage $loadImage): View
     {
-        $image->load([
-            'processingImages' => function ($query): void {
-                $query->orderBy('mimetype', 'desc')->orderBy('original_width', 'desc');
-            },
-        ]);
-        $processing = $image->processingImages->groupBy(['mimetype', 'original_width']);
-
-        return view('images.show', compact(['image', 'processing']));
+        return view('images.show', $loadImage->load($image));
     }
 
     public function store(StoreOptimizerRequest $request, NewImage $newImage): RedirectResponse
