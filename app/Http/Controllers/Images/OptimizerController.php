@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Images;
 
-use App\Actions\Image\{ConvertImage, NewImage, PrepareImage, TestImage};
+use App\Actions\Image\{NewImage, TestImage};
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Images\StoreOptimizerRequest;
 use App\Models\Image;
-use App\Services\Images\{Annotate, Convert, Crop, Image as Imagick};
 use Illuminate\Contracts\View\View;
-use Illuminate\Http\{File, RedirectResponse, Request};
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\{RedirectResponse, Request};
 
 class OptimizerController extends Controller
 {
@@ -62,24 +60,11 @@ class OptimizerController extends Controller
         return view('images.show', compact(['image', 'processing']));
     }
 
-    public function store(
-        StoreOptimizerRequest $request,
-        NewImage $newImage,
-        PrepareImage $prepareImage,
-        ConvertImage $convertImage
-    ): RedirectResponse {
+    public function store(StoreOptimizerRequest $request, NewImage $newImage): RedirectResponse
+    {
         $image = $request->image;
         $data = $request->validated();
         $image = $newImage->create($image, $data['method']);
-        $file = new File(Storage::path($image->path));
-        $filename = $file->getBasename(".{$file->getExtension()}");
-
-        //500x500 original image
-        $output = 'public/images/' . $filename . '.' . $file->getExtension();
-        $prepareImage->prepare($data['method'], $file->getRealPath(), $output);
-
-        //converted images
-        $convertImage->convert($image, Storage::path($output), $filename, $data['method']);
 
         return redirect()->route('optimizer')->with('image', $image)->with('success', true);
     }
