@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Actions\ProcessingImage;
 
+use App\Enum\ProcessingImageStatus;
 use App\Jobs\Images\OptimizeJob;
 use App\Models\{Image, ProcessingImage};
-use App\Services\Processing\{CsvProcessing, JsonProcessing, XmlProcessing};
 use Illuminate\Http\File;
 
 class NewProcessingImage
@@ -25,7 +25,7 @@ class NewProcessingImage
         $processingImage->image()->associate($image);
 
         if ($isSkipped === true || !in_array($file->getMimeType(), ['image/gif', 'image/jpeg', 'image/png'], true)) {
-            $processingImage->status = 'skipped';
+            $processingImage->status = ProcessingImageStatus::Skipped;
         }
 
         $processingImage->save();
