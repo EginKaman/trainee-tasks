@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services\Images;
 
-use Intervention\Image\Facades\Image as InterventionImage;
+use Intervention\Image\Facades\Image as InterventionImageFacade;
+use Intervention\Image\Image as InterventionImage;
 
 class Optimizer
 {
@@ -15,7 +16,7 @@ class Optimizer
         /** @phpstan-ignore-next-line */
         $this->image = match (mb_strtolower($method)) {
             'native' => app(Image::class)->make($file),
-            'library' => InterventionImage::make($file)
+            'library' => InterventionImageFacade::make($file)
         };
 
         return $this;
