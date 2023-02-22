@@ -17,7 +17,7 @@ class StoreFormRequest extends FormRequest
                 'string',
                 'min:6',
                 'max:254',
-                "regex:/^[a-z0-9!#$%&'*+\\/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+\\/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/",
+                "regex:/^[a-z][a-z0-9!#$%&'*+\\/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+\\/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/i",
             ],
             'email_rfc' => [
                 'nullable',
@@ -31,7 +31,7 @@ class StoreFormRequest extends FormRequest
                 'required',
                 'string',
                 'min:12',
-                'regex:/^\+38?[-.\s]?\(?0\d{1,2}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/',
+                'regex:/^\+38([-.\s]+)?\(?0\d{1,2}?\)?([-.\s]+)?\d{1,4}([-.\s]+)?\d{1,4}([-.\s]+)?\d{1,9}$/',
             ],
             'additional_phone' => [
                 'nullable',
