@@ -1,18 +1,9 @@
-let container = document.querySelector('#info-form');
-const delegate = (selector) => (cb) => (e) => e.target.matches(selector) && cb(e);
-
-const inputDelegate = delegate('input');
-
-const textareaDelegate = delegate('textarea');
-
-container.addEventListener('input', inputDelegate(function (el) {
-    if (document.getElementById('length-' + el.target.name)) {
-        return document.getElementById('length-' + el.target.name).textContent = el.target.value.length;
+$('form input, textarea').on('input', function () {
+    let lengthBox = $('#length-' + this.name);
+    if (lengthBox) {
+        lengthBox.text(this.value.length);
     }
-}));
-
-container.addEventListener('input', textareaDelegate(function (el) {
-    if (document.getElementById('length-' + el.target.name)) {
-        return document.getElementById('length-' + el.target.name).textContent = el.target.value.length;
-    }
-}));
+});
+$("document").ready(function() {
+    $('form input, textarea').trigger('input');
+});
