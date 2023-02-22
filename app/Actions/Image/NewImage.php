@@ -12,7 +12,9 @@ use Illuminate\Support\Facades\Storage;
 class NewImage
 {
     public function __construct(
-        private Optimizer $optimizer
+        private Optimizer $optimizer,
+        private PrepareImage $prepareImage,
+        private ConvertImage $convertImage
     ) {
     }
 
@@ -23,6 +25,7 @@ class NewImage
 
         $path = $uploadedFile->store('public/images/original');
         $file = new File(Storage::path($path));
+        $filename = $file->getBasename(".{$file->getExtension()}");
         $this->optimizer = $this->optimizer->init($file->getRealPath(), $method);
 
         $image = new Image();
@@ -34,6 +37,12 @@ class NewImage
         $image->height = $this->optimizer->getWidth();
         $image->width = $this->optimizer->getHeight();
         $image->save();
+
+        $output = 'public/images/' . $filename . '.' . $file->getExtension();
+        $this->prepareImage->prepare($method, $file->getRealPath(), $output);
+
+        //converted images
+        $this->convertImage->convert($image, Storage::path($output), $filename, $method);
 
         return $image;
     }
