@@ -16,7 +16,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->middleware(['localization'])->group(function () {
     Route::post('login', [\App\Http\Controllers\Auth\LoginController::class, 'login']);
-    Route::post('logout', [\App\Http\Controllers\Auth\LoginController::class, 'logout']);
+    Route::middleware(['auth:api'])->group(function () {
+        Route::post('logout', [\App\Http\Controllers\Auth\LoginController::class, 'logout']);
+    });
 
     Route::apiResource('users', \App\Http\Controllers\UserController::class);
     Route::get('roles', \App\Http\Controllers\RoleController::class);

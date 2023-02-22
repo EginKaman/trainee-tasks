@@ -18,7 +18,7 @@ class LoginMail extends Mailable implements ShouldQueue
 
     public function __construct(
         public User $user,
-        public string $hash
+        public string $token
     ) {
     }
 
@@ -34,7 +34,8 @@ class LoginMail extends Mailable implements ShouldQueue
     public function content(): Content
     {
         return new Content(view: 'emails.login', with: [
-            'hash' => $this->hash,
+            'name' => $this->user->name,
+            'hash' => $this->token,
         ]);
     }
 
