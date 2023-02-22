@@ -69,11 +69,11 @@ class StoreFormRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->merge([
-            'pincode' => preg_replace('/ /', '', $this->pincode),
-            'id' => preg_replace('/ /', '', $this->id),
-            'email' => preg_replace('/ /', '', $this->email),
-            'email_rfc' => preg_replace('/ /', '', $this->email_rfc),
-            'phone' => preg_replace('/ /', '', $this->phone),
+            'pincode' => preg_replace('/ /', '', (string) $this->pincode),
+            'id' => preg_replace('/ /', '', (string) $this->id),
+            'email' => preg_replace('/ /', '', (string) $this->email),
+            'email_rfc' => preg_replace('/ /', '', (string) $this->email_rfc),
+            'phone' => preg_replace('/ /', '', (string) $this->phone),
         ]);
     }
 }
