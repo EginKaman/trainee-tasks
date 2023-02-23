@@ -80,4 +80,9 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(LoginToken::class);
     }
+
+    public function providers(): HasMany
+    {
+        return $this->hasMany(UserProvider::class);
+    }
 }
