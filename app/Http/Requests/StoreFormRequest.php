@@ -34,7 +34,7 @@ class StoreFormRequest extends FormRequest
                 'string',
                 'min:6',
                 'max:254',
-                'regex:/^(?:[\sa-z0-9!#$%&\'*+\.\/\\\\=?^_`{|}~-]+(?:\.[\sa-z0-9!#$%&\'\"*+\.\/\\\\=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\ \x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z]){1,}?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])$/i',
+                'regex:^(?:[a-z0-9!#$%&\'*+\.\/\\=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'\"*+\.\/\\\\=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\ \x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z](?:[a-z-]*[a-z]){1,}?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])$/i',
             ],
             'id' => ['nullable', 'string', 'min:2', 'max:128', 'regex:/^[a-z0-9](?!.*__.*)([a-z0-9_)]+)?[a-z0-9]$/'],
             'phone' => [
@@ -48,8 +48,7 @@ class StoreFormRequest extends FormRequest
                 'string',
                 'min:7',
                 'max:256',
-                'regex:/.*\d{6,}.*/',
-                'regex:/^((\+?(\d{1,4}?[\-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{2,9})(?:[,;]? ?))+)[^\D\s]$/',
+                'regex:/^((\\+?(\\d{1,4}?([\\-.\\s]+)?\\(?\\d{1,3}?\\)?([-.\\s]+)?\\d{2,4}([-.\\s]+)?\\d{1,4}([-.\\s]+)?\\d{1,9})(?:[,;]?([\\s]+)?))+)(?<=\\d)$/m',
             ],
             'pincode' => ['required', 'string', 'min:8', 'max:9', 'regex:/^\d{4}-?\d{4}$/'],
             'description' => ['nullable', 'string', 'max:500', 'regex:/.{0,500}/'],
@@ -69,11 +68,12 @@ class StoreFormRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->merge([
-            'pincode' => preg_replace('/ /', '', (string) $this->pincode),
-            'id' => preg_replace('/ /', '', (string) $this->id),
-            'email' => preg_replace('/ /', '', (string) $this->email),
-            'email_rfc' => preg_replace('/ /', '', (string) $this->email_rfc),
-            'phone' => preg_replace('/ /', '', (string) $this->phone),
+            'pincode' => preg_replace('/\s/', '', (string) $this->pincode),
+            'id' => preg_replace('/\s/', '', (string) $this->id),
+            'email' => preg_replace('/\s/', '', (string) $this->email),
+            'email_rfc' => preg_replace('/\s/', '', (string) $this->email_rfc),
+            'phone' => preg_replace('/\s/', '', (string) $this->phone),
+            'additional_phone' => preg_replace('/\s/', '', (string) $this->additional_phone),
         ]);
     }
 }
