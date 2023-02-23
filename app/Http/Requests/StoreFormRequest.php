@@ -48,8 +48,7 @@ class StoreFormRequest extends FormRequest
                 'string',
                 'min:7',
                 'max:256',
-                'regex:/.*\d{6,}.*/',
-                'regex:/^((\+?(\d{1,4}?[\-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{2,9})(?:[,;]? ?))+)[^\D\s]$/',
+                'regex:/^((\\+?(\\d{1,4}?([\\-.\\s]+)?\\(?\\d{1,3}?\\)?([-.\\s]+)?\\d{2,4}([-.\\s]+)?\\d{1,4}([-.\\s]+)?\\d{1,9})(?:[,;]?([\\s]+)?))+)(?<=\\d)$/m',
             ],
             'pincode' => ['required', 'string', 'min:8', 'max:9', 'regex:/^\d{4}-?\d{4}$/'],
             'description' => ['nullable', 'string', 'max:500', 'regex:/.{0,500}/'],
@@ -69,11 +68,12 @@ class StoreFormRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->merge([
-            'pincode' => preg_replace('/ /', '', (string) $this->pincode),
-            'id' => preg_replace('/ /', '', (string) $this->id),
-            'email' => preg_replace('/ /', '', (string) $this->email),
-            'email_rfc' => preg_replace('/ /', '', (string) $this->email_rfc),
-            'phone' => preg_replace('/ /', '', (string) $this->phone),
+            'pincode' => preg_replace('/\s/', '', (string) $this->pincode),
+            'id' => preg_replace('/\s/', '', (string) $this->id),
+            'email' => preg_replace('/\s/', '', (string) $this->email),
+            'email_rfc' => preg_replace('/\s/', '', (string) $this->email_rfc),
+            'phone' => preg_replace('/\s/', '', (string) $this->phone),
+            'additional_phone' => preg_replace('/\s/', '', (string) $this->additional_phone),
         ]);
     }
 }
