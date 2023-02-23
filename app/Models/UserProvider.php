@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class UserProvider extends Model
 {
-    protected $fillable = ['driver', 'token'];
+    protected $fillable = ['driver', 'driver_id', 'token', 'refresh_token'];
 
     public function user(): BelongsTo
     {

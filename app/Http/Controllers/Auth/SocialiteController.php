@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Auth;
 
+use App\Actions\Socialite\Callback;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\{JsonResponse, Request};
+use App\Http\Requests\SocialiteCallbackRequest;
+use App\Http\Resources\UserResource;
+use Illuminate\Http\JsonResponse;
 use Laravel\Socialite\Facades\Socialite;
 
 class SocialiteController extends Controller
@@ -13,12 +16,13 @@ class SocialiteController extends Controller
     public function social(): JsonResponse
     {
         return response()->json([
-            'url' => Socialite::driver('facebook')->redirect()->getTargetUrl(),
+            /** @phpstan-ignore-next-line */
+            'url' => Socialite::driver('google')->stateless()->redirect()->getTargetUrl(),
         ]);
     }
 
-    public function callback(Request $request): JsonResponse
+    public function callback(SocialiteCallbackRequest $request): UserResource|JsonResponse
     {
-        return response()->json(Socialite::driver('facebook')->user());
+        return app(Callback::class)->callback($request->validated('driver'));
     }
 }
