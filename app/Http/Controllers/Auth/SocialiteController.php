@@ -6,18 +6,18 @@ namespace App\Http\Controllers\Auth;
 
 use App\Actions\Socialite\Callback;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\SocialiteCallbackRequest;
+use App\Http\Requests\Auth\{SocialiteCallbackRequest, SocialiteSocialRequest};
 use App\Http\Resources\UserResource;
 use Illuminate\Http\JsonResponse;
 use Laravel\Socialite\Facades\Socialite;
 
 class SocialiteController extends Controller
 {
-    public function social(): JsonResponse
+    public function social(SocialiteSocialRequest $request): JsonResponse
     {
         return response()->json([
             /** @phpstan-ignore-next-line */
-            'url' => Socialite::driver('google')->stateless()->redirect()->getTargetUrl(),
+            'url' => Socialite::driver($request->validated('driver'))->stateless()->redirect()->getTargetUrl(),
         ]);
     }
 
