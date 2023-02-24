@@ -70,10 +70,6 @@ class StoreFormRequest extends FormRequest
         $this->merge([
             'pincode' => preg_replace('/\s/', '', (string) $this->pincode),
             'id' => preg_replace('/\s/', '', (string) $this->id),
-            'email' => preg_replace('/\s/', '', (string) $this->email),
-            'email_rfc' => preg_replace('/\s/', '', (string) $this->email_rfc),
-            'phone' => preg_replace('/\s/', '', (string) $this->phone),
-            'additional_phone' => preg_replace('/\s/', '', (string) $this->additional_phone),
         ]);
     }
 }
