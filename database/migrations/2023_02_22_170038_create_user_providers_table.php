@@ -14,8 +14,8 @@ return new class() extends Migration {
             $table->foreignId('user_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('driver');
             $table->string('driver_id');
-            $table->string('token');
-            $table->string('refresh_token')->nullable();
+            $table->text('token')->nullable();
+            $table->text('refresh_token')->nullable();
             $table->timestamps();
         });
     }
