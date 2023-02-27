@@ -255,7 +255,41 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SomethingWentWrong'
+
+  /login:
+    post:
+      parameters:
+        - in: header
+          name: Accept-Language
+          description: Set interface language (en, de)
+          schema:
+            type: string
+            example: en
+      tags:
+        - login
+      description: Login user
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Login'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+      responses:
+        200:
+          description: Users response
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/Role'
 components:
+  securitySchemes:
+    AuthToken:
+      type: http
+      scheme: bearer
+
   schemas:
     #  Users properties
     UserName:
@@ -483,6 +517,12 @@ components:
           $ref: '#/components/schemas/To'
         total:
           $ref: '#/components/schemas/Total'
+
+    Login:
+      type: object
+      properties:
+        email:
+          $ref: '#/components/schemas/UserEmail'
 
     # Errors
     NotFound:
