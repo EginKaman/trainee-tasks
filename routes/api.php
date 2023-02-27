@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\SocialiteController;
+use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -29,5 +30,6 @@ Route::prefix('v1')->middleware(['localization'])->group(function () {
 
     Route::apiResource('users', UserController::class);
     Route::get('roles', RoleController::class);
+    Route::get('products', ProductsController::class);
 });
 
