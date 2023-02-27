@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Jobs\Images;
 
+use App\Enum\ProcessingImageStatus;
 use App\Models\{Image, ProcessingImage};
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -38,7 +39,7 @@ class OptimizeJob implements ShouldQueue
             $this->processingImage->kraked_width = $response['kraked_width'];
             $this->processingImage->kraked_height = $response['kraked_height'];
             $this->processingImage->saved_bytes = $response['saved_bytes'];
-            $this->processingImage->status = 'success';
+            $this->processingImage->status = ProcessingImageStatus::Success;
             $this->processingImage->save();
         }
     }

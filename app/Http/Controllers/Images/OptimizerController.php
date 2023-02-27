@@ -4,33 +4,22 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Images;
 
-use App\Actions\Image\{ConvertImage, NewImage, PrepareImage, TestImage};
+use App\Actions\Image\{LoadImage, NewImage, TestImage};
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Images\StoreOptimizerRequest;
 use App\Models\Image;
-use App\Services\Images\{Annotate, Convert, Crop, Image as Imagick};
 use Illuminate\Contracts\View\View;
-use Illuminate\Http\{File, RedirectResponse, Request};
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\{RedirectResponse, Request};
 
 class OptimizerController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request, LoadImage $loadImage): View
     {
         /** @var Image $image */
         $image = $request->session()->get('image');
         $viewData = [];
         if ($image !== null) {
-            $image->load([
-                'processingImages' => function ($query): void {
-                    $query->orderBy('mimetype', 'desc')->orderBy('original_width', 'desc');
-                },
-            ]);
-            $processing = $image->processingImages->groupBy(['mimetype', 'original_width']);
-            $viewData = [
-                'image' => $image,
-                'processing' => $processing,
-            ];
+            $viewData = $loadImage->load($image);
         }
 
         return view('images.optimizer', $viewData);
@@ -50,36 +39,16 @@ class OptimizerController extends Controller
         ]);
     }
 
-    public function show(Image $image): View
+    public function show(Image $image, LoadImage $loadImage): View
     {
-        $image->load([
-            'processingImages' => function ($query): void {
-                $query->orderBy('mimetype', 'desc')->orderBy('original_width', 'desc');
-            },
-        ]);
-        $processing = $image->processingImages->groupBy(['mimetype', 'original_width']);
-
-        return view('images.show', compact(['image', 'processing']));
+        return view('images.show', $loadImage->load($image));
     }
 
-    public function store(
-        StoreOptimizerRequest $request,
-        NewImage $newImage,
-        PrepareImage $prepareImage,
-        ConvertImage $convertImage
-    ): RedirectResponse {
+    public function store(StoreOptimizerRequest $request, NewImage $newImage): RedirectResponse
+    {
         $image = $request->image;
-        $image = $newImage->create($image);
         $data = $request->validated();
-        $file = new File(Storage::path($image->path));
-        $filename = $file->getBasename(".{$file->getExtension()}");
-
-        //500x500 original image
-        $output = 'public/images/' . $filename . '.' . $file->getExtension();
-        $prepareImage->prepare($data['method'], $file->getRealPath(), $output);
-
-        //converted images
-        $convertImage->convert($image, Storage::path($output), $filename, $data['method']);
+        $image = $newImage->create($image, $data['method']);
 
         return redirect()->route('optimizer')->with('image', $image)->with('success', true);
     }

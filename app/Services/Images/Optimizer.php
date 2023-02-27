@@ -4,87 +4,59 @@ declare(strict_types=1);
 
 namespace App\Services\Images;
 
-use App\Exceptions\NotSupportedException;
-use Imagick;
+use Intervention\Image\Facades\Image as InterventionImageFacade;
+use Intervention\Image\Image as InterventionImage;
 
 class Optimizer
 {
-    public function __construct(
-        protected ?Imagick $imagick,
-        protected Crop $crop,
-        protected Convert $convert,
-        protected Annotate $annotate
-    ) {
-    }
+    private Image|InterventionImage $image;
 
-    public function init(string $file, string $method): \Intervention\Image\Image|static
+    public function init(string $file, string $method): static
     {
         /** @phpstan-ignore-next-line */
-        return match (mb_strtolower($method)) {
-            'native' => $this->make($file),
-            'library' => \Intervention\Image\Facades\Image::make($file)
+        $this->image = match (mb_strtolower($method)) {
+            'native' => app(Image::class)->make($file),
+            'library' => InterventionImageFacade::make($file)
         };
-    }
-
-    public function make(string $file): static
-    {
-        $this->imagick = new Imagick();
-        $this->imagick->readImage($file);
-
-        $this->imagick = $this->removeAnimation($this->imagick);
-
-        $this->imagick->setImageOrientation(\Imagick::ORIENTATION_UNDEFINED);
 
         return $this;
     }
 
+    public function getWidth(): int
+    {
+        return $this->image->getWidth();
+    }
+
+    public function getHeight(): int
+    {
+        return $this->image->getHeight();
+    }
+
     public function resize(int $width, int $height): static
     {
-        $this->imagick = $this->crop->handle($this->imagick, $width, $height);
+        $this->image->resize($width, $height);
 
         return $this;
     }
 
     public function encode(string $format): static
     {
-        $this->imagick = match (mb_strtolower($format)) {
-            'gif' => $this->convert->convertToGif($this->imagick),
-            'png' => $this->convert->convertToPng($this->imagick),
-            'jpg' => $this->convert->convertToJpeg($this->imagick),
-            'bmp' => $this->convert->convertToBmp($this->imagick),
-            'webp' => $this->convert->convertToWebp($this->imagick),
-            default => throw new NotSupportedException("Encoding format ({$format}) is not supported."),
-        };
+        $this->image->encode($format);
 
         return $this;
     }
 
     public function text(string $text): static
     {
-        $this->imagick = $this->annotate->handle($this->imagick, $text);
+        $this->image->text($text);
 
         return $this;
     }
 
-    public function save(?string $path = null): static
+    public function save(?string $path = null): self
     {
-        $this->imagick->writeImage($path);
+        $this->image->save($path);
 
         return $this;
-    }
-
-    protected function removeAnimation(Imagick $object): Imagick
-    {
-        $imagick = new \Imagick();
-
-        foreach ($object as $frame) {
-            $imagick->addImage($frame->getImage());
-
-            break;
-        }
-
-        $object->destroy();
-
-        return $imagick;
     }
 }

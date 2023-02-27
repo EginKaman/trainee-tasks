@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enum\ProcessingImageStatus;
 use App\Facades\FileHelper;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
@@ -28,7 +29,9 @@ class ProcessingImage extends Model
         'status',
     ];
 
-    protected $casts = [];
+    protected $casts = [
+        'status' => ProcessingImageStatus::class,
+    ];
 
     public function sizeForHumans(): Attribute
     {
