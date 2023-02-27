@@ -41,3 +41,6 @@ Route::prefix('images')->group(function () {
     Route::get('optimizer/{image:hash}', [OptimizerController::class, 'show'])->name('optimizer.show');
     Route::post('optimizer', [OptimizerController::class, 'store']);
 })->name('images');
+
+Route::get('form', [\App\Http\Controllers\FormController::class, 'index'])->name('form.index');
+Route::post('form', [\App\Http\Controllers\FormController::class, 'store'])->name('form.store');
