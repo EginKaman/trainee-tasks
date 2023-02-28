@@ -6,8 +6,8 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\File;
+use Illuminate\Validation\{Rule, ValidationException};
 
 /**
  * @property string $name
@@ -21,9 +21,9 @@ class StoreUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'min:2', 'max:60'],
+            'name' => ['required', 'string', 'min:2', 'max:60', 'regex:/^[A-Za-z- ]+$/'],
             'email' => ['required', 'email:rfc', 'unique:users,email', 'min:6', 'max:128'],
-            'phone' => ['required', 'phone:INTERNATIONAL,UA'],
+            'phone' => ['required', 'phone:INTERNATIONAL,UA', 'unique:users,phone'],
             'photo' => [
                 'required',
                 'mimes:jpg',
