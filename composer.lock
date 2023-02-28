@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "180e53d859ad72cf14f0b1c1932121f0",
+    "content-hash": "7a12374943349457bb4c21d952baacd5",
     "packages": [
         {
             "name": "almasaeed2010/adminlte",
@@ -101,16 +101,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.260.2",
+            "version": "3.261.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "de98dc14291ae7f39de5e381ba163c3ba40fd22d"
+                "reference": "9523e082488df5898d8e975c6554cc8b9a79f97a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/de98dc14291ae7f39de5e381ba163c3ba40fd22d",
-                "reference": "de98dc14291ae7f39de5e381ba163c3ba40fd22d",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/9523e082488df5898d8e975c6554cc8b9a79f97a",
+                "reference": "9523e082488df5898d8e975c6554cc8b9a79f97a",
                 "shasum": ""
             },
             "require": {
@@ -189,9 +189,9 @@
             "support": {
                 "forum": "https://forums.aws.amazon.com/forum.jspa?forumID=80",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.260.2"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.261.0"
             },
-            "time": "2023-02-23T19:35:08+00:00"
+            "time": "2023-02-27T19:22:33+00:00"
         },
         {
             "name": "brick/math",
@@ -974,24 +974,24 @@
         },
         {
             "name": "graham-campbell/result-type",
-            "version": "v1.1.0",
+            "version": "v1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/GrahamCampbell/Result-Type.git",
-                "reference": "a878d45c1914464426dc94da61c9e1d36ae262a8"
+                "reference": "672eff8cf1d6fe1ef09ca0f89c4b287d6a3eb831"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/GrahamCampbell/Result-Type/zipball/a878d45c1914464426dc94da61c9e1d36ae262a8",
-                "reference": "a878d45c1914464426dc94da61c9e1d36ae262a8",
+                "url": "https://api.github.com/repos/GrahamCampbell/Result-Type/zipball/672eff8cf1d6fe1ef09ca0f89c4b287d6a3eb831",
+                "reference": "672eff8cf1d6fe1ef09ca0f89c4b287d6a3eb831",
                 "shasum": ""
             },
             "require": {
                 "php": "^7.2.5 || ^8.0",
-                "phpoption/phpoption": "^1.9"
+                "phpoption/phpoption": "^1.9.1"
             },
             "require-dev": {
-                "phpunit/phpunit": "^8.5.28 || ^9.5.21"
+                "phpunit/phpunit": "^8.5.32 || ^9.6.3 || ^10.0.12"
             },
             "type": "library",
             "autoload": {
@@ -1020,7 +1020,7 @@
             ],
             "support": {
                 "issues": "https://github.com/GrahamCampbell/Result-Type/issues",
-                "source": "https://github.com/GrahamCampbell/Result-Type/tree/v1.1.0"
+                "source": "https://github.com/GrahamCampbell/Result-Type/tree/v1.1.1"
             },
             "funding": [
                 {
@@ -1032,7 +1032,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-07-30T15:56:11+00:00"
+            "time": "2023-02-25T20:23:15+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -1515,6 +1515,74 @@
                 "source": "https://github.com/henriqueramos/laravel-json-schema-validator/tree/master"
             },
             "time": "2020-04-27T05:45:52+00:00"
+        },
+        {
+            "name": "illuminatech/multipart-middleware",
+            "version": "1.1.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/illuminatech/multipart-middleware.git",
+                "reference": "61b105d5bce4857f38935b56a96ff70f114df1c6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/illuminatech/multipart-middleware/zipball/61b105d5bce4857f38935b56a96ff70f114df1c6",
+                "reference": "61b105d5bce4857f38935b56a96ff70f114df1c6",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/http": "^6.0 || ^7.0 || ^8.0 || ^9.0 || ^10.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^7.5 || ^8.0 || ^9.3 || ^10.0.7"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Illuminatech\\MultipartMiddleware\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Paul Klimov",
+                    "email": "klimov.paul@gmail.com"
+                }
+            ],
+            "description": "'multipart/form-data' parser middleware for Laravel",
+            "keywords": [
+                "file",
+                "laravel",
+                "middleware",
+                "multipart",
+                "parser",
+                "request",
+                "upload"
+            ],
+            "support": {
+                "issues": "https://github.com/illuminatech/multipart-middleware/issues",
+                "source": "https://github.com/illuminatech/multipart-middleware",
+                "wiki": "https://github.com/illuminatech/multipart-middleware/wiki"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/klimov-paul",
+                    "type": "github"
+                },
+                {
+                    "url": "https://www.patreon.com/klimov_paul",
+                    "type": "patreon"
+                }
+            ],
+            "time": "2023-02-24T15:59:00+00:00"
         },
         {
             "name": "intervention/image",
@@ -3754,24 +3822,24 @@
         },
         {
             "name": "phpoption/phpoption",
-            "version": "1.9.0",
+            "version": "1.9.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/schmittjoh/php-option.git",
-                "reference": "dc5ff11e274a90cc1c743f66c9ad700ce50db9ab"
+                "reference": "dd3a383e599f49777d8b628dadbb90cae435b87e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/schmittjoh/php-option/zipball/dc5ff11e274a90cc1c743f66c9ad700ce50db9ab",
-                "reference": "dc5ff11e274a90cc1c743f66c9ad700ce50db9ab",
+                "url": "https://api.github.com/repos/schmittjoh/php-option/zipball/dd3a383e599f49777d8b628dadbb90cae435b87e",
+                "reference": "dd3a383e599f49777d8b628dadbb90cae435b87e",
                 "shasum": ""
             },
             "require": {
                 "php": "^7.2.5 || ^8.0"
             },
             "require-dev": {
-                "bamarni/composer-bin-plugin": "^1.8",
-                "phpunit/phpunit": "^8.5.28 || ^9.5.21"
+                "bamarni/composer-bin-plugin": "^1.8.2",
+                "phpunit/phpunit": "^8.5.32 || ^9.6.3 || ^10.0.12"
             },
             "type": "library",
             "extra": {
@@ -3813,7 +3881,7 @@
             ],
             "support": {
                 "issues": "https://github.com/schmittjoh/php-option/issues",
-                "source": "https://github.com/schmittjoh/php-option/tree/1.9.0"
+                "source": "https://github.com/schmittjoh/php-option/tree/1.9.1"
             },
             "funding": [
                 {
@@ -3825,7 +3893,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-07-30T15:51:26+00:00"
+            "time": "2023-02-25T19:38:58+00:00"
         },
         {
             "name": "predis/predis",
@@ -5339,16 +5407,16 @@
         },
         {
             "name": "swagger-api/swagger-ui",
-            "version": "v4.16.0",
+            "version": "v4.16.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/swagger-api/swagger-ui.git",
-                "reference": "e00fefde4e1320da6c225c547228acf50fa71cbf"
+                "reference": "cea6642894da2b6dbdee835fd3acedaa3ee37f18"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/swagger-api/swagger-ui/zipball/e00fefde4e1320da6c225c547228acf50fa71cbf",
-                "reference": "e00fefde4e1320da6c225c547228acf50fa71cbf",
+                "url": "https://api.github.com/repos/swagger-api/swagger-ui/zipball/cea6642894da2b6dbdee835fd3acedaa3ee37f18",
+                "reference": "cea6642894da2b6dbdee835fd3acedaa3ee37f18",
                 "shasum": ""
             },
             "type": "library",
@@ -5394,9 +5462,9 @@
             ],
             "support": {
                 "issues": "https://github.com/swagger-api/swagger-ui/issues",
-                "source": "https://github.com/swagger-api/swagger-ui/tree/v4.16.0"
+                "source": "https://github.com/swagger-api/swagger-ui/tree/v4.16.1"
             },
-            "time": "2023-02-24T09:38:46+00:00"
+            "time": "2023-02-25T18:18:34+00:00"
         },
         {
             "name": "swaggest/json-diff",
@@ -8100,16 +8168,16 @@
         },
         {
             "name": "zircote/swagger-php",
-            "version": "4.7.0",
+            "version": "4.7.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zircote/swagger-php.git",
-                "reference": "f2bcbd5aa9d838d28bf5665c70f88eda6adc22cb"
+                "reference": "de32660ba43f7dd5f47a7a38d33d5d2c1c367d65"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zircote/swagger-php/zipball/f2bcbd5aa9d838d28bf5665c70f88eda6adc22cb",
-                "reference": "f2bcbd5aa9d838d28bf5665c70f88eda6adc22cb",
+                "url": "https://api.github.com/repos/zircote/swagger-php/zipball/de32660ba43f7dd5f47a7a38d33d5d2c1c367d65",
+                "reference": "de32660ba43f7dd5f47a7a38d33d5d2c1c367d65",
                 "shasum": ""
             },
             "require": {
@@ -8172,9 +8240,9 @@
             ],
             "support": {
                 "issues": "https://github.com/zircote/swagger-php/issues",
-                "source": "https://github.com/zircote/swagger-php/tree/4.7.0"
+                "source": "https://github.com/zircote/swagger-php/tree/4.7.1"
             },
-            "time": "2023-02-20T23:05:35+00:00"
+            "time": "2023-02-25T22:37:20+00:00"
         }
     ],
     "packages-dev": [
@@ -10471,16 +10539,16 @@
         },
         {
             "name": "laravel-lang/lang",
-            "version": "12.18.3",
+            "version": "12.18.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Laravel-Lang/lang.git",
-                "reference": "b7f80e78e9555895f1a94db9a3bf311c98942bff"
+                "reference": "61d2bb94035c1ce13fb7e4a26549730dd466a1b0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Laravel-Lang/lang/zipball/b7f80e78e9555895f1a94db9a3bf311c98942bff",
-                "reference": "b7f80e78e9555895f1a94db9a3bf311c98942bff",
+                "url": "https://api.github.com/repos/Laravel-Lang/lang/zipball/61d2bb94035c1ce13fb7e4a26549730dd466a1b0",
+                "reference": "61d2bb94035c1ce13fb7e4a26549730dd466a1b0",
                 "shasum": ""
             },
             "require": {
@@ -10516,7 +10584,7 @@
                     "homepage": "https://github.com/Laravel-Lang"
                 }
             ],
-            "description": "Languages for Laravel",
+            "description": "List of 78 languages for Laravel Framework, Laravel Jetstream, Laravel Fortify, Laravel Breeze, Laravel Cashier, Laravel Nova, Laravel Spark and Laravel UI",
             "keywords": [
                 "lang",
                 "languages",
@@ -10533,7 +10601,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2023-02-23T16:22:56+00:00"
+            "time": "2023-02-27T16:14:16+00:00"
         },
         {
             "name": "laravel-lang/publisher",
@@ -11654,16 +11722,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "1.10.2",
+            "version": "1.10.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "a2ffec7db373d8da4973d1d62add872db5cd22dd"
+                "reference": "5419375b5891add97dc74be71e6c1c34baaddf64"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/a2ffec7db373d8da4973d1d62add872db5cd22dd",
-                "reference": "a2ffec7db373d8da4973d1d62add872db5cd22dd",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/5419375b5891add97dc74be71e6c1c34baaddf64",
+                "reference": "5419375b5891add97dc74be71e6c1c34baaddf64",
                 "shasum": ""
             },
             "require": {
@@ -11693,7 +11761,7 @@
             ],
             "support": {
                 "issues": "https://github.com/phpstan/phpstan/issues",
-                "source": "https://github.com/phpstan/phpstan/tree/1.10.2"
+                "source": "https://github.com/phpstan/phpstan/tree/1.10.3"
             },
             "funding": [
                 {
@@ -11709,27 +11777,27 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-02-23T14:36:46+00:00"
+            "time": "2023-02-25T14:47:13+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
-            "version": "9.2.24",
+            "version": "9.2.25",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "2cf940ebc6355a9d430462811b5aaa308b174bed"
+                "reference": "0e2b40518197a8c0d4b08bc34dfff1c99c508954"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/2cf940ebc6355a9d430462811b5aaa308b174bed",
-                "reference": "2cf940ebc6355a9d430462811b5aaa308b174bed",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/0e2b40518197a8c0d4b08bc34dfff1c99c508954",
+                "reference": "0e2b40518197a8c0d4b08bc34dfff1c99c508954",
                 "shasum": ""
             },
             "require": {
                 "ext-dom": "*",
                 "ext-libxml": "*",
                 "ext-xmlwriter": "*",
-                "nikic/php-parser": "^4.14",
+                "nikic/php-parser": "^4.15",
                 "php": ">=7.3",
                 "phpunit/php-file-iterator": "^3.0.3",
                 "phpunit/php-text-template": "^2.0.2",
@@ -11778,7 +11846,7 @@
             ],
             "support": {
                 "issues": "https://github.com/sebastianbergmann/php-code-coverage/issues",
-                "source": "https://github.com/sebastianbergmann/php-code-coverage/tree/9.2.24"
+                "source": "https://github.com/sebastianbergmann/php-code-coverage/tree/9.2.25"
             },
             "funding": [
                 {
@@ -11786,7 +11854,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-01-26T08:26:55+00:00"
+            "time": "2023-02-25T05:32:00+00:00"
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -12031,16 +12099,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "9.6.3",
+            "version": "9.6.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "e7b1615e3e887d6c719121c6d4a44b0ab9645555"
+                "reference": "9125ee085b6d95e78277dc07aa1f46f9e0607b8d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/e7b1615e3e887d6c719121c6d4a44b0ab9645555",
-                "reference": "e7b1615e3e887d6c719121c6d4a44b0ab9645555",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/9125ee085b6d95e78277dc07aa1f46f9e0607b8d",
+                "reference": "9125ee085b6d95e78277dc07aa1f46f9e0607b8d",
                 "shasum": ""
             },
             "require": {
@@ -12113,7 +12181,7 @@
             ],
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/9.6.3"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/9.6.4"
             },
             "funding": [
                 {
@@ -12129,7 +12197,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-02-04T13:37:15+00:00"
+            "time": "2023-02-27T13:06:37+00:00"
         },
         {
             "name": "sebastian/cli-parser",
@@ -14033,16 +14101,16 @@
         },
         {
             "name": "symplify/easy-coding-standard",
-            "version": "11.2.9",
+            "version": "11.2.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/easy-coding-standard/easy-coding-standard.git",
-                "reference": "947267668efb055bf78c7b68416cb206285f21d4"
+                "reference": "5fc343df9b86e154516ddf506f7fe0b421d7d5ef"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/easy-coding-standard/easy-coding-standard/zipball/947267668efb055bf78c7b68416cb206285f21d4",
-                "reference": "947267668efb055bf78c7b68416cb206285f21d4",
+                "url": "https://api.github.com/repos/easy-coding-standard/easy-coding-standard/zipball/5fc343df9b86e154516ddf506f7fe0b421d7d5ef",
+                "reference": "5fc343df9b86e154516ddf506f7fe0b421d7d5ef",
                 "shasum": ""
             },
             "require": {
@@ -14068,7 +14136,7 @@
             "description": "Use Coding Standard with 0-knowledge of PHP-CS-Fixer and PHP_CodeSniffer",
             "support": {
                 "issues": "https://github.com/easy-coding-standard/easy-coding-standard/issues",
-                "source": "https://github.com/easy-coding-standard/easy-coding-standard/tree/11.2.9"
+                "source": "https://github.com/easy-coding-standard/easy-coding-standard/tree/11.2.10"
             },
             "funding": [
                 {
@@ -14080,7 +14148,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-02-21T11:31:15+00:00"
+            "time": "2023-02-27T10:00:30+00:00"
         },
         {
             "name": "theseer/tokenizer",
