@@ -23,9 +23,15 @@ class UpdateUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'min:2', 'max:60'],
-            'email' => ['required', 'email:rfc', Rule::unique('users')->ignore($this->user->id), 'min:6', 'max:128'],
-            'phone' => ['required', 'phone:INTERNATIONAL,UA'],
+            'name' => ['required', 'string', 'min:2', 'max:60', 'regex:/^[a-zA-z](?!.*--.*)([a-zA-Z- )]+)?[a-zA-z]$/'],
+            'email' => [
+                'required',
+                'email:rfc',
+                Rule::unique('users', 'email')->ignore($this->user->id),
+                'min:6',
+                'max:128',
+            ],
+            'phone' => ['required', 'phone:INTERNATIONAL,UA', Rule::unique('users', 'phone')->ignore($this->user->id)],
             'photo' => [
                 'nullable',
                 'mimes:jpg',

@@ -13,7 +13,12 @@ class LoginController extends Controller
 {
     public function login(LoginRequest $request, Login $login): JsonResponse
     {
-        return $login->login($request->validated('email'), $request->validated('token'));
+        return $login->link($request->validated('email'));
+    }
+
+    public function verify(LoginRequest $request, Login $login): JsonResponse
+    {
+        return $login->login($request->validated('token'));
     }
 
     public function logout(): JsonResponse

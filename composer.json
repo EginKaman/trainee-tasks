@@ -20,6 +20,7 @@
         "darkaonline/l5-swagger": "^8.5",
         "guzzlehttp/guzzle": "^7.2",
         "henriqueramos/laravel_json_schema_validator": "^1.0",
+        "illuminatech/multipart-middleware": "^1.1",
         "intervention/image": "^2.7",
         "jeroennoten/laravel-adminlte": "^3.8",
         "josiasmontag/laravel-recaptchav3": "^1.0",
