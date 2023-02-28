@@ -14,18 +14,20 @@ class Login
     ) {
     }
 
-    public function login(?string $email = null, ?string $token = null): JsonResponse
+    public function link(?string $email = null): JsonResponse
     {
-        if ($token === null) {
-            $user = User::query()->where('email', $email)->first();
+        $user = User::query()->where('email', $email)->first();
 
-            $this->newLogin->create($user);
+        $this->newLogin->create($user);
 
-            return response()->json([
-                'status' => __('Success'),
-                'message' => __('A message with an authorization link was successfully sent to your email'),
-            ]);
-        }
+        return response()->json([
+            'status' => __('Success'),
+            'message' => __('A message with an authorization link was successfully sent to your email'),
+        ]);
+    }
+
+    public function login(?string $token = null): JsonResponse
+    {
         $loginToken = LoginToken::query()->with('user')->where('token', $token)->first();
         if ($loginToken->consumed_at === null && $loginToken->expired_at > now()) {
             $loginToken->consumed_at = now();
