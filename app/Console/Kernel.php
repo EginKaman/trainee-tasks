@@ -25,7 +25,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('users:remove')->daily()
             ->timezone('Europe/Kyiv')
             ->after(function (): void {
-                Artisan::call('db:seed');
+                Artisan::call('db:seed  --class=UserSeeder');
             });
         $schedule->command('backup:run')->daily()
             ->timezone('Europe/Kyiv');
