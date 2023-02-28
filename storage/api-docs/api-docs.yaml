@@ -6,6 +6,7 @@ info:
 servers:
   - url: 'https://test2023-backend-ivan-t.abztrainee.com/api/v1'
   - url: 'http://localhost/api/v1'
+
 paths:
   /roles:
     get:
@@ -64,7 +65,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
+                type: object
                 $ref: '#/components/schemas/Users'
         422:
           description: Bad Request
@@ -258,6 +259,9 @@ paths:
 
   /login:
     post:
+      tags:
+        - auth
+      description: "Get authorization link by email. The authorization link will be sent to the user's email in the form: 'https://<domain-name>/auth?hash={hash}' . After that, you need to call the method POST /login to authorize"
       parameters:
         - in: header
           name: Accept-Language
@@ -265,9 +269,6 @@ paths:
           schema:
             type: string
             example: en
-      tags:
-        - login
-      description: Login user
       requestBody:
         content:
           multipart/form-data:
@@ -278,16 +279,97 @@ paths:
               $ref: '#/components/schemas/Login'
       responses:
         200:
-          description: Users response
+          description: Login success
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/LoginResponse'
+        422:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+              example:
+                message: The email must be a valid email address
+                errors:
+                  email:
+                    - "The email format is invalid."
+        404:
+          description: Not found email
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+              example:
+                message: Not found email, please register
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
+
+  /verify:
+    post:
+      tags:
+        - auth
+      description: "The AuthToken must be obtained from the method POST /verify by clicking on the link that will be sent to the mail"
+      parameters:
+        - in: header
+          name: Accept-Language
+          description: Set interface language (en, de)
+          schema:
+            type: string
+            example: en
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Verify'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Verify'
+      responses:
+        200:
+          description: Authorization success
+          content:
+            application/json:
+              schema:
                 $ref: '#/components/schemas/SuccessAuth'
+            multipart/form-data:
+              schema:
+                $ref: '#/components/schemas/SuccessAuth'
+        404:
+          description: Not found hash
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+              example:
+                message: Not found hash
+        422:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+              example:
+                message: The token must be a valid
+                errors:
+                  hash:
+                    - "The hash format is required."
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
+
   /logout:
     post:
       tags:
-        - login
+        - auth
       description: "Logout user"
       parameters:
         - in: header
@@ -323,39 +405,6 @@ paths:
     post:
       tags:
         - social
-      description: "This method will returned url for social auth"
-      parameters:
-        - in: header
-          name: Accept-Language
-          description: Set interface language (en, de)
-          schema:
-            type: string
-            example: en
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Social'
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Social'
-      responses:
-        200:
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SocialUrl'
-        503:
-          description: Something Went Wrong
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SomethingWentWrong'
-  /callback:
-    get:
-      tags:
-        - social
       description: "This method will check if the user is registered in the system (through a social network) and will give a response depending on this. If the user is not registered, then you will need to go through the second step of registration to fill in all the required fields. When a user is registered, an authorization token and his data will be issued"
       parameters:
         - in: header
@@ -368,10 +417,10 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/SocialCallback'
+              $ref: '#/components/schemas/Social'
           application/json:
             schema:
-              $ref: '#/components/schemas/SocialCallback'
+              $ref: '#/components/schemas/Social'
       responses:
         200:
           description: Authorization success
@@ -419,6 +468,389 @@ paths:
               schema:
                 $ref: '#/components/schemas/SomethingWentWrong'
 
+  /social/next:
+    post:
+      tags:
+        - social
+      description: Method for full register user by social network and get user data and LoginToken.
+      parameters:
+        - in: header
+          name: Accept-Language
+          description: Set interface language (en, de)
+          schema:
+            type: string
+            example: en
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TwoStepRegister'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TwoStepRegister'
+      responses:
+        200:
+          description: Authorization success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessAuth'
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+              example:
+                message: The hash not found
+        422:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+              example:
+                message: The token must be a valid
+                errors:
+                  email:
+                    - "The token format is invalid."
+        409:
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Conflict'
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
+
+  /orders:
+    post:
+      tags:
+        - orders
+      description: Method for creating an order before payment
+      parameters:
+        - in: header
+          name: Accept-Language
+          description: Set interface language (en, de)
+          schema:
+            type: string
+            example: en
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NewOrder'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewOrder'
+      responses:
+        201:
+          description: Create order success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        422:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+              example:
+                message: The token must be a valid
+                errors:
+                  email:
+                    - "The token format is invalid."
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
+    get:
+      tags:
+        - orders
+      description: Method for getting users orders information
+      parameters:
+        - in: header
+          name: Accept-Language
+          description: Set interface language (en, de)
+          schema:
+            type: string
+            example: en
+      responses:
+        200:
+          description: Getting order success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Orders'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
+
+  /payment:
+    post:
+      tags:
+        - payment
+      description: Method for payment an order via Stripe or PayPal
+      parameters:
+        - in: header
+          name: Accept-Language
+          description: Set interface language (en, de)
+          schema:
+            type: string
+            example: en
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NewPayment'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewPayment'
+      responses:
+        200:
+          description: Payment success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        422:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+              example:
+                message: The token must be a valid
+                errors:
+                  email:
+                    - "The token format is invalid."
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
+
+  /payment/refund:
+    post:
+      tags:
+        - payment
+      description: Method for charge refund
+      parameters:
+        - in: header
+          name: Accept-Language
+          description: Set interface language (en, de)
+          schema:
+            type: string
+            example: en
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NewRefund'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewRefund'
+      responses:
+        200:
+          description: Refund success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Refund'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+              example:
+                message: Not found order
+        422:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+              example:
+                message: The token must be a valid
+                errors:
+                  email:
+                    - "The token format is invalid."
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
+
+  /products:
+    get:
+      tags:
+        - products
+      description: Method to get all products
+      parameters:
+        - in: header
+          name: Accept-Language
+          description: Set interface language (en, de)
+          schema:
+            type: string
+            example: en
+        - name: page
+          in: query
+          description: Number page for getting products
+          style: form
+          schema:
+            type: integer
+        - name: per_page
+          in: query
+          description: Size page for getting products
+          style: form
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Products
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Products'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
+
+  /cards/{id}:
+    delete:
+      tags:
+        - card
+      description: This method deleting saved card.
+      parameters:
+        - in: header
+          name: Accept-Language
+          description: Set interface language (en, de)
+          schema:
+            type: string
+            example: en
+        - name: id
+          in: path
+          required: true
+          description: Card id
+          schema:
+            type: integer
+      responses:
+        204:
+          description: Successfully deleted saved card
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deleted'
+
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+              example:
+                message: Not found card id
+        422:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+              example:
+                message: The token must be a valid
+                errors:
+                  email:
+                    - "The token format is invalid."
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
+
+  /cards:
+    get:
+      tags:
+        - card
+      description: This method for getting users saved card.
+      parameters:
+        - in: header
+          name: Accept-Language
+          description: Set interface language (en, de)
+          schema:
+            type: string
+            example: en
+      responses:
+        200:
+          description: Successfully getting saved card
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserCards'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
 
 components:
   securitySchemes:
@@ -427,15 +859,38 @@ components:
       scheme: bearer
 
   schemas:
-    AccessToken:
+    #Social Driver properties
+    SocialDriver:
       type: string
-      example: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0L2FwaS92MS9jYWxsYmFjayIsImlhdCI6MTY3NzQ5MDg0NCwiZXhwIjoxNjc3NDk0NDQ1LCJuYmYiOjE2Nzc0OTA4NDUsImp0aSI6IkpjbklmR3ZrVFVjUTA0bW4iLCJzdWIiOiI0NiIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.O1qq_bVdUztBe8CTtkjjH4bLgUR11imiVZBN5tQLvAGurZJ7EeYQcms8TY2_XEW4DRrgI0EjUd6or7lkk34gmFanESLRqDeMTnzBpxZ8K0DwWEUU-RfniJDvmJt-QdgWueTTFG3myeEZmK1nphMxNd6mvpiPf6NTmc5n9AVQObgvcAwi0JVzyzgsTOPOtvrp1BQPpiaWQkK4qeibUL7NEmfp8fQhs5dwi3VH-G_Rj8XGVahunW7NiwCIpiWEOVxHshtvAFHalSI__YMxYg6aSStK_6RJl11IbPxbHK33BaOKzY0TQA95S4DH7wfoRyiTYclr3cpxJ8vPq9PUnpD_cHnAGHih44HXZ6XzJksGhKC6Z6bGBxtgsQSOuFNStSzIKfFb1PADSHKG5j8aX-DN4K6ghDNFonx8b0dD-NKUHUSVHen3f27ZRDIsewh5xpgxNoBlBXCas5iWLiBLCNFmXiFpxfBXz6OkL7ZOkEWd2b_Jg6XMUX-z-pRZFqGgf11v1HZcFiapIlfaU3BnMkyjbUGHI1EIkIeiyKCnb3uzklDK3A7E2Q308KZpT0n5Tfsa5KmYC5zQ36DPxXL20yDvtUkHqQASjg9LI692HASEWklHEanQGGEyY6_VhHSNxf-sEHtn-IY9f5UkbPpRsH4m_zIhq0ivQymDpOoIF6sbJ1Y'
+      description: Social network through which you register or log in
+      enum:
+        - google
+        - facebook
+      example: facebook
 
+      # Auth Token properties
+    AuthToken:
+      type: string
+      example: fhMg2cwiHUghKOGpWWD4BFZukjubZ7p5Aj2edOM0
+      description: Social network token for login
+      nullable: false
+
+    # Hash properties
+    LoginHash:
+      type: string
+      example: fhMg2cwiHUghKOGpWWD4BFZukjubZ7p5Aj2edOM0
+      nullable: false
+      description: Hash with query parameter in message with POST /login
+    SocialHash:
+      type: string
+      example: fhMg2cwiHUghKOGpWWD4BFZukjubZ7p5Aj2edOM0
+      nullable: false
+      description: Hash for which will be an identifiable user in POST /two-step/social
 
     #  Users properties
     UserName:
       type: string
-      example: John
+      example: Andrii
       nullable: false
       description: User name, may contain only lattice letters and symbols space, -
       minLength: 2
@@ -449,23 +904,27 @@ components:
       maxLength: 254
     UserPhone:
       type: string
-      example: "+380930400000"
+      example: "+380730000000"
       description: User phone, must be a valid according to +380000000000 (Ukraine format)
       nullable: false
       minLength: 1
-    UserPhoto:
+    UserImage:
       type: string
       format: binary
       description: User image, must be a jpg, jpeg format. Min height and min width must be a 70px, and size image smaller 5Mb
-    UserPhotoResponse:
+    UserImageResponse:
       type: string
       example: https://test2023-backend-ivan-t.abztrainee.com/storage/users/dzsfd32NJdpsdvDJcko9dssdc.jpg
       description: Link for user image. If image is small, file name -> dzsfd32NJdpsdvDJcko9dssdc_small.jpg
     UserId:
-      title: 'User'
       type: integer
       example: 1
       description: User id
+      minLength: 1
+    StripeCutomerId:
+      type: string
+      example: 24jrdKPe43fk
+      description: Stripe customer id
       minLength: 1
 
     # Role properties
@@ -477,57 +936,338 @@ components:
     RoleTitle:
       type: string
       example: Developer
-      description: Role title
+      description: Role id
       minLength: 1
-
-    #links properties
-    LinksFirst:
-      type: string
-      example: https://test2023-backend-ivan-t.abztrainee.com/api/V1/users?page=1
-    LinksLast:
-      type: string
-      example: https://test2023-backend-ivan-t.abztrainee.com/api/V1/users?page=3
-    LinksPrev:
-      type: string
-      example: https://test2023-backend-ivan-t.abztrainee.com/api/V1/users?page=1
-    LinksNext:
-      type: string
-      example: https://test2023-backend-ivan-t.abztrainee.com/api/V1/users?page=2
 
     # Paginate properties
     CurrentPage:
       type: integer
       example: 1
-    From:
-      type: integer
-      example: 1
+    FirstPageUrl:
+      type: string
+      example: https://test2023-backend-ivan-t.abztrainee.com/api/V1/users?page=1&per_page=15
     LastPage:
       type: integer
       example: 4
-    MetaLinks:
-      type: array
-      example:
-        - url: https://test2023-backend-ivan-t.abztrainee.com/api/V1/users?page=1
-          label: '1'
-          active: false
-        - url: https://test2023-backend-ivan-t.abztrainee.com/api/V1/users?page=2
-          label: '2'
-          active: true
-        - url: https://test2023-backend-ivan-t.abztrainee.com/api/V1/users?page=3
-          label: '3'
-          active: true
-    Path:
+    LastPageUrl:
       type: string
-      example: https://test2023-backend-ivan-t.abztrainee.com/api/V1/users
+      example: https://test2023-backend-ivan-t.abztrainee.com/api/V1/users?page=1&per_page=15
     PerPage:
       type: integer
-      example: 15
+      example: 10
     Total:
       type: integer
-      example: 45
-    To:
-      type: integer
       example: 15
+    PrevLink:
+      type: string
+      example: https://test2023-backend-ivan-t.abztrainee.com/api/V1/users?page=1&per_page=15
+    NextLink:
+      type: string
+      example: https://test2023-backend-ivan-t.abztrainee.com/api/V1/users?page=2&per_page=15
+
+    # Order properties
+    OrderId:
+      type: integer
+      example: 1
+      description: Order id
+      minLength: 1
+    OrderPaymentId:
+      type: string
+      example: pi_1DsvVk2eZvKYlo2CPTkujDWC
+      description: Unique identifier for the object PaymentIntent
+      minLength: 1
+    OrderClientSecret:
+      type: string
+      example: pi_1DsvVk2eZvKYlo2CPTkujDWC_secret_2UgUfLIr4eJehOFEAkxq59zCn
+      description: Client secret key
+      minLength: 1
+    OrderPaymentMethod:
+      type: string
+      example: pm_card_visa
+      description: ID of the payment method (a PaymentMethod, Card, or compatible Source object)
+      minLength: 1
+    OrderTypePayment:
+      type: string
+      $ref: '#/components/schemas/OrderTypePaymentEnum'
+
+    # PaymentStatus properties
+    PaymentStatusId:
+      type: integer
+      example: 1
+      description: Status Payment id
+      minLength: 1
+    PaymentStatusCreatedAt:
+      type: string
+      example: 2022-12-12 12:30:33
+      description: Status Payment created at
+
+    # Product properties
+    ProductId:
+      type: integer
+      example: 1
+      description: Product id
+      minLength: 1
+    ProductUniqueNumber:
+      type: string
+      example: 20230802110922
+      description: Unique number of Product
+      minLength: 1
+    ProductTitle:
+      type: string
+      example: White mug with a cat
+      description: Product title
+      minLength: 1
+    ProductDescription:
+      type: string
+      example: Porcelain mug with a diameter of 10 cm is made of sturdy glass
+      description: Product description
+      minLength: 1
+    ProductImg:
+      type: string
+      format: binary
+      description: Product image, must be a jpg, jpeg format. Size image smaller 5Mb
+    ProductImgOutput:
+      type: string
+      example: https://test2023-backend-ivan-t.abztrainee.com/storage/products/bhjdBJHViud9384bv2223mdnc.jpg
+      description: Link to product image
+    ProductQuantity:
+      type: integer
+      example: 100
+      description: Quantity products
+    ProductPrice:
+      type: number
+      multipleOf: 0.01
+      example: 23.45
+      description: Price product
+
+    #OrderItems properties
+    OrderItemId:
+      type: integer
+      example: 1
+      description: Product id
+      minLength: 1
+    OrderItemTitle:
+      type: string
+      example: White mug with a cat
+      description: Product title
+      minLength: 1
+    OrderItemDescription:
+      type: string
+      example: Porcelain mug with a diameter of 10 cm is made of sturdy glass
+      description: Product description
+      minLength: 1
+    OrderItemImg:
+      type: string
+      format: binary
+      description: Product image, must be a jpg, jpeg format. Size image smaller 5Mb
+    OrderItemQuantity:
+      type: integer
+      example: 10
+      description: The number of products you want to order
+      maximum: 99
+    OrderItemPrice:
+      type: number
+      multipleOf: 0.01
+      example: 23
+      description: Price product
+
+    #Payment properties
+    LabelSaveCard:
+      type: boolean
+      example: false
+      description: Label for saving the card for a specific payment id
+
+    #UserCard properties
+    UserCardId:
+      type: integer
+      example: 1
+      description: Id user card
+    UserCardNumber:
+      type: string
+      example: 1234
+      description: last for number card
+    UserCardType:
+      type: string
+      example: visa
+      description: Type card
+    ChooseCardId:
+      nullable: true
+      example: 1
+      type: integer
+      description: Id of the selected saved card. Can be null when the card is not selected or there is no given functionality
+    UserCardPaymentMethod:
+      nullable: true
+      type: string
+      example: null
+      description: Payment method choose card
+
+    # Enums
+    OrderTypePaymentEnum:
+      nullable: false
+      type: string
+      enum:
+        - stripe
+        - paypal
+      example: stripe
+      description: Type of payment
+    OrderStatusPaymentEnum:
+      type: string
+      enum:
+        - refund
+        - success
+        - pending
+        - failed
+      example: success
+      description: Status of payment
+
+    # Refund  responses or requestBody
+    NewRefund:
+      properties:
+        order_id:
+          $ref: '#/components/schemas/PaymentStatusId'
+        type_payment:
+          $ref: '#/components/schemas/OrderTypePaymentEnum'
+    Refund:
+      properties:
+        message:
+          type: string
+          example: 'Refund success'
+
+    # PaymentStatus responses or requestBody
+    PaymentStatuses:
+      type: array
+      items:
+        properties:
+          id:
+            $ref: '#/components/schemas/PaymentStatusId'
+          status:
+            $ref: '#/components/schemas/OrderStatusPaymentEnum'
+          created_at:
+            $ref: '#/components/schemas/PaymentStatusCreatedAt'
+
+    # OrderItem Responses and RequestBody
+    OrderItem:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/OrderItemId'
+        title:
+          $ref: '#/components/schemas/OrderItemTitle'
+        description:
+          $ref: '#/components/schemas/OrderItemDescription'
+        img:
+          $ref: '#/components/schemas/OrderItemImg'
+        quantity:
+          $ref: '#/components/schemas/OrderItemQuantity'
+        price:
+          $ref: '#/components/schemas/OrderItemPrice'
+        product_id:
+          $ref: '#/components/schemas/ProductUniqueNumber'
+
+    # UserCard Responses and RequestBody
+    UserCard:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/UserCardId'
+        last_number:
+          $ref: '#/components/schemas/UserCardNumber'
+        type_card:
+          $ref: '#/components/schemas/UserCardType'
+    UserCards:
+      type: array
+      items:
+        $ref: '#/components/schemas/UserCard'
+
+    # Payment Responses and RequestBody
+    NewPayment:
+      required:
+        - type_payment
+        - order_id
+      type: object
+      properties:
+        order_id:
+          $ref: '#/components/schemas/OrderId'
+        type_payment:
+          $ref: '#/components/schemas/OrderTypePayment'
+        save_card:
+          $ref: '#/components/schemas/LabelSaveCard'
+        card_id:
+          $ref: '#/components/schemas/UserCardId'
+
+    Payment:
+      type: object
+      properties:
+        type_payment:
+          $ref: '#/components/schemas/OrderTypePayment'
+        payment_id:
+          $ref: '#/components/schemas/OrderPaymentId'
+        client_secret:
+          $ref: '#/components/schemas/OrderClientSecret'
+        payment_method:
+          $ref: '#/components/schemas/UserCardPaymentMethod'
+
+
+    # Product Responses and RequestBody
+    Product:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/ProductId'
+        product_id:
+          $ref: '#/components/schemas/ProductUniqueNumber'
+        title:
+          $ref: '#/components/schemas/ProductTitle'
+        description:
+          $ref: '#/components/schemas/ProductDescription'
+        img:
+          $ref: '#/components/schemas/ProductImgOutput'
+        quantity:
+          $ref: '#/components/schemas/ProductQuantity'
+        price:
+          $ref: '#/components/schemas/ProductPrice'
+    Products:
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Product'
+        meta:
+          $ref: '#/components/schemas/Paginate'
+
+    # Order Responses and RequestBody
+    NewOrder:
+      required:
+        - id
+        - quantity
+        - products
+      properties:
+        products:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                $ref: '#/components/schemas/ProductId'
+              quantity:
+                $ref: '#/components/schemas/OrderItemQuantity'
+
+    Order:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/OrderId'
+        statuses:
+          $ref: '#/components/schemas/PaymentStatuses'
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+    Orders:
+      type: array
+      items:
+        $ref: '#/components/schemas/Order'
+
 
     # Users Responses and RequestBody
     Users:
@@ -536,10 +1276,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/User'
-        links:
-          type: array
-          items:
-            $ref: '#/components/schemas/Links'
         meta:
           $ref: '#/components/schemas/Paginate'
     User:
@@ -550,6 +1286,7 @@ components:
         - phone
         - photo_small
         - photo_big
+        - role
       type: object
       properties:
         id:
@@ -561,9 +1298,9 @@ components:
         phone:
           $ref: '#/components/schemas/UserPhone'
         photo_small:
-          $ref: '#/components/schemas/UserPhotoResponse'
+          $ref: '#/components/schemas/UserImageResponse'
         photo_big:
-          $ref: '#/components/schemas/UserPhotoResponse'
+          $ref: '#/components/schemas/UserImageResponse'
         role:
           $ref: '#/components/schemas/RoleTitle'
     NewUser:
@@ -582,7 +1319,7 @@ components:
         phone:
           $ref: '#/components/schemas/UserPhone'
         photo:
-          $ref: '#/components/schemas/UserPhoto'
+          $ref: '#/components/schemas/UserImage'
         role_id:
           $ref: '#/components/schemas/RoleId'
     UpdateUser:
@@ -600,17 +1337,11 @@ components:
         phone:
           $ref: '#/components/schemas/UserPhone'
         photo:
-          $ref: '#/components/schemas/UserPhoto'
+          $ref: '#/components/schemas/UserImage'
         role_id:
           $ref: '#/components/schemas/RoleId'
 
     # Role Responses
-    Roles:
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Role'
     Role:
       type: object
       properties:
@@ -619,67 +1350,43 @@ components:
         title:
           $ref: '#/components/schemas/RoleTitle'
 
-    Links:
-      type: object
-      properties:
-        first:
-          $ref: '#/components/schemas/LinksFirst'
-        last:
-          $ref: '#/components/schemas/LinksLast'
-        prev:
-          $ref: '#/components/schemas/LinksPrev'
-        next:
-          $ref: '#/components/schemas/LinksNext'
-
     # Paginate Response
     Paginate:
       required:
         - current_page
-        - from
+        - first_page_url
         - last_page
-        - links
-        - path
+        - last_page_url
         - per_page
-        - to
         - total
+        - prev_link
+        - next_link
       properties:
         current_page:
           $ref: '#/components/schemas/CurrentPage'
-        from:
-          $ref: '#/components/schemas/From'
+        first_page_url:
+          $ref: '#/components/schemas/FirstPageUrl'
         last_page:
           $ref: '#/components/schemas/LastPage'
-        links:
-          $ref: '#/components/schemas/MetaLinks'
-        path:
-          $ref: '#/components/schemas/Path'
+        last_page_url:
+          $ref: '#/components/schemas/LastPageUrl'
         per_page:
           $ref: '#/components/schemas/PerPage'
-        to:
-          $ref: '#/components/schemas/To'
         total:
           $ref: '#/components/schemas/Total'
+        prev_link:
+          $ref: '#/components/schemas/PrevLink'
+        next_link:
+          $ref: '#/components/schemas/NextLink'
 
-    Login:
-      type: object
-      properties:
-        email:
-          $ref: '#/components/schemas/UserEmail'
-        token:
-          $ref: '#/components/schemas/LoginHash'
-
+    # Auth Responses an RequestBody
     SuccessLogout:
       type: object
       properties:
         message:
           type: string
           example: You successfully logged out
-
-    LoginHash:
-      type: string
-      example: rBe4c5c9NbcWSwf59AdqNrG9sqBD6WsY
-      description: Required if email address is not filled. A token with a request parameter in a message with POST /login
-    SocialCallback:
+    Social:
       type: object
       required:
         - driver
@@ -689,26 +1396,6 @@ components:
           $ref: '#/components/schemas/AuthToken'
         driver:
           $ref: '#/components/schemas/SocialDriver'
-
-    SocialHash:
-      type: string
-      example: fhMg2cwiHUghKOGpWWD4BFZukjubZ7p5Aj2edOM0
-      nullable: false
-      description: Hash for which will be an identifiable user in POST /two-step/social
-
-    Social:
-      type: object
-      required:
-        - driver
-      properties:
-        driver:
-          $ref: '#/components/schemas/SocialDriver'
-
-    SocialUrl:
-      type: object
-      properties:
-        url:
-          $ref: '#/components/schemas/SocialRedirectUrl'
 
     SuccessFirstStepRegister:
       type: object
@@ -742,48 +1429,49 @@ components:
         phone:
           $ref: '#/components/schemas/UserPhone'
         photo:
-          $ref: '#/components/schemas/UserPhoto'
+          $ref: '#/components/schemas/UserImage'
         role_id:
           $ref: '#/components/schemas/RoleId'
         hash:
           $ref: '#/components/schemas/SocialHash'
 
-    SocialRedirectUrl:
-      type: string
-      description: Social network auth url
-      example: 'https://www.facebook.com/v3.3/dialog/oauth?client_id=763927244779654&redirect_uri=http%3A%2F%2Flocalhost%2Fv1%2Ffacebook%2Fcallback&scope=email&response_type=code'
-
-    #Social Driver properties
-    SocialDriver:
-      type: string
-      description: Social network through which you register or log in
-      enum:
-        - google
-        - facebook
-      example: facebook
-
-      # Auth Token properties
-    AuthToken:
-      type: string
-      example: fhMg2cwiHUghKOGpWWD4BFZukjubZ7p5Aj2edOM0
-      description: Social network token for login
-      nullable: false
-
     SuccessAuth:
       type: object
       properties:
+        message:
+          type: string
+          example: You are successfully logged in
+        token:
+          $ref: '#/components/schemas/AuthToken'
         data:
           type: object
           $ref: '#/components/schemas/User'
-        access_token:
-          $ref: '#/components/schemas/AccessToken'
-        token_type:
-          type: string
-          example: 'bearer'
-        expires_in:
-          type: integer
-          example: 3600
 
+    LoginResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: Success
+          description: status to send mail
+        message:
+          type: string
+          example: A message with an authorization link was successfully sent to your email
+    Login:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          $ref: '#/components/schemas/UserEmail'
+
+    Verify:
+      type: object
+      required:
+        - hash
+      properties:
+        hash:
+          $ref: '#/components/schemas/LoginHash'
 
     # Errors
     NotFound:
