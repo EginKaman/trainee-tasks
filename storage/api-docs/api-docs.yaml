@@ -260,7 +260,7 @@ paths:
   /login:
     post:
       tags:
-        - auth
+        - login
       description: "Get authorization link by email. The authorization link will be sent to the user's email in the form: 'https://<domain-name>/auth?hash={hash}' . After that, you need to call the method POST /login to authorize"
       parameters:
         - in: header
@@ -313,7 +313,7 @@ paths:
   /verify:
     post:
       tags:
-        - auth
+        - login
       description: "The AuthToken must be obtained from the method POST /verify by clicking on the link that will be sent to the mail"
       parameters:
         - in: header
@@ -369,7 +369,7 @@ paths:
   /logout:
     post:
       tags:
-        - auth
+        - login
       description: "Logout user"
       parameters:
         - in: header
@@ -403,6 +403,40 @@ paths:
 
   /social:
     post:
+      tags:
+        - social
+      description: "This method will returned url for social auth"
+      parameters:
+        - in: header
+          name: Accept-Language
+          description: Set interface language (en, de)
+          schema:
+            type: string
+            example: en
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Social'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Social'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialUrl'
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
+
+  /callback:
+    get:
       tags:
         - social
       description: "This method will check if the user is registered in the system (through a social network) and will give a response depending on this. If the user is not registered, then you will need to go through the second step of registration to fill in all the required fields. When a user is registered, an authorization token and his data will be issued"
@@ -762,7 +796,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/SomethingWentWrong'
 
-  /cards/{id}:
+  /cards/{card}:
     delete:
       tags:
         - card
@@ -774,7 +808,7 @@ paths:
           schema:
             type: string
             example: en
-        - name: id
+        - name: card
           in: path
           required: true
           description: Card id
@@ -859,6 +893,10 @@ components:
       scheme: bearer
 
   schemas:
+    AccessToken:
+      type: string
+      example: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0L2FwaS92MS9jYWxsYmFjayIsImlhdCI6MTY3NzQ5MDg0NCwiZXhwIjoxNjc3NDk0NDQ1LCJuYmYiOjE2Nzc0OTA4NDUsImp0aSI6IkpjbklmR3ZrVFVjUTA0bW4iLCJzdWIiOiI0NiIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.O1qq_bVdUztBe8CTtkjjH4bLgUR11imiVZBN5tQLvAGurZJ7EeYQcms8TY2_XEW4DRrgI0EjUd6or7lkk34gmFanESLRqDeMTnzBpxZ8K0DwWEUU-RfniJDvmJt-QdgWueTTFG3myeEZmK1nphMxNd6mvpiPf6NTmc5n9AVQObgvcAwi0JVzyzgsTOPOtvrp1BQPpiaWQkK4qeibUL7NEmfp8fQhs5dwi3VH-G_Rj8XGVahunW7NiwCIpiWEOVxHshtvAFHalSI__YMxYg6aSStK_6RJl11IbPxbHK33BaOKzY0TQA95S4DH7wfoRyiTYclr3cpxJ8vPq9PUnpD_cHnAGHih44HXZ6XzJksGhKC6Z6bGBxtgsQSOuFNStSzIKfFb1PADSHKG5j8aX-DN4K6ghDNFonx8b0dD-NKUHUSVHen3f27ZRDIsewh5xpgxNoBlBXCas5iWLiBLCNFmXiFpxfBXz6OkL7ZOkEWd2b_Jg6XMUX-z-pRZFqGgf11v1HZcFiapIlfaU3BnMkyjbUGHI1EIkIeiyKCnb3uzklDK3A7E2Q308KZpT0n5Tfsa5KmYC5zQ36DPxXL20yDvtUkHqQASjg9LI692HASEWklHEanQGGEyY6_VhHSNxf-sEHtn-IY9f5UkbPpRsH4m_zIhq0ivQymDpOoIF6sbJ1Y'
+
     #Social Driver properties
     SocialDriver:
       type: string
@@ -868,7 +906,12 @@ components:
         - facebook
       example: facebook
 
-      # Auth Token properties
+    SocialCode:
+      type: string
+      description: Social network access code
+      example: 'AQBEI2ySKbeOu6Pes7wiFlldMT3_OxjeUeCHrc3xH6_7COWog5EbidgqZcOudGlHbNxcbVC1YEicsqmn3QHyXFqU-WJPayGyIGbMyioORElrFJXbYpPEWKTTzxgn_Aoi2DENULpIODPEXbiiyopdl3RhnMBovhUXbKOYdhtVUGB7cO6LuL894vT3uYIrGs93T27F3xfpfX5ffMupkd2DuYEDokplTiR4MVGqZKZKJ--dsU--1hPDxOrdDnAWKz0MJLYyINb7uVmwD2TP588nm-3PnKUExD9fOG0-zDVNE_jz5bEeBmAldTAAM5k07HQaW3-6wlJ8fleqjkljrKONj01yVjU_7tWmxEU-MYq5gsUeGXTFEy3jp08h1n9s-PqE8z4'
+
+    # Auth Token properties
     AuthToken:
       type: string
       example: fhMg2cwiHUghKOGpWWD4BFZukjubZ7p5Aj2edOM0
@@ -890,7 +933,7 @@ components:
     #  Users properties
     UserName:
       type: string
-      example: Andrii
+      example: John
       nullable: false
       description: User name, may contain only lattice letters and symbols space, -
       minLength: 2
@@ -904,19 +947,20 @@ components:
       maxLength: 254
     UserPhone:
       type: string
-      example: "+380730000000"
+      example: "+380930400000"
       description: User phone, must be a valid according to +380000000000 (Ukraine format)
       nullable: false
       minLength: 1
-    UserImage:
+    UserPhoto:
       type: string
       format: binary
       description: User image, must be a jpg, jpeg format. Min height and min width must be a 70px, and size image smaller 5Mb
-    UserImageResponse:
+    UserPhotoResponse:
       type: string
       example: https://test2023-backend-ivan-t.abztrainee.com/storage/users/dzsfd32NJdpsdvDJcko9dssdc.jpg
       description: Link for user image. If image is small, file name -> dzsfd32NJdpsdvDJcko9dssdc_small.jpg
     UserId:
+      title: 'User'
       type: integer
       example: 1
       description: User id
@@ -936,34 +980,57 @@ components:
     RoleTitle:
       type: string
       example: Developer
-      description: Role id
+      description: Role title
       minLength: 1
+
+    #links properties
+    LinksFirst:
+      type: string
+      example: https://test2023-backend-ivan-t.abztrainee.com/api/V1/users?page=1
+    LinksLast:
+      type: string
+      example: https://test2023-backend-ivan-t.abztrainee.com/api/V1/users?page=3
+    LinksPrev:
+      type: string
+      example: https://test2023-backend-ivan-t.abztrainee.com/api/V1/users?page=1
+    LinksNext:
+      type: string
+      example: https://test2023-backend-ivan-t.abztrainee.com/api/V1/users?page=2
 
     # Paginate properties
     CurrentPage:
       type: integer
       example: 1
-    FirstPageUrl:
-      type: string
-      example: https://test2023-backend-ivan-t.abztrainee.com/api/V1/users?page=1&per_page=15
+    From:
+      type: integer
+      example: 1
     LastPage:
       type: integer
       example: 4
-    LastPageUrl:
+    MetaLinks:
+      type: array
+      example:
+        - url: https://test2023-backend-ivan-t.abztrainee.com/api/V1/users?page=1
+          label: '1'
+          active: false
+        - url: https://test2023-backend-ivan-t.abztrainee.com/api/V1/users?page=2
+          label: '2'
+          active: true
+        - url: https://test2023-backend-ivan-t.abztrainee.com/api/V1/users?page=3
+          label: '3'
+          active: true
+    Path:
       type: string
-      example: https://test2023-backend-ivan-t.abztrainee.com/api/V1/users?page=1&per_page=15
+      example: https://test2023-backend-ivan-t.abztrainee.com/api/V1/users
     PerPage:
       type: integer
-      example: 10
+      example: 15
     Total:
       type: integer
+      example: 45
+    To:
+      type: integer
       example: 15
-    PrevLink:
-      type: string
-      example: https://test2023-backend-ivan-t.abztrainee.com/api/V1/users?page=1&per_page=15
-    NextLink:
-      type: string
-      example: https://test2023-backend-ivan-t.abztrainee.com/api/V1/users?page=2&per_page=15
 
     # Order properties
     OrderId:
@@ -1028,7 +1095,7 @@ components:
       description: Product image, must be a jpg, jpeg format. Size image smaller 5Mb
     ProductImgOutput:
       type: string
-      example: https://test2023-backend-ivan-t.abztrainee.com/storage/products/bhjdBJHViud9384bv2223mdnc.jpg
+      example: https://test2022-backend-andrey-l2.abztrainee.com/storage/products/bhjdBJHViud9384bv2223mdnc.jpg
       description: Link to product image
     ProductQuantity:
       type: integer
@@ -1268,7 +1335,6 @@ components:
       items:
         $ref: '#/components/schemas/Order'
 
-
     # Users Responses and RequestBody
     Users:
       properties:
@@ -1276,6 +1342,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/User'
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/Links'
         meta:
           $ref: '#/components/schemas/Paginate'
     User:
@@ -1298,9 +1368,9 @@ components:
         phone:
           $ref: '#/components/schemas/UserPhone'
         photo_small:
-          $ref: '#/components/schemas/UserImageResponse'
+          $ref: '#/components/schemas/UserPhotoResponse'
         photo_big:
-          $ref: '#/components/schemas/UserImageResponse'
+          $ref: '#/components/schemas/UserPhotoResponse'
         role:
           $ref: '#/components/schemas/RoleTitle'
     NewUser:
@@ -1319,7 +1389,7 @@ components:
         phone:
           $ref: '#/components/schemas/UserPhone'
         photo:
-          $ref: '#/components/schemas/UserImage'
+          $ref: '#/components/schemas/UserPhoto'
         role_id:
           $ref: '#/components/schemas/RoleId'
     UpdateUser:
@@ -1337,11 +1407,17 @@ components:
         phone:
           $ref: '#/components/schemas/UserPhone'
         photo:
-          $ref: '#/components/schemas/UserImage'
+          $ref: '#/components/schemas/UserPhoto'
         role_id:
           $ref: '#/components/schemas/RoleId'
 
     # Role Responses
+    Roles:
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Role'
     Role:
       type: object
       properties:
@@ -1350,34 +1426,46 @@ components:
         title:
           $ref: '#/components/schemas/RoleTitle'
 
+    Links:
+      type: object
+      properties:
+        first:
+          $ref: '#/components/schemas/LinksFirst'
+        last:
+          $ref: '#/components/schemas/LinksLast'
+        prev:
+          $ref: '#/components/schemas/LinksPrev'
+        next:
+          $ref: '#/components/schemas/LinksNext'
+
     # Paginate Response
     Paginate:
       required:
         - current_page
-        - first_page_url
+        - from
         - last_page
-        - last_page_url
+        - links
+        - path
         - per_page
+        - to
         - total
-        - prev_link
-        - next_link
       properties:
         current_page:
           $ref: '#/components/schemas/CurrentPage'
-        first_page_url:
-          $ref: '#/components/schemas/FirstPageUrl'
+        from:
+          $ref: '#/components/schemas/From'
         last_page:
           $ref: '#/components/schemas/LastPage'
-        last_page_url:
-          $ref: '#/components/schemas/LastPageUrl'
+        links:
+          $ref: '#/components/schemas/MetaLinks'
+        path:
+          $ref: '#/components/schemas/Path'
         per_page:
           $ref: '#/components/schemas/PerPage'
+        to:
+          $ref: '#/components/schemas/To'
         total:
           $ref: '#/components/schemas/Total'
-        prev_link:
-          $ref: '#/components/schemas/PrevLink'
-        next_link:
-          $ref: '#/components/schemas/NextLink'
 
     # Auth Responses an RequestBody
     SuccessLogout:
@@ -1390,12 +1478,26 @@ components:
       type: object
       required:
         - driver
-        - token
       properties:
-        token:
-          $ref: '#/components/schemas/AuthToken'
         driver:
           $ref: '#/components/schemas/SocialDriver'
+
+    SocialCallback:
+      type: object
+      required:
+        - driver
+        - code
+      properties:
+        driver:
+          $ref: '#/components/schemas/SocialDriver'
+        code:
+          $ref: '#/components/schemas/SocialCode'
+
+    SocialUrl:
+      type: object
+      properties:
+        url:
+          $ref: '#/components/schemas/SocialRedirectUrl'
 
     SuccessFirstStepRegister:
       type: object
@@ -1422,30 +1524,35 @@ components:
         - phone
         - photo
         - role_id
-        - hash
       properties:
         name:
           $ref: '#/components/schemas/UserName'
         phone:
           $ref: '#/components/schemas/UserPhone'
         photo:
-          $ref: '#/components/schemas/UserImage'
+          $ref: '#/components/schemas/UserPhoto'
         role_id:
           $ref: '#/components/schemas/RoleId'
-        hash:
-          $ref: '#/components/schemas/SocialHash'
+
+    SocialRedirectUrl:
+      type: string
+      description: Social network auth url
+      example: 'https://www.facebook.com/v3.3/dialog/oauth?client_id=763927244779654&redirect_uri=http%3A%2F%2Flocalhost%2Fv1%2Ffacebook%2Fcallback&scope=email&response_type=code'
 
     SuccessAuth:
       type: object
       properties:
-        message:
-          type: string
-          example: You are successfully logged in
-        token:
-          $ref: '#/components/schemas/AuthToken'
         data:
           type: object
           $ref: '#/components/schemas/User'
+        access_token:
+          $ref: '#/components/schemas/AccessToken'
+        token_type:
+          type: string
+          example: 'bearer'
+        expires_in:
+          type: integer
+          example: 3600
 
     LoginResponse:
       type: object
