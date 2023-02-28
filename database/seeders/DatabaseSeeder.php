@@ -15,6 +15,6 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         \App\Models\Role::factory(5)->create();
-        \App\Models\User::factory(45)->create();
+        $this->call([UserSeeder::class]);
     }
 }
