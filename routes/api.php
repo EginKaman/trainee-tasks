@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\SocialiteController;
+use App\Http\Controllers\OrdersController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
@@ -26,6 +27,7 @@ Route::prefix('v1')->middleware(['localization'])->group(function () {
     Route::post('social', [SocialiteController::class, 'social']);
     Route::middleware(['auth:api'])->group(function () {
         Route::post('logout', [LoginController::class, 'logout']);
+        Route::apiResource('orders', OrdersController::class);
     });
 
     Route::apiResource('users', UserController::class);

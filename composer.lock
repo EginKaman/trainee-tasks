@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0b4f329701515d0fe85f7b554d0a742f",
+    "content-hash": "05020ad76a290c448344d969613eec90",
     "packages": [
         {
             "name": "almasaeed2010/adminlte",
@@ -192,16 +192,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.260.3",
+            "version": "3.261.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "547b8047b2f9a551a7100b22e1abe1a3cc1b0ff0"
+                "reference": "9523e082488df5898d8e975c6554cc8b9a79f97a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/547b8047b2f9a551a7100b22e1abe1a3cc1b0ff0",
-                "reference": "547b8047b2f9a551a7100b22e1abe1a3cc1b0ff0",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/9523e082488df5898d8e975c6554cc8b9a79f97a",
+                "reference": "9523e082488df5898d8e975c6554cc8b9a79f97a",
                 "shasum": ""
             },
             "require": {
@@ -280,9 +280,9 @@
             "support": {
                 "forum": "https://forums.aws.amazon.com/forum.jspa?forumID=80",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.260.3"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.261.0"
             },
-            "time": "2023-02-24T19:25:34+00:00"
+            "time": "2023-02-27T19:22:33+00:00"
         },
         {
             "name": "brick/math",
@@ -1606,6 +1606,74 @@
                 "source": "https://github.com/henriqueramos/laravel-json-schema-validator/tree/master"
             },
             "time": "2020-04-27T05:45:52+00:00"
+        },
+        {
+            "name": "illuminatech/multipart-middleware",
+            "version": "1.1.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/illuminatech/multipart-middleware.git",
+                "reference": "61b105d5bce4857f38935b56a96ff70f114df1c6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/illuminatech/multipart-middleware/zipball/61b105d5bce4857f38935b56a96ff70f114df1c6",
+                "reference": "61b105d5bce4857f38935b56a96ff70f114df1c6",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/http": "^6.0 || ^7.0 || ^8.0 || ^9.0 || ^10.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^7.5 || ^8.0 || ^9.3 || ^10.0.7"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Illuminatech\\MultipartMiddleware\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Paul Klimov",
+                    "email": "klimov.paul@gmail.com"
+                }
+            ],
+            "description": "'multipart/form-data' parser middleware for Laravel",
+            "keywords": [
+                "file",
+                "laravel",
+                "middleware",
+                "multipart",
+                "parser",
+                "request",
+                "upload"
+            ],
+            "support": {
+                "issues": "https://github.com/illuminatech/multipart-middleware/issues",
+                "source": "https://github.com/illuminatech/multipart-middleware",
+                "wiki": "https://github.com/illuminatech/multipart-middleware/wiki"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/klimov-paul",
+                    "type": "github"
+                },
+                {
+                    "url": "https://www.patreon.com/klimov_paul",
+                    "type": "patreon"
+                }
+            ],
+            "time": "2023-02-24T15:59:00+00:00"
         },
         {
             "name": "intervention/image",
@@ -10562,16 +10630,16 @@
         },
         {
             "name": "laravel-lang/lang",
-            "version": "12.18.3",
+            "version": "12.18.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Laravel-Lang/lang.git",
-                "reference": "b7f80e78e9555895f1a94db9a3bf311c98942bff"
+                "reference": "61d2bb94035c1ce13fb7e4a26549730dd466a1b0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Laravel-Lang/lang/zipball/b7f80e78e9555895f1a94db9a3bf311c98942bff",
-                "reference": "b7f80e78e9555895f1a94db9a3bf311c98942bff",
+                "url": "https://api.github.com/repos/Laravel-Lang/lang/zipball/61d2bb94035c1ce13fb7e4a26549730dd466a1b0",
+                "reference": "61d2bb94035c1ce13fb7e4a26549730dd466a1b0",
                 "shasum": ""
             },
             "require": {
@@ -10607,7 +10675,7 @@
                     "homepage": "https://github.com/Laravel-Lang"
                 }
             ],
-            "description": "Languages for Laravel",
+            "description": "List of 78 languages for Laravel Framework, Laravel Jetstream, Laravel Fortify, Laravel Breeze, Laravel Cashier, Laravel Nova, Laravel Spark and Laravel UI",
             "keywords": [
                 "lang",
                 "languages",
@@ -10624,7 +10692,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2023-02-23T16:22:56+00:00"
+            "time": "2023-02-27T16:14:16+00:00"
         },
         {
             "name": "laravel-lang/publisher",
