@@ -39,9 +39,13 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $e): void {
         });
         $this->renderable(function (NotFoundHttpException $e, $request) {
+            if ($request->hasHeader('Accept-Language')
+                && in_array($request->header('Accept-Language'), config('localization.supported_locales'), true)) {
+                \App::setLocale($request->header('Accept-Language'));
+            }
             if ($request->is('api/v1/users/*')) {
                 return response()->json([
-                    'message' => 'User record not found.',
+                    'message' => __('User record not found.'),
                 ], 404);
             }
         });

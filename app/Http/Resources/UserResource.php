@@ -26,8 +26,6 @@ class UserResource extends JsonResource
             'photo_big' => $this->when($this->photo_big !== null, url(Storage::url($this->photo_big))),
             'photo_small' => $this->when($this->photo_small !== null, url(Storage::url($this->photo_small))),
             'role' => $this->whenLoaded('role', $this->role->title),
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
         ];
     }
 }
