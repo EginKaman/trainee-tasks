@@ -15,8 +15,8 @@ class UserController extends Controller
 {
     public function index(IndexUserRequest $request): UserCollection
     {
-        $per_page = $request->validated('per_page', 6);
-        $page = $request->validated('page', 1);
+        $per_page = $request->validated('per_page', 6) ?? 6;
+        $page = $request->validated('page', 1) ?? 1;
 
         return Cache::tags('users')->rememberForever(
             "users.index.{$per_page}.{$page}",
