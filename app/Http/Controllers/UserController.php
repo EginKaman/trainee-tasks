@@ -15,12 +15,15 @@ class UserController extends Controller
 {
     public function index(IndexUserRequest $request): UserCollection
     {
-        $per_page = $request->validated('per_page', 15);
+        $per_page = $request->validated('per_page', 6);
         $page = $request->validated('page', 1);
 
         return Cache::tags('users')->rememberForever(
             "users.index.{$per_page}.{$page}",
-            fn () => new UserCollection(User::query()->with('role')->paginate(perPage: $per_page, page: $page))
+            fn () => new UserCollection(User::query()->with('role')->latest('created_at')->paginate(
+                perPage: $per_page,
+                page: $page
+            ))
         );
     }
 
@@ -47,6 +50,8 @@ class UserController extends Controller
     public function destroy(User $user): Response
     {
         if ($user->delete()) {
+            Cache::tags('users')->flush();
+
             return response(__('Deleted success'), 204);
         }
 

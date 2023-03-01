@@ -15,7 +15,7 @@ class NewUser
         $user = new User($request->validated());
 
         if ($request->hasFile('photo')) {
-            $photo = $request->photo->store('users');
+            $photo = $request->photo->store('public/users');
 
             $user->photo_big = app(ResizePhoto::class)->resize($photo, 70, 70);
             $user->photo_small = app(ResizePhoto::class)->resize($photo, 38, 38, 'small');
