@@ -41,7 +41,7 @@ class Handler extends ExceptionHandler
         $this->renderable(function (NotFoundHttpException $e, $request) {
             if ($request->is('api/v1/users/*')) {
                 return response()->json([
-                    'message' => 'User record not found.',
+                    'message' => __('User record not found.'),
                 ], 404);
             }
         });
