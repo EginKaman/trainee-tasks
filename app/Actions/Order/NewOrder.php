@@ -26,7 +26,7 @@ class NewOrder
             $orderProduct->save();
         }
 
-        $order->total_price = round($order->products()->sum('price'), 2);
+        $order->amount = round($order->products()->sum('price'), 2);
         $order->save();
 
         return $order;

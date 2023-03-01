@@ -9,10 +9,10 @@ use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasMany};
 
 class Order extends Model
 {
-    protected $fillable = ['total_price'];
+    protected $fillable = ['amount'];
 
     protected $casts = [
-        'total_price' => 'float',
+        'amount' => 'float',
     ];
 
     public function user(): BelongsTo

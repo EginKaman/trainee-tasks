@@ -12,7 +12,7 @@ return new class() extends Migration {
         Schema::create('orders', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->unsignedFloat('total_price')->nullable();
+            $table->unsignedFloat('amount')->nullable();
             $table->timestamps();
         });
     }
