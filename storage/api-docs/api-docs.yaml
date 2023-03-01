@@ -340,6 +340,8 @@ paths:
 
   /logout:
     post:
+      security:
+        - bearerAuth: [ ]
       tags:
         - login
       description: "Logout user"
@@ -487,6 +489,8 @@ paths:
 
   /social/next:
     patch:
+      security:
+        - bearerAuth: [ ]
       tags:
         - social
       description: Method for full register user by social network and get user data and LoginToken.
@@ -538,6 +542,8 @@ paths:
 
   /orders:
     post:
+      security:
+        - bearerAuth: [ ]
       tags:
         - orders
       description: Method for creating an order before payment
@@ -587,6 +593,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/SomethingWentWrong'
     get:
+      security:
+        - bearerAuth: [ ]
       tags:
         - orders
       description: Method for getting users orders information
@@ -619,6 +627,8 @@ paths:
 
   /payment:
     post:
+      security:
+        - bearerAuth: [ ]
       tags:
         - payment
       description: Method for payment an order via Stripe or PayPal
@@ -670,6 +680,8 @@ paths:
 
   /payment/refund:
     post:
+      security:
+        - bearerAuth: [ ]
       tags:
         - payment
       description: Method for charge refund
@@ -773,6 +785,9 @@ paths:
 
   /cards/{card}:
     delete:
+
+      security:
+        - bearerAuth: [ ]
       tags:
         - card
       description: This method deleting saved card.
@@ -831,6 +846,8 @@ paths:
 
   /cards:
     get:
+      security:
+        - bearerAuth: [ ]
       tags:
         - card
       description: This method for getting users saved card.
@@ -863,9 +880,10 @@ paths:
 
 components:
   securitySchemes:
-    AuthToken:
+    bearerAuth:
       type: http
       scheme: bearer
+      bearerFormat: JWT
 
   schemas:
     AccessToken:
