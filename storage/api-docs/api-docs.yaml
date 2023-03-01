@@ -112,12 +112,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BadRequest'
-        409:
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Conflict'
         503:
           description: Something Went Wrong
           content:
@@ -207,12 +201,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/NotFound'
-        409:
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Conflict'
         503:
           description: Something Went Wrong
           content:
@@ -295,14 +283,6 @@ paths:
                 errors:
                   email:
                     - "The email format is invalid."
-        404:
-          description: Not found email
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotFound'
-              example:
-                message: Not found email, please register
         503:
           description: Something Went Wrong
           content:
@@ -340,14 +320,6 @@ paths:
             multipart/form-data:
               schema:
                 $ref: '#/components/schemas/SuccessAuth'
-        404:
-          description: Not found hash
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotFound'
-              example:
-                message: Not found hash
         422:
           description: Bad Request
           content:
@@ -428,6 +400,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SocialUrl'
+        422:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+              example:
+                message: The selected driver is invalid.
+                errors:
+                  email:
+                    - "The selected driver is invalid."
         503:
           description: Something Went Wrong
           content:
@@ -503,7 +486,7 @@ paths:
                 $ref: '#/components/schemas/SomethingWentWrong'
 
   /social/next:
-    post:
+    patch:
       tags:
         - social
       description: Method for full register user by social network and get user data and LoginToken.
@@ -529,14 +512,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SuccessAuth'
-        404:
-          description: Not Found
+        401:
+          description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/NotFound'
-              example:
-                message: The hash not found
+                $ref: '#/components/schemas/Unauthorized'
         422:
           description: Bad Request
           content:
@@ -548,12 +529,6 @@ paths:
                 errors:
                   email:
                     - "The token format is invalid."
-        409:
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Conflict'
         503:
           description: Something Went Wrong
           content:
@@ -1636,13 +1611,6 @@ components:
     Deleted:
       type: object
       title: Deleted
-      properties:
-        message:
-          type: string
-          example: 'Deleted success'
-        status:
-          type: integer
-          example: 204
     SomethingWentWrong:
       type: object
       title: Something Went Wrong
