@@ -421,7 +421,7 @@ paths:
                 $ref: '#/components/schemas/SomethingWentWrong'
 
   /callback:
-    get:
+    post:
       tags:
         - social
       description: "This method will check if the user is registered in the system (through a social network) and will give a response depending on this. If the user is not registered, then you will need to go through the second step of registration to fill in all the required fields. When a user is registered, an authorization token and his data will be issued"
@@ -436,10 +436,10 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/Social'
+              $ref: '#/components/schemas/SocialCallback'
           application/json:
             schema:
-              $ref: '#/components/schemas/Social'
+              $ref: '#/components/schemas/SocialCallback'
       responses:
         200:
           description: Authorization success
@@ -821,16 +821,14 @@ components:
         message:
           type: string
           example: You successfully logged out
+
     Social:
       type: object
       required:
         - driver
-        - code
       properties:
         driver:
           $ref: '#/components/schemas/SocialDriver'
-        code:
-          $ref: '#/components/schemas/SocialToken'
 
     SocialCallback:
       type: object
