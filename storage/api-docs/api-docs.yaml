@@ -703,6 +703,7 @@ components:
         - phone
         - photo_small
         - photo_big
+        - role
       type: object
       properties:
         id:
