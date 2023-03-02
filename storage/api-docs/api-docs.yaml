@@ -6,6 +6,7 @@ info:
 servers:
   - url: 'https://test2023-backend-ivan-t.abztrainee.com/api/v1'
   - url: 'http://localhost/api/v1'
+
 paths:
   /roles:
     get:
@@ -64,7 +65,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
+                type: object
                 $ref: '#/components/schemas/Users'
         422:
           description: Bad Request
@@ -111,12 +112,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BadRequest'
-        409:
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Conflict'
         503:
           description: Something Went Wrong
           content:
@@ -206,12 +201,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/NotFound'
-        409:
-          description: Conflict
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Conflict'
         503:
           description: Something Went Wrong
           content:
@@ -258,6 +247,9 @@ paths:
 
   /login:
     post:
+      tags:
+        - login
+      description: "Get authorization link by email. The authorization link will be sent to the user's email in the form: 'https://<domain-name>/auth?hash={hash}' . After that, you need to call the method POST /login to authorize"
       parameters:
         - in: header
           name: Accept-Language
@@ -265,9 +257,6 @@ paths:
           schema:
             type: string
             example: en
-      tags:
-        - login
-      description: Login user
       requestBody:
         content:
           multipart/form-data:
@@ -278,14 +267,81 @@ paths:
               $ref: '#/components/schemas/Login'
       responses:
         200:
-          description: Users response
+          description: Login success
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/LoginResponse'
+        422:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+              example:
+                message: The email must be a valid email address
+                errors:
+                  email:
+                    - "The email format is invalid."
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
+
+  /verify:
+    post:
+      tags:
+        - login
+      description: "The AuthToken must be obtained from the method POST /verify by clicking on the link that will be sent to the mail"
+      parameters:
+        - in: header
+          name: Accept-Language
+          description: Set interface language (en, de)
+          schema:
+            type: string
+            example: en
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Verify'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Verify'
+      responses:
+        200:
+          description: Authorization success
+          content:
+            application/json:
+              schema:
                 $ref: '#/components/schemas/SuccessAuth'
+            multipart/form-data:
+              schema:
+                $ref: '#/components/schemas/SuccessAuth'
+        422:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+              example:
+                message: The token must be a valid
+                errors:
+                  hash:
+                    - "The hash format is required."
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
+
   /logout:
     post:
+      security:
+        - bearerAuth: [ ]
       tags:
         - login
       description: "Logout user"
@@ -346,12 +402,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SocialUrl'
+        422:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+              example:
+                message: The selected driver is invalid.
+                errors:
+                  email:
+                    - "The selected driver is invalid."
         503:
           description: Something Went Wrong
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SomethingWentWrong'
+
   /callback:
     get:
       tags:
@@ -368,10 +436,10 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/SocialCallback'
+              $ref: '#/components/schemas/Social'
           application/json:
             schema:
-              $ref: '#/components/schemas/SocialCallback'
+              $ref: '#/components/schemas/Social'
       responses:
         200:
           description: Authorization success
@@ -419,18 +487,103 @@ paths:
               schema:
                 $ref: '#/components/schemas/SomethingWentWrong'
 
+  /social/next:
+    patch:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - social
+      description: Method for full register user by social network and get user data and LoginToken.
+      parameters:
+        - in: header
+          name: Accept-Language
+          description: Set interface language (en, de)
+          schema:
+            type: string
+            example: en
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TwoStepRegister'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TwoStepRegister'
+      responses:
+        200:
+          description: Authorization success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessAuth'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        422:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+              example:
+                message: The token must be a valid
+                errors:
+                  email:
+                    - "The token format is invalid."
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
 
 components:
   securitySchemes:
-    AuthToken:
+    bearerAuth:
       type: http
       scheme: bearer
+      bearerFormat: JWT
 
   schemas:
     AccessToken:
       type: string
       example: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0L2FwaS92MS9jYWxsYmFjayIsImlhdCI6MTY3NzQ5MDg0NCwiZXhwIjoxNjc3NDk0NDQ1LCJuYmYiOjE2Nzc0OTA4NDUsImp0aSI6IkpjbklmR3ZrVFVjUTA0bW4iLCJzdWIiOiI0NiIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.O1qq_bVdUztBe8CTtkjjH4bLgUR11imiVZBN5tQLvAGurZJ7EeYQcms8TY2_XEW4DRrgI0EjUd6or7lkk34gmFanESLRqDeMTnzBpxZ8K0DwWEUU-RfniJDvmJt-QdgWueTTFG3myeEZmK1nphMxNd6mvpiPf6NTmc5n9AVQObgvcAwi0JVzyzgsTOPOtvrp1BQPpiaWQkK4qeibUL7NEmfp8fQhs5dwi3VH-G_Rj8XGVahunW7NiwCIpiWEOVxHshtvAFHalSI__YMxYg6aSStK_6RJl11IbPxbHK33BaOKzY0TQA95S4DH7wfoRyiTYclr3cpxJ8vPq9PUnpD_cHnAGHih44HXZ6XzJksGhKC6Z6bGBxtgsQSOuFNStSzIKfFb1PADSHKG5j8aX-DN4K6ghDNFonx8b0dD-NKUHUSVHen3f27ZRDIsewh5xpgxNoBlBXCas5iWLiBLCNFmXiFpxfBXz6OkL7ZOkEWd2b_Jg6XMUX-z-pRZFqGgf11v1HZcFiapIlfaU3BnMkyjbUGHI1EIkIeiyKCnb3uzklDK3A7E2Q308KZpT0n5Tfsa5KmYC5zQ36DPxXL20yDvtUkHqQASjg9LI692HASEWklHEanQGGEyY6_VhHSNxf-sEHtn-IY9f5UkbPpRsH4m_zIhq0ivQymDpOoIF6sbJ1Y'
 
+    #Social Driver properties
+    SocialDriver:
+      type: string
+      description: Social network through which you register or log in
+      enum:
+        - google
+        - facebook
+      example: facebook
+
+    SocialCode:
+      type: string
+      description: Social network access code
+      example: 'AQBEI2ySKbeOu6Pes7wiFlldMT3_OxjeUeCHrc3xH6_7COWog5EbidgqZcOudGlHbNxcbVC1YEicsqmn3QHyXFqU-WJPayGyIGbMyioORElrFJXbYpPEWKTTzxgn_Aoi2DENULpIODPEXbiiyopdl3RhnMBovhUXbKOYdhtVUGB7cO6LuL894vT3uYIrGs93T27F3xfpfX5ffMupkd2DuYEDokplTiR4MVGqZKZKJ--dsU--1hPDxOrdDnAWKz0MJLYyINb7uVmwD2TP588nm-3PnKUExD9fOG0-zDVNE_jz5bEeBmAldTAAM5k07HQaW3-6wlJ8fleqjkljrKONj01yVjU_7tWmxEU-MYq5gsUeGXTFEy3jp08h1n9s-PqE8z4'
+
+    # Auth Token properties
+    AuthToken:
+      type: string
+      example: fhMg2cwiHUghKOGpWWD4BFZukjubZ7p5Aj2edOM0
+      description: Social network token for login
+      nullable: false
+
+    # Hash properties
+    LoginHash:
+      type: string
+      example: fhMg2cwiHUghKOGpWWD4BFZukjubZ7p5Aj2edOM0
+      nullable: false
+      description: Hash with query parameter in message with POST /login
+    SocialHash:
+      type: string
+      example: fhMg2cwiHUghKOGpWWD4BFZukjubZ7p5Aj2edOM0
+      nullable: false
+      description: Hash for which will be an identifiable user in POST /two-step/social
 
     #  Users properties
     UserName:
@@ -660,55 +813,45 @@ components:
         total:
           $ref: '#/components/schemas/Total'
 
-    Login:
-      type: object
-      properties:
-        email:
-          $ref: '#/components/schemas/UserEmail'
-        token:
-          $ref: '#/components/schemas/LoginHash'
-
+    # Auth Responses an RequestBody
     SuccessLogout:
       type: object
       properties:
         message:
           type: string
           example: You successfully logged out
-
-    LoginHash:
-      type: string
-      example: rBe4c5c9NbcWSwf59AdqNrG9sqBD6WsY
-      description: Required if email address is not filled. A token with a request parameter in a message with POST /login
-    SocialCallback:
-      type: object
-      required:
-        - driver
-        - token
-      properties:
-        token:
-          $ref: '#/components/schemas/AuthToken'
-        driver:
-          $ref: '#/components/schemas/SocialDriver'
-
-    SocialHash:
-      type: string
-      example: fhMg2cwiHUghKOGpWWD4BFZukjubZ7p5Aj2edOM0
-      nullable: false
-      description: Hash for which will be an identifiable user in POST /two-step/social
-
     Social:
       type: object
       required:
         - driver
+        - code
       properties:
         driver:
           $ref: '#/components/schemas/SocialDriver'
+        code:
+          $ref: '#/components/schemas/SocialToken'
+
+    SocialCallback:
+      type: object
+      required:
+        - driver
+        - code
+      properties:
+        driver:
+          $ref: '#/components/schemas/SocialDriver'
+        code:
+          $ref: '#/components/schemas/SocialToken'
 
     SocialUrl:
       type: object
       properties:
         url:
           $ref: '#/components/schemas/SocialRedirectUrl'
+
+    SocialToken:
+      type: string
+      description: Social network access token
+      example: AQCHGj4a2FgcwZorYc14-qq8vt83SWIKZDd4thDe8TQYPzbSRHlksjYHexTVAGAahEcRePCPrFCMBxr7BQIlSGHDVUMiu7vIuhlYFWWPKNKOI0qg0BeODIO9M0aZK-ZAxGNXRkRsTIx1jafryh8JrubO362oJ96y5vekmPUtCHGj_HkmE1vMNfjpIIhJy6xcEKcstSfSz6fIyPhowhqPb_9D-ePpvHbEUZDnGdDl2UanAWxTblWmAs9pQN8KU7eTgNI9YbSMMQf232wVPApD-_cHapbKg1C3tdvYrSQE9O_59uQiob48eXkeABaPgNNT-ViB7aj5bqKQFV8MuqKra-sdJneE95QakXQ85mADhPePzbWt_zTkJZ_EfquANFUFkDA
 
     SuccessFirstStepRegister:
       type: object
@@ -735,7 +878,6 @@ components:
         - phone
         - photo
         - role_id
-        - hash
       properties:
         name:
           $ref: '#/components/schemas/UserName'
@@ -745,29 +887,11 @@ components:
           $ref: '#/components/schemas/UserPhoto'
         role_id:
           $ref: '#/components/schemas/RoleId'
-        hash:
-          $ref: '#/components/schemas/SocialHash'
 
     SocialRedirectUrl:
       type: string
       description: Social network auth url
       example: 'https://www.facebook.com/v3.3/dialog/oauth?client_id=763927244779654&redirect_uri=http%3A%2F%2Flocalhost%2Fv1%2Ffacebook%2Fcallback&scope=email&response_type=code'
-
-    #Social Driver properties
-    SocialDriver:
-      type: string
-      description: Social network through which you register or log in
-      enum:
-        - google
-        - facebook
-      example: facebook
-
-      # Auth Token properties
-    AuthToken:
-      type: string
-      example: fhMg2cwiHUghKOGpWWD4BFZukjubZ7p5Aj2edOM0
-      description: Social network token for login
-      nullable: false
 
     SuccessAuth:
       type: object
@@ -784,6 +908,31 @@ components:
           type: integer
           example: 3600
 
+    LoginResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: Success
+          description: status to send mail
+        message:
+          type: string
+          example: A message with an authorization link was successfully sent to your email
+    Login:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          $ref: '#/components/schemas/UserEmail'
+
+    Verify:
+      type: object
+      required:
+        - hash
+      properties:
+        hash:
+          $ref: '#/components/schemas/LoginHash'
 
     # Errors
     NotFound:
@@ -841,13 +990,6 @@ components:
     Deleted:
       type: object
       title: Deleted
-      properties:
-        message:
-          type: string
-          example: 'Deleted success'
-        status:
-          type: integer
-          example: 204
     SomethingWentWrong:
       type: object
       title: Something Went Wrong

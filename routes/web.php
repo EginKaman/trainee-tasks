@@ -44,3 +44,7 @@ Route::prefix('images')->group(function () {
 
 Route::get('form', [\App\Http\Controllers\FormController::class, 'index'])->name('form.index');
 Route::post('form', [\App\Http\Controllers\FormController::class, 'store'])->name('form.store');
+
+Route::get('{driver}/callback', function () {
+    return view('socialite.callback');
+});
