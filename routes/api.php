@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->middleware(['localization'])->group(function () {
     Route::post('login', [LoginController::class, 'login']);
+    Route::post('verify', [LoginController::class, 'verify']);
     Route::post('callback', [SocialiteController::class, 'callback']);
 
     Route::get('callback', [SocialiteController::class, 'callback']);
@@ -42,5 +43,7 @@ Route::prefix('v1')->middleware(['localization'])->group(function () {
     Route::apiResource('users', UserController::class);
     Route::get('roles', RoleController::class);
     Route::get('products', ProductsController::class);
+
+    Route::post('payments/{method}/webhook', [PaymentsController::class, 'webhook']);
 });
 

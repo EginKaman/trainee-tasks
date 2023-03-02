@@ -48,3 +48,7 @@ Route::post('form', [\App\Http\Controllers\FormController::class, 'store'])->nam
 Route::get('{driver}/callback', function () {
     return view('socialite.callback');
 });
+
+Route::get('payments', function () {
+   return view('payments.form');
+});

@@ -540,6 +540,344 @@ paths:
               schema:
                 $ref: '#/components/schemas/SomethingWentWrong'
 
+  /orders:
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - orders
+      description: Method for creating an order before payment
+      parameters:
+        - in: header
+          name: Accept-Language
+          description: Set interface language (en, de)
+          schema:
+            type: string
+            example: en
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NewOrder'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewOrder'
+      responses:
+        201:
+          description: Create order success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        422:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+              example:
+                message: The token must be a valid
+                errors:
+                  email:
+                    - "The token format is invalid."
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - orders
+      description: Method for getting users orders information
+      parameters:
+        - in: header
+          name: Accept-Language
+          description: Set interface language (en, de)
+          schema:
+            type: string
+            example: en
+      responses:
+        200:
+          description: Getting order success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Orders'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
+
+  /payment:
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - payment
+      description: Method for payment an order via Stripe or PayPal
+      parameters:
+        - in: header
+          name: Accept-Language
+          description: Set interface language (en, de)
+          schema:
+            type: string
+            example: en
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NewPayment'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewPayment'
+      responses:
+        200:
+          description: Payment success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        422:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+              example:
+                message: The token must be a valid
+                errors:
+                  email:
+                    - "The token format is invalid."
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
+
+  /payment/refund:
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - payment
+      description: Method for charge refund
+      parameters:
+        - in: header
+          name: Accept-Language
+          description: Set interface language (en, de)
+          schema:
+            type: string
+            example: en
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NewRefund'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewRefund'
+      responses:
+        200:
+          description: Refund success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Refund'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+              example:
+                message: Not found order
+        422:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+              example:
+                message: The token must be a valid
+                errors:
+                  email:
+                    - "The token format is invalid."
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
+
+  /products:
+    get:
+      tags:
+        - products
+      description: Method to get all products
+      parameters:
+        - in: header
+          name: Accept-Language
+          description: Set interface language (en, de)
+          schema:
+            type: string
+            example: en
+        - name: page
+          in: query
+          description: Number page for getting products
+          style: form
+          schema:
+            type: integer
+        - name: per_page
+          in: query
+          description: Size page for getting products
+          style: form
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Products
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Products'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
+
+  /cards/{card}:
+    delete:
+
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - card
+      description: This method deleting saved card.
+      parameters:
+        - in: header
+          name: Accept-Language
+          description: Set interface language (en, de)
+          schema:
+            type: string
+            example: en
+        - name: card
+          in: path
+          required: true
+          description: Card id
+          schema:
+            type: integer
+      responses:
+        204:
+          description: Successfully deleted saved card
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deleted'
+
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+              example:
+                message: Not found card id
+        422:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+              example:
+                message: The token must be a valid
+                errors:
+                  email:
+                    - "The token format is invalid."
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
+
+  /cards:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - card
+      description: This method for getting users saved card.
+      parameters:
+        - in: header
+          name: Accept-Language
+          description: Set interface language (en, de)
+          schema:
+            type: string
+            example: en
+      responses:
+        200:
+          description: Successfully getting saved card
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserCards'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -1129,14 +1467,16 @@ components:
         message:
           type: string
           example: You successfully logged out
-
     Social:
       type: object
       required:
         - driver
+        - code
       properties:
         driver:
           $ref: '#/components/schemas/SocialDriver'
+        code:
+          $ref: '#/components/schemas/SocialToken'
 
     SocialCallback:
       type: object
@@ -1236,9 +1576,9 @@ components:
     Verify:
       type: object
       required:
-        - hash
+        - token
       properties:
-        hash:
+        token:
           $ref: '#/components/schemas/LoginHash'
 
     # Errors

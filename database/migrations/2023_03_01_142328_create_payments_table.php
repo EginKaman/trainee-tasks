@@ -15,6 +15,7 @@ return new class() extends Migration {
             $table->foreignId('order_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('method');
             $table->string('method_id')->nullable();
+            $table->string('client_secret')->nullable();
             $table->integer('amount');
             $table->string('currency');
             $table->string('status')->nullable();

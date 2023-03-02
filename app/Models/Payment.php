@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasMany};
 
 class Payment extends Model
 {
-    protected $fillable = ['method', 'method_id', 'amount', 'currency', 'status'];
+    protected $fillable = ['method', 'method_id', 'client_secret', 'amount', 'currency', 'status'];
 
     public function user(): BelongsTo
     {
