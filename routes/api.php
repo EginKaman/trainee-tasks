@@ -21,7 +21,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->middleware(['localization'])->group(function () {
     Route::post('login', [LoginController::class, 'login']);
+    Route::post('verify', [LoginController::class, 'verify']);
     Route::post('callback', [SocialiteController::class, 'callback']);
+
     Route::post('social', [SocialiteController::class, 'social']);
     Route::middleware(['auth:api'])->group(function () {
         Route::post('logout', [LoginController::class, 'logout']);
