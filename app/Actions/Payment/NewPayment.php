@@ -8,6 +8,7 @@ use App\Http\Requests\StorePaymentRequest;
 use App\Models\{Order, Payment};
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Str;
+use Srmklive\PayPal\Facades\PayPal;
 
 class NewPayment
 {
@@ -16,7 +17,7 @@ class NewPayment
         $order = Order::find($request->validated('order_id'));
 
         $payment = new Payment([
-            'method' => 'stripe',
+            'method' => $request->validated('method'),
             'currency' => 'usd',
             'amount' => $order->amount,
         ]);
@@ -48,7 +49,7 @@ class NewPayment
                 'payment_method' => $paymentIntent->payment_method,
             ]);
         }
-        $provider = \PayPal::setProvider();
+        $provider = Paypal::setProvider();
         $provider->setApiCredentials(config('paypal'));
         $token = $provider->getAccessToken();
         $provider->setRequestHeader('Authorization', 'Bearer ' . $token['access_token']);
@@ -63,11 +64,27 @@ class NewPayment
                     ],
                 ],
             ],
+            'application_context' => [
+                'return_url' => url('api/v1/payments/paypal'),
+                'cancel_url' => url('paypal/cancel'),
+            ],
         ]);
         $payment->method_id = $order['id'];
         $payment->status = $order['status'];
         $payment->save();
 
-        return response()->json($order);
+        $redirectUrl = '';
+        foreach ($order['links'] as $link) {
+            if ($link['rel'] === 'approve') {
+                $redirectUrl = $link['href'];
+            }
+        }
+
+        return response()->json([
+            'url' => $redirectUrl,
+            'type_payment' => $payment->method,
+            'payment_id' => $payment->method_id,
+            'amount' => $payment->amount,
+        ]);
     }
 }

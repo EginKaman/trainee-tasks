@@ -1,48 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8"/>
-    <title>Accept a card payment</title>
-    <meta name="description" content="A demo of a card payment on Stripe"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+@extends('adminlte::page')
 
+@section('title', 'Task 4 - ReGex, AdminLTE and forms')
+
+@section('content_header')
+    <h1>Task 7 - Payments</h1>
+@endsection
+@push('js')
+    @vite(['resources/js/form.js'])
     <style>
         /* Variables */
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-            font-size: 16px;
-            -webkit-font-smoothing: antialiased;
-            display: flex;
-            justify-content: center;
-            align-content: center;
-            height: 100vh;
-            width: 100vw;
-        }
-
-        form {
-            width: 30vw;
-            min-width: 500px;
-            align-self: center;
-            box-shadow: 0px 0px 0px 0.5px rgba(50, 50, 93, 0.1),
-            0px 2px 5px 0px rgba(50, 50, 93, 0.1), 0px 1px 1.5px 0px rgba(0, 0, 0, 0.07);
-            border-radius: 7px;
-            padding: 40px;
-        }
-
-        input {
-            border-radius: 6px;
-            margin-bottom: 6px;
-            padding: 12px;
-            border: 1px solid rgba(50, 50, 93, 0.1);
-            height: 44px;
-            font-size: 16px;
-            width: 100%;
-            background: white;
-        }
 
         .result-message {
             line-height: 22px;
@@ -187,157 +153,7 @@
             }
         }
     </style>
-    <script src="https://js.stripe.com/v3/"></script>
-</head>
 
-<body>
-<!-- Display a payment form -->
-<form id="payment-form">
-    <div id="card-element"><!--Stripe.js injects the Card Element--></div>
-    <button id="submit">
-        <div class="spinner hidden" id="spinner"></div>
-        <span id="button-text">Pay now</span>
-    </button>
-    <p id="card-error" role="alert"></p>
-    <p class="result-message hidden">
-        Payment succeeded, see the result in your
-        <a href="" target="_blank">Stripe dashboard.</a> Refresh the page to pay again.
-    </p>
-</form>
-<script>
-    // This is your test publishable API key.
-    var stripe = Stripe("{{config('services.stripe.api_key')}}");
-
-    // The items the customer wants to buy
-    var purchase = {
-        order_id: 4,
-        method: 'stripe'
-    };
-
-    // Disable the button until we have Stripe set up on the page
-    document.querySelector("button").disabled = true;
-    fetch("/api/v1/payments", {
-        method: "POST",
-        headers: {
-            "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0L2FwaS92MS92ZXJpZnkiLCJpYXQiOjE2Nzc3NTkxNDUsImV4cCI6MTY3Nzc2Mjc0NSwibmJmIjoxNjc3NzU5MTQ1LCJqdGkiOiJzZmJuSHVnSzRmWk5vb1drIiwic3ViIjoiNiIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.FdGkGTKpIvMm_No66q-UW70Z3GIS4k0TF0Se6Zlp8ztwWb4BZHiAAIu5nthu2IfJ8SBnoNmVBg6k_xyY2jCLJLEUxiouB7qSW7DlG-oylgllgOmxhW5Nnu9Xx9pBnEyDNT7DlQBh8QfeolrOF9ERCqPod_0Z4mLD_e485exisnh5mTgPHend8uc4KzRxUeSZCxam2j9ITjF-xoc33FqydSihn_Uvaki7G-7pDWwqF-1PD9c-PijjtviuhkV5_hrstnf5rsCHiIHpU_15JaYi2F5dcDVJN_yVFZYn4T2U9mQMHm6fIHwhUSGDwbn-bnFAwteahy8zy34ALqeJHEn1jxwFJlYjOzYHR0Ynbh-ztlhE7m3nPntLpc-xdFFCiAiaxXNiBbJNNJaw44ZDPW8jWk3noF2nCY5sqHRo2pJ3i8T-pF7I7KFzKkUsdKGJ3XirRGE3I0YRGw03Ng_kwb3rQwC1DRyFkEBSbMgByj3GYzEZnbCefhygFDJn_VA4QvUz6a3bG-4ux9D27AxULYE7uiVfnH0Betj_471Sg28MiRMAlu7jQVPi6W6IsiUT-jCDQv82pVz7bM54_2oyx6cpJM65v4s_qb8vFhzKvjxVaj8P-zvneFH56OLExn2a745mdkqZKBlCU6NNNB1DnAup0GCgP4lQjqZZA4FVTFJ4mAo",
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-        },
-        body: JSON.stringify(purchase)
-    })
-        .then(function (result) {
-            return result.json();
-        })
-        .then(function (data) {
-            var elements = stripe.elements();
-            var style = {
-                base: {
-                    color: "#32325d",
-                    fontFamily: 'Arial, sans-serif',
-                    fontSmoothing: "antialiased",
-                    fontSize: "16px",
-                    "::placeholder": {
-                        color: "#32325d"
-                    }
-                },
-                invalid: {
-                    fontFamily: 'Arial, sans-serif',
-                    color: "#fa755a",
-                    iconColor: "#fa755a"
-                }
-            };
-
-            var card = elements.create("card", {style: style});
-            // Stripe injects an iframe into the DOM
-            card.mount("#card-element");
-
-            card.on("change", function (event) {
-                // Disable the Pay button if there are no card details in the Element
-                document.querySelector("button").disabled = event.empty;
-                document.querySelector("#card-error").textContent = event.error ? event.error.message : "";
-            });
-
-            var form = document.getElementById("payment-form");
-            form.addEventListener("submit", function (event) {
-                event.preventDefault();
-                // Complete payment when the submit button is clicked
-                payWithCard(stripe, card, data.client_secret);
-            });
-        });
-
-    // Calls stripe.confirmCardPayment
-    // If the card requires authentication Stripe shows a pop-up modal to
-    // prompt the user to enter authentication details without leaving your page.
-    var payWithCard = function (stripe, card, clientSecret) {
-        loading(true);
-        stripe
-            .confirmCardPayment(clientSecret, {
-                payment_method: {
-                    card: card
-                }
-            })
-            .then(function (result) {
-                if (result.error) {
-                    // Show error to your customer
-                    showError(result.error.message);
-                } else {
-                    // The payment succeeded!
-                    orderComplete(result.paymentIntent.id);
-                }
-            });
-    };
-
-    /* ------- UI helpers ------- */
-
-    // Shows a success message when the payment is complete
-    var orderComplete = function (paymentIntentId) {
-        loading(false);
-        document
-            .querySelector(".result-message a")
-            .setAttribute(
-                "href",
-                "https://dashboard.stripe.com/test/payments/" + paymentIntentId
-            );
-        document.querySelector(".result-message").classList.remove("hidden");
-        document.querySelector("button").disabled = true;
-    };
-
-    // Show the customer the error from Stripe if their card fails to charge
-    var showError = function (errorMsgText) {
-        loading(false);
-        var errorMsg = document.querySelector("#card-error");
-        errorMsg.textContent = errorMsgText;
-        setTimeout(function () {
-            errorMsg.textContent = "";
-        }, 4000);
-    };
-
-    // Show a spinner on payment submission
-    var loading = function (isLoading) {
-        if (isLoading) {
-            // Disable the button and show a spinner
-            document.querySelector("button").disabled = true;
-            document.querySelector("#spinner").classList.remove("hidden");
-            document.querySelector("#button-text").classList.add("hidden");
-        } else {
-            document.querySelector("button").disabled = false;
-            document.querySelector("#spinner").classList.add("hidden");
-            document.querySelector("#button-text").classList.remove("hidden");
-        }
-    };
-</script>
-</body>
-</html>
-
-@extends('adminlte::page')
-
-@section('title', 'Task 4 - ReGex, AdminLTE and forms')
-
-@section('content_header')
-    <h1>Task 7 - Payments</h1>
-@endsection
-@push('js')
-    @vite(['resources/js/form.js'])
 @endpush
 @section('content')
     @if(session('success'))
@@ -353,137 +169,232 @@
     @endif
     <div class="row">
         <div class="col-12">
-            <form action="{{ route('form.store') }}" method="post" id="info-form">
-                @csrf
-                <x-adminlte-card title="Form Example" theme="lightblue" theme-mode="outline"
+            <form id="payment-form">
+                <x-adminlte-card title="Stripe Payment" theme="lightblue" theme-mode="outline"
                                  header-class="rounded-bottom border-info">
                     <div class="row">
-                        <div class="col-8">
-                            <h4>Contact info</h4>
-                            <div class="row">
-                                <x-adminlte-input type="text" name="name" label="Name *" placeholder="Name"
-                                                  value="{{ old('name') }}"
-                                                  fgroup-class="col-md-6" enable-old-support>
-                                    <x-slot name="bottomSlot">
-                                        <span class="text-sm text-gray float-right">
-                                            <span id="length-name">0</span> / 128
-                                        </span>
-                                    </x-slot>
-                                </x-adminlte-input>
-                            </div>
-                            <div class="row">
-                                <x-adminlte-input type="text" name="phone" label="Phone *" placeholder="Phone"
-                                                  error-key="phone"
-                                                  fgroup-class="col-md-6" enable-old-support>
-                                    @if(!$errors->has('phone'))
-                                        <x-slot name="bottomSlot">
-                                            <span class="text-sm text-gray">
-                                                +38 (xxx) xxx - xx - xx
-                                            </span>
-                                        </x-slot>
-                                    @endif
-                                </x-adminlte-input>
-                                <x-adminlte-input type="text" name="additional_phone" label="Phone" placeholder="Phone"
-                                                  error-key="additional_phone"
-                                                  fgroup-class="col-md-6" enable-old-support>
-                                    <x-slot name="bottomSlot">
-                                        @if(!$errors->has('additional_phone'))
-                                            <span class="text-sm text-gray">
-                                                Enter your phone number
-                                            </span>
-                                        @endif
+                        <div class="col-6">
+                            <x-adminlte-input type="text" name="token" label="Bearer token *" placeholder="Bearer token"
+                                              error-key="token"
+                                              fgroup-class="col-md-6" enable-old-support>
+                            </x-adminlte-input>
+                            <x-adminlte-input type="text" name="order_id" label="Order ID *" placeholder="Order ID"
+                                              error-key="order_id"
+                                              fgroup-class="col-md-6" enable-old-support>
+                            </x-adminlte-input>
+                            <x-adminlte-input type="text" name="card_id" label="Card ID *" placeholder="Card ID"
+                                              error-key="card_id"
+                                              fgroup-class="col-md-6" enable-old-support>
+                            </x-adminlte-input>
+                            <x-adminlte-input-switch type="checkbox" name="save_card" label="Save Card? *"
+                                                     error-key="save_card" enable-old-support>
+                            </x-adminlte-input-switch>
+                            <x-adminlte-button onclick="event.preventDefault();stripe()" class="btn-flat" id="submit-stripe" type="submit"
+                                               label="Submit" theme="success"></x-adminlte-button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6" id="card-form" style="display: none">
+                            <div id="card-element"><!--Stripe.js injects the Card Element--></div>
+                            <button id="submit">
+                                <div class="spinner hidden" id="spinner"></div>
+                                <span id="button-text">Pay now</span>
+                            </button>
+                            <p id="card-error" role="alert"></p>
+                            <p class="result-message hidden">
+                                Payment succeeded, see the result in your
+                                <a href="" target="_blank">Stripe dashboard.</a> Refresh the page to pay again.
+                            </p>
+                        </div>
+                        <script src="https://js.stripe.com/v3/"></script>
+                        <script>
+                            function stripe() {
+                                document.querySelector("#card-form").style.display = '';
+                                // This is your test publishable API key.
+                                var stripe = Stripe("{{config('services.stripe.api_key')}}");
 
-                                        <span class="text-sm text-gray float-right">
-                                            <span id="length-additional_phone">0</span> / 256
-                                        </span>
-                                    </x-slot>
-                                </x-adminlte-input>
-                            </div>
-                            <div class="row">
-                                <x-adminlte-input type="text" name="email" label="Email *" placeholder="Email"
-                                                  error-key="email"
-                                                  fgroup-class="col-md-6" enable-old-support>
-                                    <x-slot name="bottomSlot">
-                                        @if(!$errors->has('email'))
-                                            <span class="text-sm text-gray">
-                                                Enter your email address
-                                            </span>
-                                        @endif
+                                // The items the customer wants to buy
+                                var purchase = {
+                                    order_id: document.querySelector("input#order_id").value,
+                                    method: 'stripe'
+                                };
 
-                                        <span class="text-sm text-gray float-right">
-                                            <span id="length-email">0</span> / 254
-                                        </span>
-                                    </x-slot>
-                                </x-adminlte-input>
-                                <x-adminlte-input type="text" name="email_rfc" label="Email RFC" placeholder="Email RFC"
-                                                  error-key="email_rfc"
-                                                  fgroup-class="col-md-6" enable-old-support>
-                                    <x-slot name="bottomSlot">
-                                        @if(!$errors->has('email_rfc'))
-                                            <span class="text-sm text-gray">
-                                                Enter your email address
-                                            </span>
-                                        @endif
+                                // Disable the button until we have Stripe set up on the page
+                                document.querySelector("button#submit").disabled = false;
+                                fetch("/api/v1/payments", {
+                                    method: "POST",
+                                    headers: {
+                                        "Authorization": "Bearer " + document.querySelector("input#token").value,
+                                        "Content-Type": "application/json",
+                                        "Accept": "application/json"
+                                    },
+                                    body: JSON.stringify(purchase)
+                                })
+                                    .then(function (result) {
+                                        return result.json();
+                                    })
+                                    .then(function (data) {
+                                        var elements = stripe.elements();
+                                        var style = {
+                                            base: {
+                                                color: "#32325d",
+                                                fontFamily: 'Arial, sans-serif',
+                                                fontSmoothing: "antialiased",
+                                                fontSize: "16px",
+                                                "::placeholder": {
+                                                    color: "#32325d"
+                                                }
+                                            },
+                                            invalid: {
+                                                fontFamily: 'Arial, sans-serif',
+                                                color: "#fa755a",
+                                                iconColor: "#fa755a"
+                                            }
+                                        };
 
-                                        <span class="text-sm text-gray float-right">
-                                            <span id="length-email_rfc">0</span> / 254
-                                        </span>
-                                    </x-slot>
-                                </x-adminlte-input>
-                            </div>
-                            <h4>Additional info</h4>
-                            <div class="row">
-                                <x-adminlte-input type="text" name="pincode" label="Pin code *" placeholder="Pin code"
-                                                  error-key="pincode"
-                                                  fgroup-class="col-md-6" enable-old-support>
-                                    <x-slot name="bottomSlot">
-                                        @if(!$errors->has('pincode'))
-                                            <span class="text-sm text-gray">
-                                                xxxx-xxxx
-                                            </span>
-                                        @endif
-                                    </x-slot>
-                                </x-adminlte-input>
-                                <x-adminlte-input type="text" name="id" label="ID" placeholder="ID"
-                                                  error-key="id"
-                                                  fgroup-class="col-md-6" enable-old-support>
-                                    <x-slot name="bottomSlot">
-                                        @if(!$errors->has('id'))
-                                            <span class="text-sm text-gray">
-                                            Enter your ID
-                                        </span>
-                                        @endif
-                                        <span class="text-sm text-gray float-right">
-                                            <span id="length-id">0</span> / 128
-                                        </span>
-                                    </x-slot>
-                                </x-adminlte-input>
-                            </div>
-                            <h4>Comment</h4>
-                            <div class="row">
-                                <x-adminlte-textarea name="description" label="Description" placeholder="Description"
-                                                     error-key="description"
-                                                     fgroup-class="col-md-12">{{ old('description') }}
-                                    <x-slot name="bottomSlot">
-                                        @if(!$errors->has('description'))
-                                            <span class="text-sm text-gray">
-                                                Add a short comment
-                                            </span>
-                                        @endif
-                                        <span class="text-sm text-gray float-right">
-                                            <span id="length-description">0</span> / 500
-                                        </span>
-                                    </x-slot>
-                                </x-adminlte-textarea>
-                            </div>
+                                        var card = elements.create("card", {style: style});
+                                        // Stripe injects an iframe into the DOM
+                                        card.mount("#card-element");
+
+                                        card.on("change", function (event) {
+                                            // Disable the Pay button if there are no card details in the Element
+                                            document.querySelector("button").disabled = event.empty;
+                                            document.querySelector("#card-error").textContent = event.error ? event.error.message : "";
+                                        });
+
+                                        var form = document.getElementById("payment-form");
+                                        form.addEventListener("submit", function (event) {
+                                            event.preventDefault();
+                                            // Complete payment when the submit button is clicked
+                                            payWithCard(stripe, card, data.client_secret);
+                                        });
+                                    });
+
+                                // Calls stripe.confirmCardPayment
+                                // If the card requires authentication Stripe shows a pop-up modal to
+                                // prompt the user to enter authentication details without leaving your page.
+                                var payWithCard = function (stripe, card, clientSecret) {
+                                    loading(true);
+                                    stripe
+                                        .confirmCardPayment(clientSecret, {
+                                            payment_method: {
+                                                card: card
+                                            }
+                                        })
+                                        .then(function (result) {
+                                            if (result.error) {
+                                                // Show error to your customer
+                                                showError(result.error.message);
+                                            } else {
+                                                // The payment succeeded!
+                                                orderComplete(result.paymentIntent.id);
+                                            }
+                                        });
+                                };
+
+                                /* ------- UI helpers ------- */
+
+                                // Shows a success message when the payment is complete
+                                var orderComplete = function (paymentIntentId) {
+                                    loading(false);
+                                    document
+                                        .querySelector(".result-message a")
+                                        .setAttribute(
+                                            "href",
+                                            "https://dashboard.stripe.com/test/payments/" + paymentIntentId
+                                        );
+                                    document.querySelector(".result-message").classList.remove("hidden");
+                                    document.querySelector("button").disabled = true;
+                                };
+
+                                // Show the customer the error from Stripe if their card fails to charge
+                                var showError = function (errorMsgText) {
+                                    loading(false);
+                                    var errorMsg = document.querySelector("#card-error");
+                                    errorMsg.textContent = errorMsgText;
+                                    setTimeout(function () {
+                                        errorMsg.textContent = "";
+                                    }, 4000);
+                                };
+
+                                // Show a spinner on payment submission
+                                var loading = function (isLoading) {
+                                    if (isLoading) {
+                                        // Disable the button and show a spinner
+                                        document.querySelector("button").disabled = true;
+                                        document.querySelector("#spinner").classList.remove("hidden");
+                                        document.querySelector("#button-text").classList.add("hidden");
+                                    } else {
+                                        document.querySelector("button").disabled = false;
+                                        document.querySelector("#spinner").classList.add("hidden");
+                                        document.querySelector("#button-text").classList.remove("hidden");
+                                    }
+                                };
+                            }
+                        </script>
+                        <div class="col-6">
+
                         </div>
                     </div>
                 </x-adminlte-card>
-                <div class="row">
-                    <div class="col-12">
-                        <x-adminlte-button label="Continue" class="float-right" type="submit"/>
+                <x-adminlte-card title="Paypal Payment" theme="lightblue" theme-mode="outline" id="paypal"
+                                 header-class="rounded-bottom border-info">
+                    <div class="row">
+                        <div class="col-6">
+                            <x-adminlte-input type="text" name="token" label="Bearer token *" placeholder="Bearer token"
+                                              error-key="token"
+                                              fgroup-class="col-md-6" enable-old-support>
+                            </x-adminlte-input>
+                            <x-adminlte-input type="text" name="order_id" label="Order ID *" placeholder="Order ID"
+                                              error-key="order_id"
+                                              fgroup-class="col-md-6" enable-old-support>
+                            </x-adminlte-input>
+                            <x-adminlte-input type="text" name="card_id" label="Card ID *" placeholder="Card ID"
+                                              error-key="card_id"
+                                              fgroup-class="col-md-6" enable-old-support>
+                            </x-adminlte-input>
+                            <x-adminlte-input-switch type="checkbox" name="save_card" label="Save Card? *"
+                                                     error-key="save_card" enable-old-support>
+                            </x-adminlte-input-switch>
+                            <x-adminlte-button onclick="event.preventDefault();paypal()" class="btn-flat" id="submit-paypal" type="submit"
+                                               label="Submit" theme="success"></x-adminlte-button>
+                        </div>
                     </div>
-                </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <a href="#" target="_blank" class="btn btn-primary btn-flat" style="display: none;" id="paypal-link">
+                                Enter the data
+                            </a>
+                        </div>
+                    </div>
+                    <script>
+                        function paypal() {
+
+                            // The items the customer wants to buy
+                            var purchase = {
+                                order_id: document.querySelector("#paypal input#order_id").value,
+                                method: 'paypal'
+                            };
+                            fetch("/api/v1/payments", {
+                                method: "POST",
+                                headers: {
+                                    "Authorization": "Bearer " + document.querySelector("#paypal input#token").value,
+                                    "Content-Type": "application/json",
+                                    "Accept": "application/json"
+                                },
+                                body: JSON.stringify(purchase)
+                            })
+                                .then(function (result) {
+                                    return result.json();
+                                })
+                                .then(function (data) {
+                                    document.querySelector('#paypal-link').href = data.url;
+                                    document.querySelector('#paypal-link').style.display = '';
+                                    document.querySelector('#paypal-link').text = 'Pay ' + data.amount + '$';
+                                });
+                        }
+                    </script>
+                </x-adminlte-card>
             </form>
         </div>
     </div>

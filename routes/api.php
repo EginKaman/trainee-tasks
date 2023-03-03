@@ -44,5 +44,6 @@ Route::prefix('v1')->middleware(['localization'])->group(function () {
     Route::get('products', ProductsController::class);
 
     Route::post('payments/{method}/webhook', [PaymentsController::class, 'webhook']);
+    Route::get('payments/{method}', [PaymentsController::class, 'paymentSuccess']);
 });
 
