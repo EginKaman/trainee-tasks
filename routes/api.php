@@ -27,7 +27,6 @@ Route::prefix('v1')->middleware(['localization'])->group(function () {
     Route::post('verify', [LoginController::class, 'verify']);
     Route::post('callback', [SocialiteController::class, 'callback']);
 
-    Route::get('callback', [SocialiteController::class, 'callback']);
     Route::post('social', [SocialiteController::class, 'social']);
 
     Route::middleware(['auth:api'])->group(function () {

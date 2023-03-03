@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace App\Jobs\Images;
 
 use App\Enum\ProcessingImageStatus;
-use App\Models\{Image, ProcessingImage};
+use App\Facades\Cloudflare;
+use App\Models\ProcessingImage;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -41,6 +42,19 @@ class OptimizeJob implements ShouldQueue
             $this->processingImage->saved_bytes = $response['saved_bytes'];
             $this->processingImage->status = ProcessingImageStatus::Success;
             $this->processingImage->save();
+
+            $this->cloudflarePurgeCache();
         }
+    }
+
+    private function cloudflarePurgeCache(): void
+    {
+        Cloudflare::zone()->cachePurge(
+            config('cloudflare.zone_id'),
+            ['https://test2023-backend-ivan-t.abztrainee.com/api/documentation#/api/v1']
+        );
+        Cloudflare::zone()->cachePurge(config('cloudflare.zone_id'), [
+            url(Storage::url($this->processingImage->path)),
+        ]);
     }
 }
