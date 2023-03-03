@@ -8,7 +8,7 @@ use App\Actions\User\{NewUser, UpdateUser};
 use App\Http\Requests\{IndexUserRequest, StoreUserRequest, UpdateUserRequest};
 use App\Http\Resources\{UserCollection, UserResource};
 use App\Models\User;
-use Illuminate\Http\{Request, Response};
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
 
 class UserController extends Controller
@@ -20,16 +20,15 @@ class UserController extends Controller
 
         return Cache::tags('users')->rememberForever(
             "users.index.{$per_page}.{$page}",
-            fn () => new UserCollection(User::query()->with('role')->latest('created_at')->paginate(
-                perPage: $per_page,
-                page: $page
-            ))
+            fn () => new UserCollection(
+                User::query()->with('role')->latest('created_at')->paginate(perPage: $per_page, page: $page)
+            )
         );
     }
 
     public function store(StoreUserRequest $request, NewUser $newUser): UserResource
     {
-        $user = $newUser->store($request);
+        $user = $newUser->store($request->validated());
 
         return new UserResource($user);
     }
@@ -44,14 +43,12 @@ class UserController extends Controller
 
     public function update(UpdateUserRequest $request, User $user, UpdateUser $updateUser): UserResource
     {
-        return new UserResource($updateUser->update($request, $user));
+        return new UserResource($updateUser->update($request->validated(), $user));
     }
 
     public function destroy(User $user): Response
     {
         if ($user->delete()) {
-            Cache::tags('users')->flush();
-
             return response(__('Deleted success'), 204);
         }
 
