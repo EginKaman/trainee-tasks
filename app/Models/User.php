@@ -12,6 +12,14 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Propaganistas\LaravelPhone\Casts\E164PhoneNumberCast;
 
+/**
+ * @property int $id
+ * @property string $name
+ * @property string $email
+ * @property E164PhoneNumberCast $phone
+ * @property string $photo_small
+ * @property string $photo_big
+ */
 class User extends Authenticatable
 {
     use HasApiTokens;
