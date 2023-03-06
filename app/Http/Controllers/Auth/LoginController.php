@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Auth;
 use App\Actions\Auth\Login;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\{LoginRequest, VerifyRequest};
+use App\Http\Resources\UserResource;
 use Illuminate\Http\JsonResponse;
 
 class LoginController extends Controller
@@ -16,7 +17,7 @@ class LoginController extends Controller
         return $login->link($request->validated('email'));
     }
 
-    public function verify(VerifyRequest $request, Login $login): JsonResponse
+    public function verify(VerifyRequest $request, Login $login): JsonResponse|UserResource
     {
         return $login->login($request->validated('token'));
     }

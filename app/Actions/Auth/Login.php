@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Auth;
 
+use App\Http\Resources\UserResource;
 use App\Models\{LoginToken, User};
 use Illuminate\Http\JsonResponse;
 
@@ -26,14 +27,14 @@ class Login
         ]);
     }
 
-    public function login(?string $token = null): JsonResponse
+    public function login(?string $token = null): JsonResponse|UserResource
     {
         $loginToken = LoginToken::query()->with('user')->where('token', $token)->first();
         if ($loginToken->consumed_at === null && $loginToken->expired_at > now()) {
             $loginToken->consumed_at = now();
             $loginToken->save();
 
-            return response()->json([
+            return (new UserResource($loginToken->user))->additional([
                 /** @phpstan-ignore-next-line */
                 'access_token' => auth('api')->login($loginToken->user),
                 'token_type' => 'bearer',

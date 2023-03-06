@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Exceptions;
 
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
@@ -49,5 +50,19 @@ class Handler extends ExceptionHandler
                 ], 404);
             }
         });
+    }
+
+    protected function unauthenticated($request, AuthenticationException $exception)
+    {
+        if ($request->hasHeader('Accept-Language')
+            && in_array($request->header('Accept-Language'), config('localization.supported_locales'), true)) {
+            \App::setLocale($request->header('Accept-Language'));
+        }
+
+        return $this->shouldReturnJson($request, $exception)
+            ? response()->json([
+                'message' => __($exception->getMessage()),
+            ], 401)
+            : redirect()->guest($exception->redirectTo() ?? route('login'));
     }
 }
