@@ -32,7 +32,6 @@ class SocialNextRequest extends FormRequest
             ],
             'photo' => [
                 'nullable',
-                'file',
                 'mimes:jpg',
                 new BrokenImageRule(),
                 File::image()
