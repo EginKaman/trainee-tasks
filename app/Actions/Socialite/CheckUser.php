@@ -13,6 +13,11 @@ use Laravel\Socialite\Two\User;
 
 class CheckUser
 {
+    public function __construct(
+        private ResizePhoto $resizePhoto
+    ) {
+    }
+
     public function checkOrCreate(User $socialiteUser, string $driver): UserResource
     {
         $userProvider = UserProvider::query()->with('user')
@@ -52,8 +57,8 @@ class CheckUser
         if ($socialiteUser->getAvatar() !== null) {
             $path = 'users/' . Str::random(40) . '.jpg';
             Storage::disk('public')->put($path, Http::get($socialiteUser->getAvatar())->body());
-            $user->photo_big = app(ResizePhoto::class)->resize('public/' . $path, 70, 70);
-            $user->photo_small = app(ResizePhoto::class)->resize('public/' . $path, 38, 38, 'small');
+            $user->photo_big = $this->resizePhoto->resize('public/' . $path, 70, 70);
+            $user->photo_small = $this->resizePhoto->resize('public/' . $path, 38, 38, 'small');
         }
 
         $user->save();
