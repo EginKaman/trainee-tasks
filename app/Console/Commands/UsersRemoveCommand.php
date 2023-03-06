@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use App\Models\User;
+use App\Models\{LoginToken, User, UserProvider};
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\{Schema, Storage};
@@ -24,6 +24,8 @@ class UsersRemoveCommand extends Command
 
         Schema::disableForeignKeyConstraints();
 
+        LoginToken::truncate();
+        UserProvider::truncate();
         User::truncate();
 
         Schema::enableForeignKeyConstraints();
