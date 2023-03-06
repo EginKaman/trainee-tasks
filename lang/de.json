@@ -38,5 +38,6 @@
     "A message with an authorization link was successfully sent to your email": "Eine Nachricht mit einem Autorisierungslink wurde erfolgreich an Ihre E-Mail gesendet",
     "Success": "Erfolg",
     "You successfully logged out": "Sie haben sich erfolgreich abgemeldet",
-    "Unauthenticated.": "Nicht authentifiziert"
+    "Unauthenticated.": "Nicht authentifiziert",
+    "You are successfully first-step register, go by two-step register": "Sie sind erfolgreich im ersten Schritt registriert, gehen Sie durch zweistufige Registrierung"
 }

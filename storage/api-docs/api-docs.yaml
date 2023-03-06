@@ -858,17 +858,17 @@ components:
         message:
           type: string
           example: You are successfully first-step register, go by two-step register
-        hash:
-          $ref: '#/components/schemas/SocialHash'
         data:
           type: object
-          properties:
-            id:
-              $ref: '#/components/schemas/UserId'
-            name:
-              $ref: '#/components/schemas/UserName'
-            email:
-              $ref: '#/components/schemas/UserEmail'
+          $ref: '#/components/schemas/User'
+        access_token:
+          $ref: '#/components/schemas/AccessToken'
+        token_type:
+          type: string
+          example: 'bearer'
+        expires_in:
+          type: integer
+          example: 3600
 
     TwoStepRegister:
       type: object

@@ -71,12 +71,17 @@ class CheckUser
 
     private function responseUserWithToken(UserModel $user): UserResource
     {
-        return (new UserResource($user))->additional([
+        $additional = [
             /** @phpstan-ignore-next-line */
             'access_token' => auth('api')->login($user),
             'token_type' => 'bearer',
             /** @phpstan-ignore-next-line */
             'expires_in' => auth('api')->factory()->getTTL() * 60,
-        ]);
+        ];
+        if ($user->wasRecentlyCreated) {
+            $additional['message'] = __('You are successfully first-step register, go by two-step register');
+        }
+
+        return (new UserResource($user))->additional($additional);
     }
 }
