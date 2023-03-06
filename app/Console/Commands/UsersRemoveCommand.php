@@ -17,7 +17,7 @@ class UsersRemoveCommand extends Command
 
     public function handle(): void
     {
-        User::chunk(20, function (Collection $users): void {
+        User::whereNotNull('photo_small')->chunk(20, function (Collection $users): void {
             Storage::delete($users->map(fn ($user) => $user->photo_small)->toArray());
             Storage::delete($users->map(fn ($user) => $user->photo_big)->toArray());
         });
