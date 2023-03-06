@@ -18,7 +18,7 @@ class Callback
             $socialiteUser = Socialite::driver($driver)->stateless()->user();
         } catch (ClientException $exception) {
             return response()->json([
-                'message' => json_decode((string) $exception->getResponse()->getBody(), false)->message,
+                'message' => json_decode((string) $exception->getResponse()->getBody(), false)->error->message,
             ], $exception->getCode());
         }
 
