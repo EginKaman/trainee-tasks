@@ -5,23 +5,29 @@ declare(strict_types=1);
 namespace App\Actions\User;
 
 use App\Actions\ProcessingImage\NewProcessingImage;
+use App\Models\Image;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Intervention\Image\Facades\Image;
+use Intervention\Image\Facades\Image as InterventionImage;
 
 class ResizePhoto
 {
+    public function __construct(
+        public NewProcessingImage $processingImage
+    ) {
+    }
+
     public function resize(string $photo, int $width, int $height, ?string $postfix = null): string
     {
-        $image = Image::make(Storage::path($photo));
+        $image = InterventionImage::make(Storage::path($photo));
         $image->resize($width, $height);
         if ($postfix !== null) {
             $photo = Str::replace($image->filename, $image->filename . '_' . $postfix, $photo);
         }
         $image->save(Storage::path($photo));
 
-        $model = new \App\Models\Image();
+        $model = new Image();
         $model->filename = $image->basename;
         $model->path = $photo;
         $model->size = $image->filesize();
@@ -31,7 +37,7 @@ class ResizePhoto
         $model->width = $image->getHeight();
         $model->save();
 
-        app(NewProcessingImage::class)->create($model, new File(Storage::path($photo)), $photo);
+        $this->processingImage->create($model, new File(Storage::path($photo)), $photo);
 
         return $photo;
     }

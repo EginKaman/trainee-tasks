@@ -22,12 +22,14 @@ class UserFactory extends Factory
     public function definition(): array
     {
         fake()->addProvider(new LoremFlickrProvider(fake()));
-        $image = fake()->image(storage_path('app/public/users'), 400, 400, ['portrait']);
+        $gender = fake()->randomElement(['male', 'female']);
+        $name = fake()->firstName($gender) . ' ' . fake()->lastName();
+        $image = fake()->image(storage_path('app/public/users'), 400, 400, ['portrait', 'office', $gender]);
         $photo = Image::make($image);
 
         return [
             'role_id' => fake()->numberBetween(1, Role::count()),
-            'name' => fake()->firstName() . ' ' . fake()->lastName(),
+            'name' => $name,
             'email' => fake()->unique()->safeEmail(),
             'phone' => fake('uk_UA')->e164PhoneNumber(),
             'photo_big' => $this->imageBig($photo),
