@@ -8,6 +8,15 @@ use Astrotomic\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $id
+ * @property int $product_id
+ * @property string $title
+ * @property string $description
+ * @property string $image
+ * @property int $quantity
+ * @property float $price
+ */
 class OrderProduct extends Model
 {
     use Translatable;
