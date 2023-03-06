@@ -9,7 +9,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * @mixin \App\Models\ProductTranslation
+ * @property int $id
+ * @property string $title
+ * @property string $description
+ * @property string $image
+ * @property int $quantity
+ * @property float $price
  */
 class Product extends Model
 {

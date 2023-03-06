@@ -22,10 +22,15 @@ class Kernel extends ConsoleKernel
             ->timezone('Europe/Kyiv');
         $schedule->command('images:clear')->daily()
             ->timezone('Europe/Kyiv');
-        $schedule->command('users:remove')->daily()
+        $schedule->command('users:remove')->dailyAt('01:00')
             ->timezone('Europe/Kyiv')
             ->after(function (): void {
                 Artisan::call('db:seed  --class=UserSeeder');
+            });
+        $schedule->command('products:remove')->dailyAt('01:00')
+            ->timezone('Europe/Kyiv')
+            ->after(function (): void {
+                Artisan::call('db:seed  --class=ProductSeeder');
             });
         $schedule->command('backup:run')->daily()
             ->timezone('Europe/Kyiv');

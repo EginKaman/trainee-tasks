@@ -6,9 +6,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-/**
- * @mixin \App\Models\OrderProduct
- */
 class OrderProductTranslation extends Model
 {
     public $timestamps = false;
