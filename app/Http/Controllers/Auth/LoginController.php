@@ -26,7 +26,7 @@ class LoginController extends Controller
         auth('api')->logout();
 
         return response()->json([
-            'message' => 'You successfully logged out"',
+            'message' => __('You successfully logged out'),
         ]);
     }
 }
