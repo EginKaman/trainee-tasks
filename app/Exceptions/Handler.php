@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -36,6 +37,17 @@ class Handler extends ExceptionHandler
     public function register(): void
     {
         $this->reportable(function (Throwable $e): void {
+        });
+        $this->renderable(function (NotFoundHttpException $e, $request) {
+            if ($request->hasHeader('Accept-Language')
+                && in_array($request->header('Accept-Language'), config('localization.supported_locales'), true)) {
+                \App::setLocale($request->header('Accept-Language'));
+            }
+            if ($request->is('api/v1/users/*')) {
+                return response()->json([
+                    'message' => __('User record not found.'),
+                ], 404);
+            }
         });
     }
 }

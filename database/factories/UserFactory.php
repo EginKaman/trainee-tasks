@@ -1,9 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
+use App\Models\Role;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
+use Intervention\Image\Facades\Image;
+use Xvladqt\Faker\LoremFlickrProvider;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
@@ -15,26 +19,41 @@ class UserFactory extends Factory
      *
      * @return array<string, mixed>
      */
-    public function definition()
+    public function definition(): array
     {
+        fake()->addProvider(new LoremFlickrProvider(fake()));
+        $gender = fake()->randomElement(['male', 'female']);
+        $name = fake()->firstName($gender) . ' ' . fake()->lastName();
+        $image = fake()->image(storage_path('app/public/users'), 400, 400, ['portrait', 'office', $gender]);
+        $photo = Image::make($image);
+
         return [
-            'name' => fake()->name(),
+            'role_id' => fake()->numberBetween(1, Role::count()),
+            'name' => $name,
             'email' => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
-            'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
-            'remember_token' => Str::random(10),
+            'phone' => fake('uk_UA')->e164PhoneNumber(),
+            'photo_big' => $this->imageBig($photo),
+            'photo_small' => $this->imageSmall($photo),
+            'updated_user_id' => 1,
+            'created_user_id' => 1,
         ];
     }
 
-    /**
-     * Indicate that the model's email address should be unverified.
-     *
-     * @return static
-     */
-    public function unverified()
+    private function imageBig(\Intervention\Image\Image $image): string
     {
-        return $this->state(fn (array $attributes) => [
-            'email_verified_at' => null,
-        ]);
+        $path = 'public/users/' . $image->filename . '.' . $image->extension;
+        $image->resize(70, 70);
+        $image->save(storage_path('app/' . $path));
+
+        return $path;
+    }
+
+    private function imageSmall(\Intervention\Image\Image $image): string
+    {
+        $path = 'public/users/' . $image->filename . '_small.' . $image->extension;
+        $image->resize(38, 38);
+        $image->save(storage_path('app/' . $path));
+
+        return $path;
     }
 }
