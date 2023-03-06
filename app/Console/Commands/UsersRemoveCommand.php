@@ -13,7 +13,7 @@ class UsersRemoveCommand extends Command
 {
     protected $signature = 'users:remove';
 
-    protected $description = 'Command description';
+    protected $description = 'Removed all users from database.';
 
     public function handle(): void
     {
