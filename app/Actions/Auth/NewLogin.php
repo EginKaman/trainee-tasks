@@ -15,7 +15,7 @@ class NewLogin
     {
         $token = new LoginToken([
             'token' => Str::random(32),
-            'expired_at' => now()->addHours(2),
+            'expired_at' => now()->addHours(24),
         ]);
         $token->user()->associate($user);
         $token->save();

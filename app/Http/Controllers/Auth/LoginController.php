@@ -6,7 +6,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Actions\Auth\Login;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\{LoginRequest, VerifyRequest};
 use Illuminate\Http\JsonResponse;
 
 class LoginController extends Controller
@@ -16,7 +16,7 @@ class LoginController extends Controller
         return $login->link($request->validated('email'));
     }
 
-    public function verify(LoginRequest $request, Login $login): JsonResponse
+    public function verify(VerifyRequest $request, Login $login): JsonResponse
     {
         return $login->login($request->validated('token'));
     }
@@ -26,7 +26,7 @@ class LoginController extends Controller
         auth('api')->logout();
 
         return response()->json([
-            'message' => 'You successfully logged out"',
+            'message' => __('You successfully logged out'),
         ]);
     }
 }

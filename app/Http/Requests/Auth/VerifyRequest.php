@@ -7,14 +7,14 @@ namespace App\Http\Requests\Auth;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
- * @property string $driver
+ * @property string $token
  */
-class SocialiteSocialRequest extends FormRequest
+class VerifyRequest extends FormRequest
 {
     public function rules(): array
     {
         return [
-            'driver' => ['required', 'string', 'in:google,facebook'],
+            'token' => ['required', 'size:32', 'exists:App\Models\LoginToken,token'],
         ];
     }
 }

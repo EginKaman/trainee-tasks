@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Auth;
 
 use App\Actions\Socialite\Callback;
+use App\Actions\User\UpdateUser;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\{SocialiteCallbackRequest, SocialiteSocialRequest};
+use App\Http\Requests\SocialNextRequest;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\JsonResponse;
 use Laravel\Socialite\Facades\Socialite;
@@ -21,8 +23,13 @@ class SocialiteController extends Controller
         ]);
     }
 
-    public function callback(SocialiteCallbackRequest $request): UserResource|JsonResponse
+    public function next(SocialNextRequest $request, UpdateUser $updateUser): UserResource
     {
-        return app(Callback::class)->callback($request->validated('driver'));
+        return new UserResource($updateUser->update($request->validated(), auth('api')->user()));
+    }
+
+    public function callback(SocialiteCallbackRequest $request, Callback $callback): UserResource|JsonResponse
+    {
+        return $callback->callback($request->validated('driver'));
     }
 }
