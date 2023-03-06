@@ -16,7 +16,7 @@ class SocialiteCallbackRequest extends FormRequest
     {
         return [
             'driver' => ['required', 'string', 'in:google,facebook'],
-            'code' => ['required', 'string', 'min:50'],
+            'code' => ['required', 'string', 'regex:/^[a-z0-9_\-\/]+$/i', 'min:50'],
         ];
     }
 }
