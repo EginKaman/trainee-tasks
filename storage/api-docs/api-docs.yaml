@@ -925,7 +925,7 @@ paths:
               $ref: '#/components/schemas/NewSubscribe'
       responses:
         200:
-          description: Successfully getting saved card
+          description: Successfully created subscribe
           content:
             application/json:
               schema:
