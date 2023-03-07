@@ -17,9 +17,11 @@ class Callback
             /** @phpstan-ignore-next-line */
             $socialiteUser = Socialite::driver($driver)->stateless()->user();
         } catch (ClientException $exception) {
+            $message = json_decode((string) $exception->getResponse()->getBody(), false);
+
             return response()->json([
-                'message' => __('Bad request'),
-            ], 400);
+                'message' => $message->error->message ?? $message->error_description,
+            ], $exception->getCode());
         }
 
         return app(CheckUser::class)->checkOrCreate($socialiteUser, $driver);
