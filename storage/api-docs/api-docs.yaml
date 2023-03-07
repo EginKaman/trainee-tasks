@@ -509,11 +509,11 @@ paths:
               $ref: '#/components/schemas/TwoStepRegister'
       responses:
         200:
-          description: Authorization success
+          description: Updated success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessAuth'
+                $ref: '#/components/schemas/User'
         401:
           description: Unauthorized
           content:
