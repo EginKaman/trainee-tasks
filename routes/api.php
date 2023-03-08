@@ -33,7 +33,6 @@ Route::prefix('v1')->middleware(['localization'])->group(function (): void {
         Route::post('payments', [PaymentsController::class, 'store']);
         Route::post('payments/refund', [PaymentsController::class, 'refund']);
 
-        Route::post('subscribe', [SubscribeController::class, 'subscribe']);
         Route::post('subscribe/cancel', [SubscribeController::class, 'cancel']);
     });
 
@@ -45,4 +44,5 @@ Route::prefix('v1')->middleware(['localization'])->group(function (): void {
     Route::get('payments/{method}', [PaymentsController::class, 'paymentSuccess']);
 
     Route::get('subscriptions', [SubscriptionController::class, 'index']);
+    Route::post('subscribe', [SubscribeController::class, 'subscribe']);
 });

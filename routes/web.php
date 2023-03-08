@@ -4,6 +4,7 @@ use App\Http\Controllers\ConvertorController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\Images\OptimizerController;
 use App\Http\Controllers\Sendgrid\WebhookController;
+use App\Http\Controllers\StripePaymentController;
 use App\Http\Middleware\SignedWebhookMiddleware;
 use Illuminate\Support\Facades\Route;
 
@@ -50,5 +51,8 @@ Route::get('{driver}/callback', function () {
 });
 
 Route::get('payments', function () {
-   return view('payments.form');
+    return view('payments.form');
 });
+
+Route::get('payments/stripe/success', [StripePaymentController::class, 'success'])->name('payments.stripe.success');
+Route::get('payments/stripe/cancel', [StripePaymentController::class, 'cancel'])->name('payments.stripe.cancel');

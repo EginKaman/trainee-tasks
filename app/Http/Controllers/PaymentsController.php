@@ -6,9 +6,9 @@ namespace App\Http\Controllers;
 
 use App\Actions\Payment\NewPayment;
 use App\Http\Requests\StorePaymentRequest;
-use App\Models\{Payment, PaymentHistory};
-use Illuminate\Http\{JsonResponse, Request};
-use Illuminate\Support\Str;
+use App\Models\{Payment, PaymentHistory, Subscription, User};
+use Illuminate\Http\{JsonResponse, Request, Response};
+use Illuminate\Support\{Carbon, Str};
 use Srmklive\PayPal\Facades\PayPal;
 
 class PaymentsController extends Controller
@@ -22,7 +22,7 @@ class PaymentsController extends Controller
     {
     }
 
-    public function webhook(Request $request, string $method): JsonResponse
+    public function webhook(Request $request, string $method): JsonResponse|Response
     {
         if ($method === 'paypal') {
             $provider = Paypal::setProvider();
@@ -83,6 +83,10 @@ class PaymentsController extends Controller
 
             $payment = Payment::where('method_id', $paymentIntent->id)->where('method', 'stripe')->first();
 
+            if ($payment === null) {
+                return response()->noContent();
+            }
+
             $payment->status = $paymentIntent->status;
             $payment->client_secret = $paymentIntent->client_secret;
 
@@ -113,6 +117,22 @@ class PaymentsController extends Controller
 
             return response()->json([
                 'message' => 'success',
+            ]);
+        }
+        if (Str::startsWith($event->type, 'customer.subscription.')) {
+            /** @phpstan-ignore-next-line */
+            $data = $event->data->object;
+            $user = User::where('stripe_id', $data->customer)->first();
+
+            $subscription = Subscription::where('stripe_id', $data->plan->id)->first();
+
+            $user->subscriptions()->where('stripe_id', $data->id);
+
+            $user->subscriptions()->syncWithPivotValues($subscription, [
+                'pay_id' => $data->id,
+                'status' => $data->status,
+                'started_at' => Carbon::createFromTimestamp($data->start_date),
+                'expired_at' => Carbon::createFromTimestamp($data->current_period_end),
             ]);
         }
 
