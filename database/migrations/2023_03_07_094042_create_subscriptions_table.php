@@ -22,11 +22,12 @@ return new class() extends Migration {
         Schema::create('subscription_user', function (Blueprint $table): void {
             $table->foreignId('user_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignId('subscription_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->string('pay_id')->nullable();
+            $table->string('method_id')->nullable();
+            $table->string('method')->nullable();
             $table->string('status')->nullable();
-            $table->timestamp('canceled_at');
-            $table->timestamp('started_at');
-            $table->timestamp('expired_at');
+            $table->timestamp('canceled_at')->nullable();
+            $table->timestamp('started_at')->nullable();
+            $table->timestamp('expired_at')->nullable();
             $table->timestamps();
 
             $table->primary(['user_id', 'subscription_id']);

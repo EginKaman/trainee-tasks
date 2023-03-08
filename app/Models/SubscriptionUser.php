@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\{BelongsTo, Pivot};
 class SubscriptionUser extends Pivot
 {
     public $incrementing = true;
-    protected $fillable = ['pay_id', 'status', 'expired_at', 'started_at'];
+    protected $fillable = ['method', 'method_id', 'status', 'expired_at', 'started_at'];
 
     public function order(): BelongsTo
     {

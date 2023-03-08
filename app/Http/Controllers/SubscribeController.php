@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\SubscribeRequest;
+use App\Http\Requests\{CancelSubscribeRequest, SubscribeRequest};
 use App\Models\Subscription;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\{Carbon, Str};
+use Srmklive\PayPal\Facades\PayPal;
 use Stripe\Exception\ApiErrorException;
 use Stripe\StripeClient;
 
@@ -15,9 +16,38 @@ class SubscribeController extends Controller
 {
     public function subscribe(SubscribeRequest $request): JsonResponse
     {
-        $stripe = new StripeClient(config('services.stripe.api_secret'));
-
         $user = auth('api')->user();
+        $subscription = Subscription::find($request->validated('subscription_id'));
+        if ($request->type_payment === 'paypal') {
+            $provider = Paypal::setProvider();
+            $provider->setApiCredentials(config('paypal'));
+            $token = $provider->getAccessToken();
+            $provider->setRequestHeader('Authorization', 'Bearer ' . $token['access_token']);
+            $provider->setRequestHeader('PayPal-Request-Id', Str::uuid()->toString());
+
+            $plan = $provider->createSubscription([
+                'plan_id' => $subscription->paypal_id,
+                'quantity' => 1,
+            ]);
+
+            $redirectUrl = '';
+            foreach ($plan['links'] as $link) {
+                if ($link['rel'] === 'approve') {
+                    $redirectUrl = $link['href'];
+                }
+            }
+
+            $user->subscriptions()->attach($subscription, [
+                'method' => $request->type_payment,
+                'method_id' => $plan['id'],
+                'status' => $plan['status'],
+            ]);
+
+            return response()->json([
+                'url' => $redirectUrl,
+            ]);
+        }
+        $stripe = new StripeClient(config('services.stripe.api_secret'));
 
         if ($user->stripe_id === null) {
             $customer = $stripe->customers->create([
@@ -29,7 +59,7 @@ class SubscribeController extends Controller
             $user->stripe_id = $customer->id;
             $user->save();
         }
-        $subscription = Subscription::find($request->validated('subscription_id'));
+
         $product = $stripe->prices->retrieve($subscription->stripe_id);
         $checkout_session = $stripe->checkout->sessions->create([
             'line_items' => [
@@ -49,10 +79,8 @@ class SubscribeController extends Controller
         ]);
     }
 
-    public function cancel(SubscribeRequest $request): JsonResponse
+    public function cancel(CancelSubscribeRequest $request): JsonResponse
     {
-        $stripe = new StripeClient(config('services.stripe.api_secret'));
-
         $user = auth('api')->user();
 
         $subscription = $user->subscriptions()->wherePivot('status', 'active')->find(
@@ -66,8 +94,10 @@ class SubscribeController extends Controller
             ]);
         }
 
+        $stripe = new StripeClient(config('services.stripe.api_secret'));
+
         try {
-            $response = $stripe->subscriptions->cancel($subscription->pivot->pay_id);
+            $response = $stripe->subscriptions->cancel($subscription->pivot->method_id);
         } catch (ApiErrorException $exception) {
             return response()->json([
                 'status' => __('Failure'),
@@ -76,7 +106,7 @@ class SubscribeController extends Controller
         }
 
         $user->subscriptions()->syncWithPivotValues($subscription, [
-            'pay_id' => $response->id,
+            'method_id' => $response->id,
             'status' => $response->status,
             'canceled_at' => Carbon::createFromTimestamp($response->canceled_at),
             'started_at' => Carbon::createFromTimestamp($response->start_date),

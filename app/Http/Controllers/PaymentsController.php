@@ -129,7 +129,7 @@ class PaymentsController extends Controller
             $user->subscriptions()->where('stripe_id', $data->id);
 
             $user->subscriptions()->syncWithPivotValues($subscription, [
-                'pay_id' => $data->id,
+                'method_id' => $data->id,
                 'status' => $data->status,
                 'started_at' => Carbon::createFromTimestamp($data->start_date),
                 'expired_at' => Carbon::createFromTimestamp($data->current_period_end),

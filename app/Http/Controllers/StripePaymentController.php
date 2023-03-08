@@ -27,7 +27,7 @@ class StripePaymentController extends Controller
          * @phpstan-ignore-next-line
          */
         $user->subscriptions()->attach(Subscription::where('stripe_id', $subscription->plan->id)->first(), [
-            'pay_id' => $subscription->id,
+            'method_id' => $subscription->id,
             'status' => $subscription->status,
             'started_at' => Carbon::createFromTimestamp($subscription->start_date),
             'expired_at' => Carbon::createFromTimestamp($subscription->current_period_end),

@@ -108,7 +108,7 @@ class User extends Authenticatable implements JWTSubject
     public function subscriptions(): BelongsToMany
     {
         return $this->belongsToMany(Subscription::class)->using(SubscriptionUser::class)->withPivot(
-            ['pay_id', 'expired_at', 'status']
-        );
+            ['method', 'method_id', 'canceled_at', 'started_at', 'expired_at', 'status']
+        )->withTimestamps();
     }
 }
