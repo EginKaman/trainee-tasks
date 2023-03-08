@@ -37,9 +37,7 @@ class SubscribeController extends Controller
             ],
             'customer' => $user->stripe_id,
             'mode' => 'subscription',
-            'success_url' => route('payments.stripe.success', [
-                'session_id' => 'CHECKOUT_SESSION_ID',
-            ]),
+            'success_url' => url('payments/stripe/success?session_id={CHECKOUT_SESSION_ID}'),
             'cancel_url' => route('payments.stripe.cancel'),
         ]);
 
