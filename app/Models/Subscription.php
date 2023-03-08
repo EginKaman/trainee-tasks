@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\{BelongsToMany, MorphMany};
  * @property string $image
  * @property string $period
  * @property float $price
+ * @property SubscriptionUser $pivot
  */
 class Subscription extends Model
 {
