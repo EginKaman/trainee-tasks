@@ -1632,10 +1632,10 @@ components:
 
     CancelSubscribe:
       required:
-        - subscribe_id
+        - subscription_id
       type: object
       properties:
-        subscribe_id:
+        subscription_id:
           $ref: '#/components/schemas/SubscriptionId'
     CanceledSubscription:
       type: object

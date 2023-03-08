@@ -4,16 +4,19 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Models\{Subscription, User};
+use App\Http\Requests\SubscribeRequest;
+use App\Models\Subscription;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Carbon;
+use Stripe\Exception\ApiErrorException;
+use Stripe\StripeClient;
 
 class SubscribeController extends Controller
 {
-    public function subscribe(): JsonResponse
+    public function subscribe(SubscribeRequest $request): JsonResponse
     {
-        $stripe = new \Stripe\StripeClient(config('services.stripe.api_secret'));
+        $stripe = new StripeClient(config('services.stripe.api_secret'));
 
-        auth('api')->login(User::find(2));
         $user = auth('api')->user();
 
         if ($user->stripe_id === null) {
@@ -26,7 +29,7 @@ class SubscribeController extends Controller
             $user->stripe_id = $customer->id;
             $user->save();
         }
-        $subscription = Subscription::find(1);
+        $subscription = Subscription::find($request->validated('subscription_id'));
         $product = $stripe->prices->retrieve($subscription->stripe_id);
         $checkout_session = $stripe->checkout->sessions->create([
             'line_items' => [
@@ -46,7 +49,43 @@ class SubscribeController extends Controller
         ]);
     }
 
-    public function cancel(): void
+    public function cancel(SubscribeRequest $request): JsonResponse
     {
+        $stripe = new StripeClient(config('services.stripe.api_secret'));
+
+        $user = auth('api')->user();
+
+        $subscription = $user->subscriptions()->wherePivot('status', 'active')->find(
+            $request->validated('subscription_id')
+        );
+
+        if (!$subscription) {
+            return response()->json([
+                'status' => __('Failure'),
+                'message' => __('Your subscription has already canceled.'),
+            ]);
+        }
+
+        try {
+            $response = $stripe->subscriptions->cancel($subscription->pivot->pay_id);
+        } catch (ApiErrorException $exception) {
+            return response()->json([
+                'status' => __('Failure'),
+                'message' => $exception->getMessage(),
+            ], $exception->getHttpStatus());
+        }
+
+        $user->subscriptions()->syncWithPivotValues($subscription, [
+            'pay_id' => $response->id,
+            'status' => $response->status,
+            'canceled_at' => Carbon::createFromTimestamp($response->canceled_at),
+            'started_at' => Carbon::createFromTimestamp($response->start_date),
+            'expired_at' => Carbon::createFromTimestamp($response->current_period_end),
+        ]);
+
+        return response()->json([
+            'status' => __('Success'),
+            'message' => __('Your subscription was canceled. Updating subscription information will be soon.'),
+        ]);
     }
 }

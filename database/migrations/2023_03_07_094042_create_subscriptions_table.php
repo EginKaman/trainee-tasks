@@ -24,8 +24,10 @@ return new class() extends Migration {
             $table->foreignId('subscription_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('pay_id')->nullable();
             $table->string('status')->nullable();
+            $table->timestamp('canceled_at');
             $table->timestamp('started_at');
             $table->timestamp('expired_at');
+            $table->timestamps();
 
             $table->primary(['user_id', 'subscription_id']);
         });
