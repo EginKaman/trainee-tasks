@@ -6,7 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Actions\Payment\NewPayment;
 use App\Http\Requests\StorePaymentRequest;
-use App\Models\{Payment, PaymentHistory, Subscription, User};
+use App\Models\{Payment, PaymentHistory, Subscription, SubscriptionUser, User};
 use Illuminate\Http\{JsonResponse, Request, Response};
 use Illuminate\Support\{Carbon, Str};
 use Srmklive\PayPal\Facades\PayPal;
@@ -44,10 +44,42 @@ class PaymentController extends Controller
                 return response()->json($verify, 400);
             }
 
+            if (Str::startsWith($request->type, 'BILLING.SUBSCRIPTION.')) {
+                $subscriptionUser = SubscriptionUser::where('method', 'paypal')->where(
+                    'method_id',
+                    $request->resource['id']
+                )->with('user')->first();
+
+                if ($subscriptionUser === null) {
+                    return response()->noContent();
+                }
+
+                $user = $subscriptionUser->user;
+                $subscription = $subscriptionUser->subscription;
+
+                $startTime = Carbon::createFromFormat('Y-m-d\T\H:i:s\Z', $request->resource['start_time']);
+                $user->subscriptions()->syncWithPivotValues($subscription, [
+                    'method_id' => $request->resource['id'],
+                    'status' => $request->resource['status'],
+                    'started_at' => $startTime,
+                    'expired_at' => $startTime->addMonth(),
+                ]);
+
+                return response()->noContent();
+            }
+
+            if (!isset($request->resource['supplementary_data'])) {
+                return response()->noContent();
+            }
+
             $payment = Payment::where(
                 'method_id',
                 $request->resource['supplementary_data']['related_ids']['order_id']
             )->where('method', 'paypal')->first();
+
+            if ($payment === null) {
+                return response()->noContent();
+            }
 
             $payment->status = $request->resource['status'];
 
@@ -125,8 +157,6 @@ class PaymentController extends Controller
             $user = User::where('stripe_id', $data->customer)->first();
 
             $subscription = Subscription::where('stripe_id', $data->plan->id)->first();
-
-            $user->subscriptions()->where('stripe_id', $data->id);
 
             $user->subscriptions()->syncWithPivotValues($subscription, [
                 'method_id' => $data->id,

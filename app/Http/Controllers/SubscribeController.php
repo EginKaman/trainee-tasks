@@ -18,6 +18,16 @@ class SubscribeController extends Controller
     {
         $user = auth('api')->user();
         $subscription = Subscription::find($request->validated('subscription_id'));
+
+        if ($subscription->whereHas('users', function ($query) use ($user): void {
+            $query->where('users.id', $user->id);
+        })->exists()) {
+            return response()->json([
+                'status' => __('Failure'),
+                'message' => __('You already have the subscription'),
+            ]);
+        }
+
         if ($request->type_payment === 'paypal') {
             $provider = Paypal::setProvider();
             $provider->setApiCredentials(config('paypal'));
@@ -41,6 +51,11 @@ class SubscribeController extends Controller
                 'method' => $request->type_payment,
                 'method_id' => $plan['id'],
                 'status' => $plan['status'],
+
+                'application_context' => [
+                    'return_url' => url('api/v1/payments/paypal'),
+                    'cancel_url' => url('paypal/cancel'),
+                ],
             ]);
 
             return response()->json([
