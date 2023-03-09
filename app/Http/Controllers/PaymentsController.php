@@ -38,7 +38,7 @@ class PaymentsController extends Controller
                 'transmission_sig' => $request->header('PAYPAL-TRANSMISSION-SIG'),
                 'transmission_time' => $request->header('PAYPAL-TRANSMISSION-TIME'),
                 'webhook_event' => $request->all(),
-                'webhook_id' => '4VE89873SA1902205',
+                'webhook_id' => config('paypal.' . config('paypal.mode') . '.webhook_id'),
             ]);
             if ($verify['verification_status'] === 'FAILURE') {
                 return response()->json($verify, 400);
