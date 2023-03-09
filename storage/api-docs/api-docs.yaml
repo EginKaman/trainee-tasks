@@ -623,7 +623,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/SomethingWentWrong'
 
-  /payment:
+  /payments:
     post:
       security:
         - bearerAuth: [ ]
@@ -676,7 +676,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/SomethingWentWrong'
 
-  /payment/refund:
+  /payments/refund:
     post:
       security:
         - bearerAuth: [ ]
