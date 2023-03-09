@@ -628,7 +628,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - payment
+        - payments
       description: Method for payment an order via Stripe or PayPal
       parameters:
         - in: header
@@ -681,7 +681,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - payment
+        - payments
       description: Method for charge refund
       parameters:
         - in: header
@@ -787,7 +787,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - card
+        - cards
       description: This method deleting saved card.
       parameters:
         - in: header
@@ -847,7 +847,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - card
+        - cards
       description: This method for getting users saved card.
       parameters:
         - in: header
