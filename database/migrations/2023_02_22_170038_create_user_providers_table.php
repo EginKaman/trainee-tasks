@@ -12,7 +12,7 @@ return new class() extends Migration {
         Schema::create('user_providers', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->string('driver');
+            $table->enum('driver', ['facebook', 'google']);
             $table->string('driver_id');
             $table->text('token')->nullable();
             $table->text('refresh_token')->nullable();
