@@ -11,7 +11,7 @@ use Illuminate\Http\{JsonResponse, Request, Response};
 use Illuminate\Support\{Carbon, Str};
 use Srmklive\PayPal\Facades\PayPal;
 
-class PaymentsController extends Controller
+class PaymentController extends Controller
 {
     public function store(StorePaymentRequest $request, NewPayment $payment): JsonResponse
     {

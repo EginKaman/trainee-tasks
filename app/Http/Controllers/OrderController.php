@@ -8,7 +8,7 @@ use App\Actions\Order\NewOrder;
 use App\Http\Requests\Order\StoreOrderRequest;
 use App\Http\Resources\{OrderCollection, OrderResource};
 
-class OrdersController extends Controller
+class OrderController extends Controller
 {
     public function index(): OrderCollection
     {
