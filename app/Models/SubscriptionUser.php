@@ -8,8 +8,13 @@ use Illuminate\Database\Eloquent\Relations\{BelongsTo, Pivot};
 
 class SubscriptionUser extends Pivot
 {
-    public $incrementing = true;
     protected $fillable = ['method', 'method_id', 'status', 'expired_at', 'started_at'];
+
+    protected $casts = [
+        'canceled_at' => 'datetime',
+        'expired_at' => 'datetime',
+        'started_at' => 'datetime',
+    ];
 
     public function user(): BelongsTo
     {

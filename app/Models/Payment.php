@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasMany, MorphTo};
+use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasMany};
 
 class Payment extends Model
 {
@@ -24,10 +24,5 @@ class Payment extends Model
     public function history(): HasMany
     {
         return $this->hasMany(PaymentHistory::class);
-    }
-
-    public function payable(): MorphTo
-    {
-        return $this->morphTo();
     }
 }

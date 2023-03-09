@@ -8,6 +8,7 @@ use App\Models\{Subscription, User};
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Stripe\StripeClient;
 
 class StripePaymentController extends Controller
 {
@@ -15,7 +16,7 @@ class StripePaymentController extends Controller
     {
         $sessionId = $request->get('session_id');
 
-        $stripe = new \Stripe\StripeClient(config('services.stripe.api_secret'));
+        $stripe = new StripeClient(config('services.stripe.api_secret'));
 
         $checkout_session = $stripe->checkout->sessions->retrieve($sessionId);
 
@@ -27,6 +28,7 @@ class StripePaymentController extends Controller
          * @phpstan-ignore-next-line
          */
         $user->subscriptions()->attach(Subscription::where('stripe_id', $subscription->plan->id)->first(), [
+            'method' => 'stripe',
             'method_id' => $subscription->id,
             'status' => $subscription->status,
             'started_at' => Carbon::createFromTimestamp($subscription->start_date),

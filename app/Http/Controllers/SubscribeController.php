@@ -38,6 +38,10 @@ class SubscribeController extends Controller
             $plan = $provider->createSubscription([
                 'plan_id' => $subscription->paypal_id,
                 'quantity' => 1,
+                'application_context' => [
+                    'return_url' => url('api/v1/payments/paypal'),
+                    'cancel_url' => url('paypal/cancel'),
+                ],
             ]);
 
             $redirectUrl = '';
@@ -51,11 +55,8 @@ class SubscribeController extends Controller
                 'method' => $request->type_payment,
                 'method_id' => $plan['id'],
                 'status' => $plan['status'],
-
-                'application_context' => [
-                    'return_url' => url('api/v1/payments/paypal'),
-                    'cancel_url' => url('paypal/cancel'),
-                ],
+                'started_at' => now(),
+                'expired_at' => now()->addMonth(),
             ]);
 
             return response()->json([
@@ -98,7 +99,7 @@ class SubscribeController extends Controller
     {
         $user = auth('api')->user();
 
-        $subscription = $user->subscriptions()->wherePivot('status', 'active')->find(
+        $subscription = $user->subscriptions()->wherePivot('status', '!=', 'canceled')->find(
             $request->validated('subscription_id')
         );
 
@@ -109,24 +110,41 @@ class SubscribeController extends Controller
             ]);
         }
 
-        $stripe = new StripeClient(config('services.stripe.api_secret'));
+        if ($subscription->pivot->method === 'paypal') {
+            $provider = Paypal::setProvider();
+            $provider->setApiCredentials(config('paypal'));
+            $token = $provider->getAccessToken();
+            $provider->setRequestHeader('Authorization', 'Bearer ' . $token['access_token']);
+            $provider->setRequestHeader('PayPal-Request-Id', Str::uuid()->toString());
 
-        try {
-            $response = $stripe->subscriptions->cancel($subscription->pivot->method_id);
-        } catch (ApiErrorException $exception) {
-            return response()->json([
-                'status' => __('Failure'),
-                'message' => $exception->getMessage(),
-            ], $exception->getHttpStatus());
+            $provider->cancelSubscription($subscription->pivot->method_id, 'Canceled by user');
+
+            $subscription->pivot->status = 'canceled';
+            $subscription->pivot->canceled_at = now();
+
+            $subscription->pivot->save();
         }
 
-        $user->subscriptions()->syncWithPivotValues($subscription, [
-            'method_id' => $response->id,
-            'status' => $response->status,
-            'canceled_at' => Carbon::createFromTimestamp($response->canceled_at),
-            'started_at' => Carbon::createFromTimestamp($response->start_date),
-            'expired_at' => Carbon::createFromTimestamp($response->current_period_end),
-        ]);
+        if ($subscription->pivot->method === 'stripe') {
+            $stripe = new StripeClient(config('services.stripe.api_secret'));
+
+            try {
+                $response = $stripe->subscriptions->cancel($subscription->pivot->method_id);
+            } catch (ApiErrorException $exception) {
+                return response()->json([
+                    'status' => __('Failure'),
+                    'message' => $exception->getMessage(),
+                ], $exception->getHttpStatus());
+            }
+
+            $user->subscriptions()->syncWithPivotValues($subscription, [
+                'method_id' => $response->id,
+                'status' => $response->status,
+                'canceled_at' => Carbon::createFromTimestamp($response->canceled_at),
+                'started_at' => Carbon::createFromTimestamp($response->start_date),
+                'expired_at' => Carbon::createFromTimestamp($response->current_period_end),
+            ]);
+        }
 
         return response()->json([
             'status' => __('Success'),
