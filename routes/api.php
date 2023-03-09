@@ -8,6 +8,8 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\SubscribeController;
+use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -38,6 +40,9 @@ Route::prefix('v1')->middleware(['localization'])->group(function () {
         ]);
         Route::post('payments', [PaymentController::class, 'store']);
         Route::post('payments/refund', [PaymentController::class, 'refund']);
+
+        Route::post('subscribe', [SubscribeController::class, 'subscribe']);
+        Route::post('subscribe/cancel', [SubscribeController::class, 'cancel']);
     });
 
     Route::apiResource('users', UserController::class);
@@ -46,5 +51,6 @@ Route::prefix('v1')->middleware(['localization'])->group(function () {
 
     Route::post('payments/{method}/webhook', [PaymentController::class, 'webhook']);
     Route::get('payments/{method}', [PaymentController::class, 'paymentSuccess']);
-});
 
+    Route::get('subscriptions', [SubscriptionController::class, 'index']);
+});

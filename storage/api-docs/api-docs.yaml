@@ -876,6 +876,113 @@ paths:
               schema:
                 $ref: '#/components/schemas/SomethingWentWrong'
 
+  /subscriptions:
+    get:
+      tags:
+        - subscriptions
+      description: This method for getting subscriptions
+      parameters:
+        - in: header
+          name: Accept-Language
+          description: Set interface language (en, de)
+          schema:
+            type: string
+            example: en
+      responses:
+        200:
+          description: Successfully getting subscriptions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscriptions'
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
+  /subscribe:
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - subscriptions
+      description: This method subscribe user with selected subscription
+      parameters:
+        - in: header
+          name: Accept-Language
+          description: Set interface language (en, de)
+          schema:
+            type: string
+            example: en
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NewSubscribe'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewSubscribe'
+      responses:
+        200:
+          description: Successfully created subscribe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NewSubscription'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
+  /subscribe/cancel:
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - subscriptions
+      description: This method subscribe user with selected subscription
+      parameters:
+        - in: header
+          name: Accept-Language
+          description: Set interface language (en, de)
+          schema:
+            type: string
+            example: en
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CancelSubscribe'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CancelSubscribe'
+      responses:
+        200:
+          description: Successfully canceled subscription
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CanceledSubscription'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
 components:
   securitySchemes:
     bearerAuth:
@@ -1458,6 +1565,88 @@ components:
         total:
           $ref: '#/components/schemas/Total'
 
+    SubscriptionId:
+      type: integer
+      example: 1
+      description: Subscription ID
+    SubscriptionTitle:
+      type: string
+      example: Online techno conference subscription
+      description: Subscription title
+    SubscriptionPrice:
+      type: integer
+      example: 100
+      description: Subscription Price
+    SubscriptionImage:
+      type: string
+      example: https://test2022-backend-andrey-l2.abztrainee.com/storage/subscriptions/bhjdBJHViud9384bv2223mdnc.jpg
+      description: Subscription image url
+    SubscriptionDescription:
+      type: string
+      example: Subscription includes lectures on IT, robotics, nanotechnology, science, engineering.
+      description: Subscription description
+    SubscriptionPeriod:
+      type: string
+      example: 1 month
+      description: Subscription period
+    Subscription:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/SubscriptionId'
+        title:
+          $ref: '#/components/schemas/SubscriptionTitle'
+        price:
+          $ref: '#/components/schemas/SubscriptionPrice'
+        image:
+          $ref: '#/components/schemas/SubscriptionImage'
+        description:
+          $ref: '#/components/schemas/SubscriptionDescription'
+        period:
+          $ref: '#/components/schemas/SubscriptionPeriod'
+    Subscriptions:
+      type: array
+      items:
+        $ref: '#/components/schemas/Subscription'
+
+    NewSubscribe:
+      required:
+        - type_payment
+        - subscription_id
+      type: object
+      properties:
+        subscription_id:
+          $ref: '#/components/schemas/SubscriptionId'
+        type_payment:
+          $ref: '#/components/schemas/OrderTypePayment'
+
+    NewSubscription:
+      type: object
+      properties:
+        url:
+          $ref: '#/components/schemas/SubscriptionUrl'
+
+    SubscriptionUrl:
+      type: string
+      example: https://checkout.stripe.com/c/pay/...
+
+    CancelSubscribe:
+      required:
+        - subscription_id
+      type: object
+      properties:
+        subscription_id:
+          $ref: '#/components/schemas/SubscriptionId'
+    CanceledSubscription:
+      type: object
+      properties:
+        status:
+          type: string
+          example: Success
+          description: status to send mail
+        message:
+          type: string
+          example: Your subscription was canceled. Updating subscription information will be soon.
     # Auth Responses an RequestBody
     SuccessLogout:
       type: object

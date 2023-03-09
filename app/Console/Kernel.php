@@ -20,14 +20,19 @@ class Kernel extends ConsoleKernel
         $schedule->job(new EmailReport())
             ->daily()
             ->timezone('Europe/Kyiv');
-        $schedule->command('images:clear')->daily()
+        $schedule->command('images:clear')->dailyAt('00:15')
             ->timezone('Europe/Kyiv');
-        $schedule->command('users:remove')->dailyAt('01:00')
+        $schedule->command('users:remove')->dailyAt('00:20')
             ->timezone('Europe/Kyiv')
             ->after(function (): void {
                 Artisan::call('db:seed  --class=UserSeeder');
             });
-        $schedule->command('products:remove')->dailyAt('01:00')
+        $schedule->command('products:remove')->dailyAt('00:25')
+            ->timezone('Europe/Kyiv')
+            ->after(function (): void {
+                Artisan::call('db:seed  --class=ProductSeeder');
+            });
+        $schedule->command('subscriptions:remove')->dailyAt('00:30')
             ->timezone('Europe/Kyiv')
             ->after(function (): void {
                 Artisan::call('db:seed  --class=ProductSeeder');
