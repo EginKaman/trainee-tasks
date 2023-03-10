@@ -6,7 +6,7 @@ namespace App\Models;
 
 use Astrotomic\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\{Model, SoftDeletes};
 
 /**
  * @property int $id
@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Model;
 class Product extends Model
 {
     use HasFactory;
+    use SoftDeletes;
     use Translatable;
 
     public array $translatedAttributes = ['title', 'description'];
