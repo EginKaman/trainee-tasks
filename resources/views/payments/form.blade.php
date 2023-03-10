@@ -1,9 +1,9 @@
 @extends('adminlte::page')
 
-@section('title', 'Task 4 - ReGex, AdminLTE and forms')
+@section('title', 'Task 7 - Payment gateways')
 
 @section('content_header')
-    <h1>Task 7 - Payments</h1>
+    <h1>Task 7 - Payment gateways</h1>
 @endsection
 @push('js')
     @vite(['resources/js/form.js'])
