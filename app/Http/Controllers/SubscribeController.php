@@ -38,7 +38,7 @@ class SubscribeController extends Controller
                 'plan_id' => $subscription->paypal_id,
                 'quantity' => 1,
                 'application_context' => [
-                    'return_url' => url('api/v1/payments/paypal'),
+                    'return_url' => url('paypal/success'),
                     'cancel_url' => url('paypal/cancel'),
                 ],
             ]);
@@ -53,7 +53,7 @@ class SubscribeController extends Controller
             $user->subscriptions()->attach($subscription, [
                 'method' => $request->type_payment,
                 'method_id' => $plan['id'],
-                'status' => $plan['status'],
+                'status' => 'pending',
                 'started_at' => now(),
                 'expired_at' => now()->addMonth(),
             ]);

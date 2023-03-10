@@ -54,5 +54,5 @@ Route::get('payments', function () {
     return view('payments.form');
 });
 
-Route::get('payments/stripe/success', [StripePaymentController::class, 'success'])->name('payments.stripe.success');
-Route::get('payments/stripe/cancel', [StripePaymentController::class, 'cancel'])->name('payments.stripe.cancel');
+Route::get('payments/{method}/success', [StripePaymentController::class, 'success'])->name('payments.stripe.success');
+Route::get('payments/{method}/cancel', [StripePaymentController::class, 'cancel'])->name('payments.stripe.cancel');
