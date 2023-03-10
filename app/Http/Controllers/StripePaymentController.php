@@ -27,13 +27,17 @@ class StripePaymentController extends Controller
         /**
          * @phpstan-ignore-next-line
          */
-        $user->subscriptions()->attach(Subscription::where('stripe_id', $subscription->plan->id)->first(), [
-            'method' => 'stripe',
-            'method_id' => $subscription->id,
-            'status' => $subscription->status,
-            'started_at' => Carbon::createFromTimestamp($subscription->start_date),
-            'expired_at' => Carbon::createFromTimestamp($subscription->current_period_end),
-        ]);
+        $planId = $subscription->plan->id;
+        $user->subscriptions()->syncWithPivotValues(
+            Subscription::where('stripe_id', $planId)->first(),
+            [
+                'method' => 'stripe',
+                'method_id' => $subscription->id,
+                'status' => $subscription->status,
+                'started_at' => Carbon::createFromTimestamp($subscription->start_date),
+                'expired_at' => Carbon::createFromTimestamp($subscription->current_period_end),
+            ]
+        );
 
         return view('payments.success');
     }

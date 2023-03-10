@@ -76,6 +76,11 @@ class SubscribeController extends Controller
         }
 
         $product = $stripe->prices->retrieve($subscription->stripe_id);
+
+        $user->subscriptions()->syncWithPivotValues($subscription, [
+            'status' => 'pending',
+        ]);
+
         $checkout_session = $stripe->checkout->sessions->create([
             'line_items' => [
                 [
