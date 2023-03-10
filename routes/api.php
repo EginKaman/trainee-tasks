@@ -1,6 +1,11 @@
 <?php
 
-use Illuminate\Http\Request;
+declare(strict_types=1);
+
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\SocialiteController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,7 +20,18 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::prefix('v1')->middleware(['localization'])->group(function () {
-    Route::apiResource('users', \App\Http\Controllers\UserController::class);
-    Route::get('roles', \App\Http\Controllers\RoleController::class);
+    Route::post('login', [LoginController::class, 'login']);
+    Route::post('verify', [LoginController::class, 'verify']);
+
+    Route::post('callback', [SocialiteController::class, 'callback']);
+    Route::post('social', [SocialiteController::class, 'social']);
+
+    Route::middleware(['auth:api'])->group(function () {
+        Route::patch('social/next', [SocialiteController::class, 'next']);
+        Route::post('logout', [LoginController::class, 'logout']);
+    });
+
+    Route::apiResource('users', UserController::class);
+    Route::get('roles', RoleController::class);
 });
 

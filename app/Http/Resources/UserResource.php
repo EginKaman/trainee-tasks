@@ -24,7 +24,7 @@ class UserResource extends JsonResource
             'phone' => $this->phone,
             'photo_big' => $this->when($this->photo_big !== null, url(Storage::url($this->photo_big))),
             'photo_small' => $this->when($this->photo_small !== null, url(Storage::url($this->photo_small))),
-            'role' => $this->whenLoaded('role', $this->role->title),
+            'role' => $this->whenLoaded('role', $this->role?->title),
         ];
     }
 }

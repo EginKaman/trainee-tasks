@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasMany};
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 use Propaganistas\LaravelPhone\Casts\E164PhoneNumberCast;
 
 /**
@@ -20,7 +21,7 @@ use Propaganistas\LaravelPhone\Casts\E164PhoneNumberCast;
  * @property string $photo_small
  * @property string $photo_big
  */
-class User extends Authenticatable
+class User extends Authenticatable implements JWTSubject
 {
     use HasApiTokens;
     use HasFactory;
@@ -50,6 +51,24 @@ class User extends Authenticatable
         'phone' => E164PhoneNumberCast::class . ':UA',
     ];
 
+    /**
+     * Get the identifier that will be stored in the subject claim of the JWT.
+     *
+     * @return mixed
+     */
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    /**
+     * Return a key value array, containing any custom claims to be added to the JWT.
+     */
+    public function getJWTCustomClaims(): array
+    {
+        return [];
+    }
+
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class);
@@ -63,5 +82,15 @@ class User extends Authenticatable
     public function updatedUser(): BelongsTo
     {
         return $this->belongsTo(__CLASS__, 'updated_user_id');
+    }
+
+    public function loginTokens(): HasMany
+    {
+        return $this->hasMany(LoginToken::class);
+    }
+
+    public function providers(): HasMany
+    {
+        return $this->hasMany(UserProvider::class);
     }
 }
