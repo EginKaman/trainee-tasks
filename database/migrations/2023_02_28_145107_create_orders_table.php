@@ -13,6 +13,7 @@ return new class() extends Migration {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->unsignedFloat('amount')->nullable();
+            $table->enum('status', ['created', 'payment_pending', 'not_payed', 'refunded', 'payment_success']);
             $table->timestamps();
         });
     }

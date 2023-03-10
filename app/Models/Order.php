@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasMany};
 
 class Order extends Model
 {
-    protected $fillable = ['amount'];
+    protected $fillable = ['amount', 'status'];
 
     protected $casts = [
         'amount' => 'float',
