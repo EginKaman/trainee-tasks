@@ -187,6 +187,7 @@
                                               fgroup-class="col-md-6" enable-old-support>
                             </x-adminlte-input>
                             <x-adminlte-input-switch type="checkbox" name="save_card" label="Save Card? *"
+                                                     value="1"
                                                      error-key="save_card" enable-old-support>
                             </x-adminlte-input-switch>
                             <x-adminlte-button onclick="event.preventDefault();stripe()" class="btn-flat" id="submit-stripe" type="submit"
@@ -216,7 +217,9 @@
                                 // The items the customer wants to buy
                                 var purchase = {
                                     order_id: document.querySelector("input#order_id").value,
-                                    method: 'stripe'
+                                    save_card: Boolean(document.querySelector("input#save_card").value),
+                                    card_id: document.querySelector("input#card_id").value,
+                                    type_payment: 'stripe'
                                 };
 
                                 // Disable the button until we have Stripe set up on the page
@@ -349,13 +352,6 @@
                                               error-key="order_id"
                                               fgroup-class="col-md-6" enable-old-support>
                             </x-adminlte-input>
-                            <x-adminlte-input type="text" name="card_id" label="Card ID *" placeholder="Card ID"
-                                              error-key="card_id"
-                                              fgroup-class="col-md-6" enable-old-support>
-                            </x-adminlte-input>
-                            <x-adminlte-input-switch type="checkbox" name="save_card" label="Save Card? *"
-                                                     error-key="save_card" enable-old-support>
-                            </x-adminlte-input-switch>
                             <x-adminlte-button onclick="event.preventDefault();paypal()" class="btn-flat" id="submit-paypal" type="submit"
                                                label="Submit" theme="success"></x-adminlte-button>
                         </div>
@@ -373,7 +369,7 @@
                             // The items the customer wants to buy
                             var purchase = {
                                 order_id: document.querySelector("#paypal input#order_id").value,
-                                method: 'paypal'
+                                type_payment: 'paypal'
                             };
                             fetch("/api/v1/payments", {
                                 method: "POST",

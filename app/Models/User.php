@@ -33,7 +33,7 @@ class User extends Authenticatable implements JWTSubject
      *
      * @var array<int, string>
      */
-    protected $fillable = ['name', 'email', 'phone', 'photo_small', 'photo_big'];
+    protected $fillable = ['stripe_id', 'name', 'email', 'phone', 'photo_small', 'photo_big'];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -102,5 +102,10 @@ class User extends Authenticatable implements JWTSubject
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
+    }
+
+    public function cards(): HasMany
+    {
+        return $this->hasMany(Card::class);
     }
 }
