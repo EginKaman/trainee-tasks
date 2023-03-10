@@ -9,10 +9,12 @@ use App\Models\{LoginToken, User};
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
-class NewLogin
+class LoginLink
 {
-    public function create(User $user): void
+    public function create(?string $email = null): void
     {
+        $user = User::query()->where('email', $email)->first();
+
         $token = new LoginToken([
             'token' => Str::random(32),
             'expired_at' => now()->addHours(24),

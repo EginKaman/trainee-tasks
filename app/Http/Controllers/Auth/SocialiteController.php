@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Auth;
 
-use App\Actions\Socialite\Callback;
+use App\Actions\Socialite\{Callback, CheckUser};
 use App\Actions\User\UpdateUser;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\{SocialiteCallbackRequest, SocialiteSocialRequest};
 use App\Http\Requests\SocialNextRequest;
 use App\Http\Resources\UserResource;
+use GuzzleHttp\Exception\ClientException;
 use Illuminate\Http\JsonResponse;
 use Laravel\Socialite\Facades\Socialite;
 
@@ -30,6 +31,32 @@ class SocialiteController extends Controller
 
     public function callback(SocialiteCallbackRequest $request, Callback $callback): UserResource|JsonResponse
     {
-        return $callback->callback($request->validated('driver'));
+        $driver = $request->validated('driver');
+
+        try {
+            /** @phpstan-ignore-next-line */
+            $socialiteUser = Socialite::driver($driver)->stateless()->user();
+        } catch (ClientException $exception) {
+            $message = json_decode((string) $exception->getResponse()->getBody(), false);
+
+            return response()->json([
+                'message' => $message->error->message ?? $message->error_description,
+            ], $exception->getCode());
+        }
+
+        $user = $callback->callback($socialiteUser, $driver);
+
+        $additional = [
+            /** @phpstan-ignore-next-line */
+            'access_token' => auth('api')->login($user),
+            'token_type' => 'bearer',
+            /** @phpstan-ignore-next-line */
+            'expires_in' => auth('api')->factory()->getTTL() * 60,
+        ];
+        if ($user->wasRecentlyCreated) {
+            $additional['message'] = __('You are successfully first-step register, go by two-step register');
+        }
+
+        return (new UserResource($user))->additional($additional);
     }
 }
