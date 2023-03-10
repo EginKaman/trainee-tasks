@@ -63,14 +63,12 @@ class ProductSeeder extends Seeder
             'image' => $image,
         ]);
 
-        $image = 'app/public/products/' . Str::random(40) . '.jpg';
-        Storage::copy(storage_path('app/products/Сap.jpg'), storage_path($image));
         Product::factory(1)->create([
             'title:en' => 'Cap with a cat',
             'title:de' => 'Kappe mit einer Katze',
             'description:en' => 'Hook-and-loop back closure for adjustable fit',
             'description:de' => 'Klettverschluss hinten für verstellbare Passform',
-            'image' => $image,
+            'image' => null,
         ]);
     }
 }
