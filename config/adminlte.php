@@ -318,6 +318,11 @@ return [
             'url' => 'form',
             'icon' => 'far fa-fw fa-file',
         ],
+        [
+            'text' => 'Task 7',
+            'url' => 'form',
+            'icon' => 'far fa-fw fa-file',
+        ],
     ],
 
     /*
