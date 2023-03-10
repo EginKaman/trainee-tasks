@@ -4,29 +4,28 @@ declare(strict_types=1);
 
 namespace App\Actions\Payment;
 
-use App\Http\Requests\StorePaymentRequest;
-use App\Models\{Order, Payment};
-use Illuminate\Http\JsonResponse;
+use App\Models\{Order, Payment, User};
 use Illuminate\Support\Str;
 use Srmklive\PayPal\Facades\PayPal;
+use Stripe\StripeClient;
 
 class NewPayment
 {
-    public function create(StorePaymentRequest $request): JsonResponse
+    public function create(User $user, array $request): array
     {
-        $order = Order::find($request->validated('order_id'));
+        $order = Order::find($request['order_id']);
 
         $payment = new Payment([
-            'method' => $request->validated('method'),
+            'method' => $request['type_payment'],
             'currency' => 'usd',
             'amount' => $order->amount,
         ]);
 
-        $payment->user()->associate(auth('api')->user());
-        $payment->order()->associate($request->validated('order_id'));
+        $payment->user()->associate($user);
+        $payment->order()->associate($request['order_id']);
 
-        if ($request->validated('method') === 'stripe') {
-            $stripe = new \Stripe\StripeClient(config('services.stripe.api_secret'));
+        if ($request['type_payment'] === 'stripe') {
+            $stripe = new StripeClient(config('services.stripe.api_secret'));
 
             $paymentIntent = $stripe->paymentIntents->create([
                 //            'payment_method_types' => ['card'],
@@ -42,12 +41,12 @@ class NewPayment
 
             $payment->save();
 
-            return response()->json([
+            return [
                 'type_payment' => 'stripe',
                 'payment_id' => $paymentIntent->id,
                 'client_secret' => $paymentIntent->client_secret,
                 'payment_method' => $paymentIntent->payment_method,
-            ]);
+            ];
         }
         $provider = Paypal::setProvider();
         $provider->setApiCredentials(config('paypal'));
@@ -80,11 +79,11 @@ class NewPayment
             }
         }
 
-        return response()->json([
+        return [
             'url' => $redirectUrl,
             'type_payment' => $payment->method,
             'payment_id' => $payment->method_id,
             'amount' => $payment->amount,
-        ]);
+        ];
     }
 }

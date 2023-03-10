@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace App\Actions\Order;
 
-use App\Models\{Order, OrderProduct, Product};
+use App\Enum\OrderStatus;
+use App\Models\{Order, OrderProduct, Product, User};
 
 class NewOrder
 {
-    public function create(array $data): Order
+    public function create(User $user, array $data): Order
     {
-        $order = new Order();
-        $order->user()->associate(auth('api')->user());
+        $order = new Order([
+            'status' => OrderStatus::Created,
+        ]);
+        $order->user()->associate($user);
         $order->save();
         foreach ($data['products'] as $product) {
             $productModel = Product::query()->withTranslation()->find($product['id']);

@@ -17,6 +17,6 @@ class OrderController extends Controller
 
     public function store(StoreOrderRequest $request, NewOrder $newOrder): OrderResource
     {
-        return new OrderResource($newOrder->create($request->validated()));
+        return new OrderResource($newOrder->create(auth('api')->user(), $request->validated()));
     }
 }

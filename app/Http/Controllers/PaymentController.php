@@ -15,7 +15,9 @@ class PaymentController extends Controller
 {
     public function store(StorePaymentRequest $request, NewPayment $payment): JsonResponse
     {
-        return $payment->create($request);
+        $response = $payment->create(auth('api')->user(), $request->validated());
+
+        return response()->json($response);
     }
 
     public function refund(Request $request): void
