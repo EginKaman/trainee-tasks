@@ -17,7 +17,7 @@ class NewOrder
         $order->user()->associate($user);
         $order->save();
         foreach ($data['products'] as $product) {
-            $productModel = Product::query()->withTranslation()->find($product['id']);
+            $productModel = Product::query()->find($product['id']);
             $orderProduct = new OrderProduct([
                 'quantity' => $product['quantity'],
                 'image' => $productModel->image,
