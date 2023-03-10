@@ -35,7 +35,7 @@ class Product extends Model
     public function image(): Attribute
     {
         return Attribute::make(get: function ($value, $attributes) {
-            if ($value !== null && Storage::disk('public')->exists($value)) {
+            if ($value !== null && Storage::exists($attributes['image'])) {
                 return $value;
             }
 

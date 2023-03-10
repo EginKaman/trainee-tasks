@@ -13,8 +13,8 @@ class ProductSeeder extends Seeder
 {
     public function run(): void
     {
-        $image = 'app/public/products/' . Str::random(40) . '.jpg';
-        Storage::copy(storage_path('app/products/Simple cup.jpg'), storage_path($image));
+        $image = 'public/products/' . Str::random(40) . '.jpg';
+        Storage::copy('products/Simple cup.jpg', $image);
         Product::factory(1)->create([
             'title:en' => 'White mug with a cat',
             'title:de' => 'Weißer Becher mit einer Katze',
@@ -23,8 +23,8 @@ class ProductSeeder extends Seeder
             'image' => $image,
         ]);
 
-        $image = 'app/public/products/' . Str::random(40) . '.jpg';
-        Storage::copy(storage_path('app/products/T-shirt.jpg'), storage_path($image));
+        $image = 'public/products/' . Str::random(40) . '.jpg';
+        Storage::copy('products/T-shirt.jpg', $image);
         Product::factory(1)->create([
             'title:en' => 'White t-shirt with a cat',
             'title:de' => 'Weißes T-Shirt mit einer Katze',
@@ -33,8 +33,8 @@ class ProductSeeder extends Seeder
             'image' => $image,
         ]);
 
-        $image = 'app/public/products/' . Str::random(40) . '.jpg';
-        Storage::copy(storage_path('app/products/Pen.jpg'), storage_path($image));
+        $image = 'public/products/' . Str::random(40) . '.jpg';
+        Storage::copy('products/Pen.jpg', $image);
         Product::factory(1)->create([
             'title:en' => 'Pen with a cat white',
             'title:de' => 'Stift mit einer Katze weiß',
@@ -43,8 +43,8 @@ class ProductSeeder extends Seeder
             'image' => $image,
         ]);
 
-        $image = 'app/public/products/' . Str::random(40) . '.jpg';
-        Storage::copy(storage_path('app/products/Cup with yellow pattern.jpg'), storage_path($image));
+        $image = 'public/products/' . Str::random(40) . '.jpg';
+        Storage::copy('products/Cup with yellow pattern.jpg', $image);
         Product::factory(1)->create([
             'title:en' => 'Yellow mug with pattern',
             'title:de' => 'Gelber Becher mit Muster',
@@ -53,8 +53,8 @@ class ProductSeeder extends Seeder
             'image' => $image,
         ]);
 
-        $image = 'app/public/products/' . Str::random(40) . '.jpg';
-        Storage::copy(storage_path('app/products/Cup with white pattern.jpg'), storage_path($image));
+        $image = 'public/products/' . Str::random(40) . '.jpg';
+        Storage::copy('products/Cup with white pattern.jpg', $image);
         Product::factory(1)->create([
             'title:en' => 'White mug with pattern',
             'title:de' => 'Weiße Tasse mit Muster',
