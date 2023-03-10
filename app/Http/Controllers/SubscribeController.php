@@ -79,6 +79,7 @@ class SubscribeController extends Controller
 
         $user->subscriptions()->syncWithPivotValues($subscription, [
             'status' => 'pending',
+            'method' => 'stripe',
         ]);
 
         $checkout_session = $stripe->checkout->sessions->create([
