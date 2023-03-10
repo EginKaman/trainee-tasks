@@ -6,7 +6,8 @@ namespace App\Models;
 
 use Astrotomic\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\{Model, SoftDeletes};
+use Illuminate\Database\Eloquent\{Casts\Attribute, Model, SoftDeletes};
+use Illuminate\Support\Facades\Storage;
 
 /**
  * @property int $id
@@ -30,4 +31,15 @@ class Product extends Model
         'quantity' => 'integer',
         'price' => 'float',
     ];
+
+    public function image(): Attribute
+    {
+        return Attribute::make(get: function ($value, $attributes) {
+            if ($value !== null && Storage::exists($attributes['image'])) {
+                return $value;
+            }
+
+            return 'public/no-image.jpeg';
+        });
+    }
 }
