@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Payment;
 
-use App\Models\{Order, Payment, User};
+use App\Models\{Card, Order, Payment, User};
 use Illuminate\Support\Str;
 use Srmklive\PayPal\Facades\PayPal;
 use Stripe\StripeClient;
@@ -26,15 +26,46 @@ class NewPayment
 
         if ($request['type_payment'] === 'stripe') {
             $stripe = new StripeClient(config('services.stripe.api_secret'));
+            if ($user->stripe_id === null) {
+                $customer = $stripe->customers->create([
+                    'email' => $user->email,
+                    'name' => $user->name,
+                    'phone' => $user->phone,
+                ]);
 
-            $paymentIntent = $stripe->paymentIntents->create([
-                //            'payment_method_types' => ['card'],
-                'amount' => $payment->amount * 100,
-                'currency' => 'usd',
-                'automatic_payment_methods' => [
-                    'enabled' => true,
-                ],
-            ]);
+                $user->stripe_id = $customer->id;
+                $user->save();
+            }
+            if (isset($request['card_id'])) {
+                $card = Card::find($request['card_id']);
+                $paymentIntent = $stripe->paymentIntents->create([
+                    'customer' => $user->stripe_id,
+                    'payment_method' => $card->fingerprint,
+                    'amount' => $payment->amount * 100,
+                    'currency' => 'usd',
+                    'automatic_payment_methods' => [
+                        'enabled' => true,
+                    ],
+                ]);
+            } elseif ($request['save_card'] === true) {
+                $paymentIntent = $stripe->paymentIntents->create([
+                    'customer' => $user->stripe_id,
+                    'setup_future_usage' => 'off_session',
+                    'amount' => $payment->amount * 100,
+                    'currency' => 'usd',
+                    'automatic_payment_methods' => [
+                        'enabled' => true,
+                    ],
+                ]);
+            } else {
+                $paymentIntent = $stripe->paymentIntents->create([
+                    'amount' => $payment->amount * 100,
+                    'currency' => 'usd',
+                    'automatic_payment_methods' => [
+                        'enabled' => true,
+                    ],
+                ]);
+            }
 
             $payment->method_id = $paymentIntent->id;
             $payment->client_secret = $paymentIntent->client_secret;

@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Actions\Payment\NewPayment;
+use App\Enum\OrderStatus;
 use App\Http\Requests\StorePaymentRequest;
-use App\Models\{Payment, PaymentHistory, Subscription, SubscriptionUser, User};
+use App\Models\{Card, Payment, PaymentHistory, Subscription, SubscriptionUser, User};
 use Illuminate\Http\{JsonResponse, Request, Response};
 use Illuminate\Support\{Carbon, Str};
 use Srmklive\PayPal\Facades\PayPal;
+use Stripe\Webhook;
 
 class PaymentController extends Controller
 {
@@ -93,7 +95,7 @@ class PaymentController extends Controller
         }
 
         try {
-            $event = \Stripe\Webhook::constructEvent(
+            $event = Webhook::constructEvent(
                 file_get_contents('php://input'),
                 $request->server('HTTP_STRIPE_SIGNATURE'),
                 config
@@ -115,12 +117,18 @@ class PaymentController extends Controller
             /** @phpstan-ignore-next-line */
             $paymentIntent = $event->data->object;
 
-            $payment = Payment::where('method_id', $paymentIntent->id)->where('method', 'stripe')->first();
+            $payment = Payment::with('order')
+                ->where('method_id', $paymentIntent->id)
+                ->where('method', 'stripe')->first();
 
             if ($payment === null) {
                 return response()->noContent();
             }
 
+            if ($paymentIntent->status === 'success') {
+                $payment->order->status = OrderStatus::PaymentSuccess;
+                $payment->order->save();
+            }
             $payment->status = $paymentIntent->status;
             $payment->client_secret = $paymentIntent->client_secret;
 
@@ -138,7 +146,8 @@ class PaymentController extends Controller
             /** @phpstan-ignore-next-line */
             $refund = $event->data->object;
 
-            $payment = Payment::where('method_id', $refund->payment_intent)->where('method', 'stripe')->first();
+            $payment = Payment::where('method_id', $refund->payment_intent)
+                ->where('method', 'stripe')->first();
 
             $payment->status = 'refunded';
             $payment->client_secret = $refund->client_secret;
@@ -148,6 +157,26 @@ class PaymentController extends Controller
             $payment->history()->save(new PaymentHistory([
                 'status' => 'refunded',
             ]));
+
+            return response()->json([
+                'message' => 'success',
+            ]);
+        }
+        if ($event->type === 'payment_method.attached') {
+            /** @phpstan-ignore-next-line */
+            $paymentMethod = $event->data->object;
+
+            $user = User::where('stripe_id', $paymentMethod->customer)->first();
+
+            if ($user) {
+                $card = new Card([
+                    'fingerprint' => $paymentMethod->id,
+                    'type' => $paymentMethod->card->brand,
+                    'last_numbers' => $paymentMethod->card->last4,
+                ]);
+                $card->user()->associate($user);
+                $card->save();
+            }
 
             return response()->json([
                 'message' => 'success',

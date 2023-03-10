@@ -34,7 +34,7 @@ class User extends Authenticatable implements JWTSubject
      *
      * @var array<int, string>
      */
-    protected $fillable = ['name', 'email', 'phone', 'photo_small', 'photo_big', 'stripe_id'];
+    protected $fillable = ['stripe_id', 'name', 'email', 'phone', 'photo_small', 'photo_big'];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -110,5 +110,10 @@ class User extends Authenticatable implements JWTSubject
         return $this->belongsToMany(Subscription::class)->using(SubscriptionUser::class)->withPivot(
             ['method', 'method_id', 'canceled_at', 'started_at', 'expired_at', 'status']
         )->withTimestamps();
+    }
+
+    public function cards(): HasMany
+    {
+        return $this->hasMany(Card::class);
     }
 }
