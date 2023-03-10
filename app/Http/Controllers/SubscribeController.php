@@ -23,9 +23,8 @@ class SubscribeController extends Controller
             $query->where('users.id', $user->id);
         })->exists()) {
             return response()->json([
-                'status' => __('Failure'),
                 'message' => __('You already have the subscription'),
-            ]);
+            ], 409);
         }
 
         if ($request->type_payment === 'paypal') {
@@ -105,9 +104,8 @@ class SubscribeController extends Controller
 
         if (!$subscription) {
             return response()->json([
-                'status' => __('Failure'),
-                'message' => __('Your subscription has already canceled.'),
-            ]);
+                'message' => __("Your didn't subscribe to this subscription"),
+            ], 404);
         }
 
         if ($subscription->pivot->method === 'paypal') {

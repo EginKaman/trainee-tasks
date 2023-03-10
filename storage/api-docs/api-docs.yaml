@@ -936,6 +936,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Unauthorized'
+        409:
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                title: Conflict
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'You already have the subscription'
+        422:
+          description: Unprocessable Content
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableContent'
         503:
           description: Something Went Wrong
           content:
@@ -977,6 +994,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Unauthorized'
+        404:
+          description: Not found
+          content:
+            application/json:
+              schema:
+                title: Not found
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Your didn't subscribe to this subscription
+        422:
+          description: Unprocessable Content
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableContent'
         503:
           description: Something Went Wrong
           content:
@@ -1804,6 +1838,20 @@ components:
               type: array
               items:
                 example: "The phone format is invalid."
+    UnprocessableContent:
+      type: object
+      title: Unprocessable Content
+      properties:
+        message:
+          type: string
+          example: 'The selected subscription id is invalid.'
+        errors:
+          type: object
+          properties:
+            subscription_id:
+              type: array
+              items:
+                example: "The selected subscription id is invalid."
     Conflict:
       type: object
       title: Conflict
