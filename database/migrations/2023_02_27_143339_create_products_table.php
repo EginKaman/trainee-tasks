@@ -14,6 +14,7 @@ return new class() extends Migration {
             $table->string('image')->nullable();
             $table->integer('quantity');
             $table->unsignedFloat('price');
+            $table->softDeletes();
             $table->timestamps();
         });
     }
