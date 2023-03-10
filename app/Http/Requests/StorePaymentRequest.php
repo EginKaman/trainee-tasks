@@ -7,6 +7,12 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
+/**
+ * @property int $order_id
+ * @property string $type_payment
+ * @property ?bool $save_card
+ * @property ?int $card_id
+ */
 class StorePaymentRequest extends FormRequest
 {
     public function rules(): array
@@ -18,7 +24,7 @@ class StorePaymentRequest extends FormRequest
                 'min:1',
                 Rule::exists('orders', 'id')->where('user_id', auth()->id()),
             ],
-            'method' => ['required', 'string', 'in:stripe,paypal'],
+            'type_payment' => ['required', 'string', 'in:stripe,paypal'],
             'save_card' => ['nullable', 'boolean'],
             'card_id' => [
                 'nullable',
