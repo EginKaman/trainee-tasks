@@ -13,7 +13,7 @@ return new class() extends Migration {
             $table->id();
             $table->string('image')->nullable();
             $table->integer('quantity');
-            $table->unsignedFloat('price');
+            $table->unsignedInteger('price');
             $table->softDeletes();
             $table->timestamps();
         });

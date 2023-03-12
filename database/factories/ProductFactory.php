@@ -30,7 +30,7 @@ class ProductFactory extends Factory
                 false
             ),
             'quantity' => $this->faker->randomNumber(3, true),
-            'price' => $this->faker->randomFloat(2, 30, 150),
+            'price' => $this->faker->numberBetween(50, 999),
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ];
