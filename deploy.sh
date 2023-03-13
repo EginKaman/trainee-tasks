@@ -32,6 +32,7 @@ CUSTOM_COMMANDS=(
   "php artisan view:cache"
   "php artisan adminlte:install"
   "php artisan storage:link"
+  "php artisan storage:link"
 )
 AFTER_LINK_COMMANDS=(
   "sudo systemctl restart supervisord"

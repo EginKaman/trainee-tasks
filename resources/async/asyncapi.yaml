@@ -1,0 +1,83 @@
+asyncapi: 2.4.0
+info:
+  title: '[Task 11] Backend_Ivan_T'
+  version: 1.0.0
+  contact:
+    name: Backend_Ivan_T
+    email: ivan.tiutiunnyk@abz.agency
+servers:
+  local:
+    url: 'task.localhost:6001'
+    protocol: ws
+  dev:
+    url: 'test2023-backend-ivan-t.abztrainee.com:6001'
+    protocol: wss
+defaultContentType: application/json
+channels:
+  updates.add:
+    description: Update information about online users
+    publish:
+      summary: Join new user
+      operationId: add
+      message:
+        name: addUser
+        title: 'The user joined test --- 18.02.2023 14:42'
+        contentType: application/json
+        payload:
+          type: object
+          example:
+            id: 62f762860c6d5088492027
+            name: Joe
+          properties:
+            id:
+              type: string
+              minLength: 22
+              maxLength: 22
+              description: Unique user ID
+            name:
+              type: string
+              description: Name of user
+components:
+  messages:
+    addUser:
+      name: addUser
+      title: 'The user joined test --- 18.02.2023 14:42'
+      contentType: application/json
+      payload:
+        type: object
+        example:
+          id: 62f762860c6d5088492027
+          name: Joe
+        properties:
+          id:
+            type: string
+            minLength: 22
+            maxLength: 22
+            description: Unique user ID
+          name:
+            type: string
+            description: Name of user
+  schemas:
+    apsertUserPayload:
+      type: object
+      example:
+        id: 62f762860c6d5088492027
+        name: Joe
+      properties:
+        id:
+          type: string
+          minLength: 22
+          maxLength: 22
+          description: Unique user ID
+        name:
+          type: string
+          description: Name of user
+    name:
+      type: string
+      description: Name of user
+    userId:
+      type: string
+      minLength: 22
+      maxLength: 22
+      description: Unique user ID
+

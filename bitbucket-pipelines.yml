@@ -10,10 +10,12 @@ definitions:
         script:
           - npm install
           - npm run build
+          - npm run ag-build
         artifacts:
           - build/**
           - node_modules/**
           - public/**
+          - resources/async/**
     - step: &composer
         name: Install composer packages
         image: php:8.2
