@@ -554,9 +554,6 @@ paths:
             example: en
       requestBody:
         content:
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/NewOrder'
           application/json:
             schema:
               $ref: '#/components/schemas/NewOrder'
@@ -711,14 +708,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Unauthorized'
-        404:
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotFound'
-              example:
-                message: Not found order
         422:
           description: Bad Request
           content:
@@ -1324,8 +1313,6 @@ components:
       properties:
         order_id:
           $ref: '#/components/schemas/PaymentStatusId'
-        type_payment:
-          $ref: '#/components/schemas/OrderTypePaymentEnum'
     Refund:
       properties:
         message:

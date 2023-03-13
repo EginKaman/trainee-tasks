@@ -6,8 +6,8 @@ namespace App\Http\Controllers;
 
 use App\Actions\Payment\NewPayment;
 use App\Enum\OrderStatus;
-use App\Http\Requests\StorePaymentRequest;
-use App\Models\{Card, Payment, PaymentHistory, Subscription, SubscriptionUser, User};
+use App\Http\Requests\{RefundPaymentRequest, StorePaymentRequest};
+use App\Models\{Card, Order, Payment, PaymentHistory, Subscription, SubscriptionUser, User};
 use Illuminate\Http\{JsonResponse, Request, Response};
 use Illuminate\Support\{Carbon, Str};
 use Srmklive\PayPal\Facades\PayPal;
@@ -22,8 +22,19 @@ class PaymentController extends Controller
         return response()->json($response);
     }
 
-    public function refund(Request $request): void
+    public function refund(RefundPaymentRequest $request): JsonResponse
     {
+        $order = Order::find($request->validated('order_id'));
+        $payment = $order->payments()->latest()->first();
+
+        $order->status = OrderStatus::Refunded;
+        $order->save();
+        $payment->status = 'refunded';
+        $payment->save();
+
+        return response()->json([
+            'message' => __('Refund success'),
+        ]);
     }
 
     public function webhook(Request $request, string $method): JsonResponse|Response

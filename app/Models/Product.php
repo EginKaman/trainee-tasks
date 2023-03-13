@@ -29,7 +29,7 @@ class Product extends Model
 
     protected $casts = [
         'quantity' => 'integer',
-        'price' => 'float',
+        'price' => 'integer',
     ];
 
     public function image(): Attribute
