@@ -12,6 +12,7 @@ server.listen(3000);
 io.use(
     authorize({
         secret: process.env.JWT_SECRET,
+        algorithms: [process.env.JWT_ALGO]
     })
 )
 io.on('connection', function (socket) {
