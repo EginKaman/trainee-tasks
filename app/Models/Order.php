@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasMany, MorphMany};
+use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasMany};
 
 class Order extends Model
 {
@@ -25,8 +25,8 @@ class Order extends Model
         return $this->hasMany(OrderProduct::class);
     }
 
-    public function payments(): MorphMany
+    public function payments(): HasMany
     {
-        return $this->morphMany(Payment::class, 'payable');
+        return $this->hasMany(Payment::class);
     }
 }
