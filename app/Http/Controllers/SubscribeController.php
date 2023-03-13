@@ -102,7 +102,7 @@ class SubscribeController extends Controller
     {
         $user = auth('api')->user();
 
-        $subscription = $user->subscriptions()->wherePivot('status', '!=', 'canceled')->find(
+        $subscription = $user->subscriptions()->wherePivotNotIn('status', ['canceled', 'pending'])->find(
             $request->validated('subscription_id')
         );
 
