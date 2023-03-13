@@ -2,17 +2,19 @@
     "private": true,
     "scripts": {
         "dev": "vite",
-        "build": "vite build"
+        "build": "vite build",
+        "ag": "ag"
     },
     "devDependencies": {
-        "axios": "^1.3.3",
+        "axios": "^1.3.4",
         "laravel-vite-plugin": "^0.7.4",
         "lodash": "^4.17.21",
         "postcss": "^8.4.21",
-        "sass": "^1.58.1",
-        "vite": "^4.1.1"
+        "sass": "^1.59.2",
+        "vite": "^4.1.4"
     },
     "dependencies": {
+        "@asyncapi/generator": "^1.9.17",
         "@popperjs/core": "^2.11.6",
         "bootstrap": "^5.2.3"
     }
