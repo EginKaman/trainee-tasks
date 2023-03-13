@@ -108,7 +108,7 @@ class SubscribeController extends Controller
 
         if (!$subscription) {
             return response()->json([
-                'message' => __("Your didn't subscribe to this subscription"),
+                'message' => __("You didn't subscribe to this subscription"),
             ], 404);
         }
 
