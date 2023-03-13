@@ -554,9 +554,6 @@ paths:
             example: en
       requestBody:
         content:
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/NewOrder'
           application/json:
             schema:
               $ref: '#/components/schemas/NewOrder'
