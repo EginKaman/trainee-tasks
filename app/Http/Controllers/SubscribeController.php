@@ -38,8 +38,8 @@ class SubscribeController extends Controller
                 'plan_id' => $subscription->paypal_id,
                 'quantity' => 1,
                 'application_context' => [
-                    'return_url' => url('paypal/success'),
-                    'cancel_url' => url('paypal/cancel'),
+                    'return_url' => url('payments/paypal/success'),
+                    'cancel_url' => url('payments/paypal/cancel'),
                 ],
             ]);
 
@@ -92,7 +92,7 @@ class SubscribeController extends Controller
             'customer' => $user->stripe_id,
             'mode' => 'subscription',
             'success_url' => url('payments/stripe/success?session_id={CHECKOUT_SESSION_ID}'),
-            'cancel_url' => route('payments.stripe.cancel'),
+            'cancel_url' => url('payments/stripe/cancel'),
         ]);
 
         return response()->json([
