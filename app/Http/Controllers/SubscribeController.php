@@ -144,7 +144,7 @@ class SubscribeController extends Controller
             $user->subscriptions()->syncWithPivotValues($subscription, [
                 'method_id' => $response->id,
                 'status' => $response->status,
-                'canceled_at' => Carbon::createFromTimestamp($response->canceled_at),
+                'canceled_at' => now(),
                 'started_at' => Carbon::createFromTimestamp($response->start_date),
                 'expired_at' => Carbon::createFromTimestamp($response->current_period_end),
             ]);
