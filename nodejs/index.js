@@ -16,10 +16,18 @@ io.use(
     })
 )
 io.on('connection', function (socket) {
-    socket.on('updates.add', function (message) {
-        io.emit('updates.add', message);
+    socket.on('users.add', function (message) {
+        io.emit('users.add', message);
+    });
+    socket.on('users.update', function (message) {
+        io.emit('users.add', message);
+    });
+    socket.on('users.delete', function (message) {
+        io.emit('users.add', message);
     });
     socket.on('disconnect', function () {
-        io.emit('updates.add', 'User has disconnected.');
+        socket.broadcast.emit('users.delete', {
+
+        })
     })
 });
