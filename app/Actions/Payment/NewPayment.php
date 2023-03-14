@@ -43,9 +43,8 @@ class NewPayment
                     'payment_method' => $card->fingerprint,
                     'amount' => $payment->amount * 100,
                     'currency' => 'usd',
-                    'automatic_payment_methods' => [
-                        'enabled' => true,
-                    ],
+                    'off_session' => true,
+                    'confirm' => true,
                 ]);
             } elseif ($request['save_card'] === true) {
                 $paymentIntent = $stripe->paymentIntents->create([
