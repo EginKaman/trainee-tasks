@@ -71,6 +71,12 @@ class NewPayment
 
             $payment->save();
 
+            if (isset($request['card_id'])) {
+                return [
+                    'paymentIntent' => $paymentIntent->id,
+                ];
+            }
+
             return [
                 'type_payment' => 'stripe',
                 'payment_id' => $paymentIntent->id,
