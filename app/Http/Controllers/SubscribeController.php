@@ -139,11 +139,10 @@ class SubscribeController extends Controller
                 ], $exception->getHttpStatus());
             }
 
-            $user->subscriptions()->syncWithPivotValues($subscription, [
-                'method_id' => $response->id,
-                'status' => $response->status,
-                'canceled_at' => now(),
-            ]);
+            $subscription->pivot->status = 'canceled';
+            $subscription->pivot->canceled_at = now();
+
+            $subscription->pivot->save();
         }
 
         return response()->json([

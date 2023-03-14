@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\{BelongsTo, Pivot};
 
 class SubscriptionUser extends Pivot
 {
-    protected $fillable = ['method', 'method_id', 'status', 'expired_at', 'started_at'];
+    protected $fillable = ['method', 'method_id', 'status', 'expired_at', 'started_at', 'canceled_at'];
 
     protected $casts = [
         'canceled_at' => 'datetime',
