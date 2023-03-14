@@ -269,20 +269,23 @@
                                         form.addEventListener("submit", function (event) {
                                             event.preventDefault();
                                             // Complete payment when the submit button is clicked
-                                            payWithCard(stripe, card, data.client_secret);
+                                            payWithCard(stripe, card, data.client_secret, data.paymentMethod);
                                         });
                                     });
 
                                 // Calls stripe.confirmCardPayment
                                 // If the card requires authentication Stripe shows a pop-up modal to
                                 // prompt the user to enter authentication details without leaving your page.
-                                var payWithCard = function (stripe, card, clientSecret) {
+                                var payWithCard = function (stripe, card, clientSecret, paymentMethod) {
                                     loading(true);
+                                    if (!paymentMethod) {
+                                        paymentMethod = {
+                                            card: card
+                                        };
+                                    }
                                     stripe
                                         .confirmCardPayment(clientSecret, {
-                                            payment_method: {
-                                                card: card
-                                            }
+                                            payment_method: paymentMethod
                                         })
                                         .then(function (result) {
                                             if (result.error) {
