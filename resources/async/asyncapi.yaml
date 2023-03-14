@@ -29,6 +29,7 @@ channels:
             id: 2
             name: Joe
             avatar: https://test2023-backend-ivan-t.abztrainee.com/storage/users/dzsfd32NJdpsdvDJcko9dssdc.jpg
+            status: true
           properties:
             id:
               type: integer
@@ -38,11 +39,14 @@ channels:
               description: User avatar
             name:
               type: string
-              description: Name of user
+              description: User name
+            status:
+              type: boolean
+              description: User status
   users.update:
-    description: Update information about online users
+    description: Update information about online user
     publish:
-      summary: Join new user
+      summary: Update user
       operationId: update
       message:
         name: addUser
@@ -54,6 +58,7 @@ channels:
             id: 2
             name: Joe
             avatar: https://test2023-backend-ivan-t.abztrainee.com/storage/users/dzsfd32NJdpsdvDJcko9dssdc.jpg
+            status: true
           properties:
             id:
               type: integer
@@ -63,7 +68,10 @@ channels:
               description: User avatar
             name:
               type: string
-              description: Name of user
+              description: User name
+            status:
+              type: boolean
+              description: User status
   users.delete:
     description: Remove information about online users
     publish:
@@ -78,17 +86,13 @@ channels:
           example:
             id: 2
             name: Joe
-            avatar: https://test2023-backend-ivan-t.abztrainee.com/storage/users/dzsfd32NJdpsdvDJcko9dssdc.jpg
           properties:
             id:
               type: integer
               description: Unique user ID
-            avatar:
-              type: string
-              description: User avatar
             name:
               type: string
-              description: Name of user
+              description: User name
 components:
   messages:
     addUser:
@@ -100,18 +104,23 @@ components:
         example:
           id: 2
           name: Joe
+          avatar: https://test2023-backend-ivan-t.abztrainee.com/storage/users/dzsfd32NJdpsdvDJcko9dssdc.jpg
+          status: true
         properties:
           id:
             type: integer
             description: Unique user ID
           name:
             type: string
-            description: Name of user
+            description: User name
           avatar:
             type: string
             description: User avatar
+          status:
+            type: boolean
+            description: User status
   schemas:
-    apsertUserPayload:
+    userPayload:
       type: object
       example:
         id: 2
@@ -131,8 +140,11 @@ components:
       description: User avatar
     name:
       type: string
-      description: Name of user
+      description: User name
     userId:
       type: integer
       description: Unique user ID
+    status:
+      type: boolean
+      description: User status
 
