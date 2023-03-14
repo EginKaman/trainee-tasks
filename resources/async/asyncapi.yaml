@@ -14,7 +14,7 @@ servers:
     protocol: wss
 defaultContentType: application/json
 channels:
-  updates.add:
+  users.add:
     description: Update information about online users
     publish:
       summary: Join new user
@@ -26,14 +26,66 @@ channels:
         payload:
           type: object
           example:
-            id: 62f762860c6d5088492027
+            id: 2
             name: Joe
+            avatar: https://test2023-backend-ivan-t.abztrainee.com/storage/users/dzsfd32NJdpsdvDJcko9dssdc.jpg
           properties:
             id:
-              type: string
-              minLength: 22
-              maxLength: 22
+              type: integer
               description: Unique user ID
+            avatar:
+              type: string
+              description: User avatar
+            name:
+              type: string
+              description: Name of user
+  users.update:
+    description: Update information about online users
+    publish:
+      summary: Join new user
+      operationId: add
+      message:
+        name: addUser
+        title: 'The user updated'
+        contentType: application/json
+        payload:
+          type: object
+          example:
+            id: 2
+            name: Joe
+            avatar: https://test2023-backend-ivan-t.abztrainee.com/storage/users/dzsfd32NJdpsdvDJcko9dssdc.jpg
+          properties:
+            id:
+              type: integer
+              description: Unique user ID
+            avatar:
+              type: string
+              description: User avatar
+            name:
+              type: string
+              description: Name of user
+  users.delete:
+    description: Remove information about online users
+    publish:
+      summary: Remove user
+      operationId: delete
+      message:
+        name: addUser
+        title: 'The user has left'
+        contentType: application/json
+        payload:
+          type: object
+          example:
+            id: 2
+            name: Joe
+            avatar: https://test2023-backend-ivan-t.abztrainee.com/storage/users/dzsfd32NJdpsdvDJcko9dssdc.jpg
+          properties:
+            id:
+              type: integer
+              description: Unique user ID
+            avatar:
+              type: string
+              description: User avatar
             name:
               type: string
               description: Name of user
@@ -46,38 +98,41 @@ components:
       payload:
         type: object
         example:
-          id: 62f762860c6d5088492027
+          id: 2
           name: Joe
         properties:
           id:
-            type: string
-            minLength: 22
-            maxLength: 22
+            type: integer
             description: Unique user ID
           name:
             type: string
             description: Name of user
+          avatar:
+            type: string
+            description: User avatar
   schemas:
     apsertUserPayload:
       type: object
       example:
-        id: 62f762860c6d5088492027
+        id: 2
         name: Joe
       properties:
         id:
-          type: string
-          minLength: 22
-          maxLength: 22
+          type: integer
           description: Unique user ID
         name:
           type: string
           description: Name of user
+        avatar:
+          type: string
+          description: User avatar
+    avatar:
+      type: string
+      description: User avatar
     name:
       type: string
       description: Name of user
     userId:
-      type: string
-      minLength: 22
-      maxLength: 22
+      type: integer
       description: Unique user ID
 
