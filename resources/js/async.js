@@ -4,7 +4,8 @@ const generator = new Generator('@asyncapi/html-template', path.resolve(__dirnam
     {
         templateParams: {
             singleFile: true
-        }
+        },
+        forceWrite: true
     });
 
 try {
