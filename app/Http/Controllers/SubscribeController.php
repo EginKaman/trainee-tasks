@@ -143,8 +143,6 @@ class SubscribeController extends Controller
                 'method_id' => $response->id,
                 'status' => $response->status,
                 'canceled_at' => now(),
-                'started_at' => Carbon::createFromTimestamp($response->start_date),
-                'expired_at' => Carbon::createFromTimestamp($response->current_period_end),
             ]);
         }
 

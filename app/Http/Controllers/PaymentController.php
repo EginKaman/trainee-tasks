@@ -60,10 +60,8 @@ class PaymentController extends Controller
             }
 
             if (Str::startsWith($request->type, 'BILLING.SUBSCRIPTION.')) {
-                $subscriptionUser = SubscriptionUser::where('method', 'paypal')->where(
-                    'method_id',
-                    $request->resource['id']
-                )->with('user')->first();
+                $subscriptionUser = SubscriptionUser::where('method', 'paypal')
+                    ->where('method_id', $request->resource['id'])->with('user')->first();
 
                 if ($subscriptionUser === null) {
                     return response()->noContent();
