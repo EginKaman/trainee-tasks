@@ -190,14 +190,15 @@
                                                      value="1"
                                                      error-key="save_card" enable-old-support>
                             </x-adminlte-input-switch>
-                            <x-adminlte-button onclick="event.preventDefault();stripe()" class="btn-flat" id="submit-stripe" type="submit"
+                            <x-adminlte-button onclick="event.preventDefault();stripe()" class="btn-flat"
+                                               id="submit-stripe" type="submit"
                                                label="Submit" theme="success"></x-adminlte-button>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-6" id="card-form" style="display: none">
-                            <div id="card-element"><!--Stripe.js injects the Card Element--></div>
-                            <button id="submit">
+                            <div id="card-element" style="display: none"><!--Stripe.js injects the Card Element--></div>
+                            <button id="submit" style="display: none">
                                 <div class="spinner hidden" id="spinner"></div>
                                 <span id="button-text">Pay now</span>
                             </button>
@@ -237,40 +238,53 @@
                                         return result.json();
                                     })
                                     .then(function (data) {
-                                        var elements = stripe.elements();
-                                        var style = {
-                                            base: {
-                                                color: "#32325d",
-                                                fontFamily: 'Arial, sans-serif',
-                                                fontSmoothing: "antialiased",
-                                                fontSize: "16px",
-                                                "::placeholder": {
-                                                    color: "#32325d"
+
+                                        if (data.message) {
+                                            alert(data.message);
+                                            return;
+                                        }
+
+                                        if (data.payment_method) {
+                                            orderComplete(data.payment_id)
+                                        } else {
+                                            document.querySelector("#submit").style.display = '';
+                                            document.querySelector("#card-element").style.display = '';
+                                            var elements = stripe.elements();
+                                            var style = {
+                                                base: {
+                                                    color: "#32325d",
+                                                    fontFamily: 'Arial, sans-serif',
+                                                    fontSmoothing: "antialiased",
+                                                    fontSize: "16px",
+                                                    "::placeholder": {
+                                                        color: "#32325d"
+                                                    }
+                                                },
+                                                invalid: {
+                                                    fontFamily: 'Arial, sans-serif',
+                                                    color: "#fa755a",
+                                                    iconColor: "#fa755a"
                                                 }
-                                            },
-                                            invalid: {
-                                                fontFamily: 'Arial, sans-serif',
-                                                color: "#fa755a",
-                                                iconColor: "#fa755a"
-                                            }
-                                        };
+                                            };
 
-                                        var card = elements.create("card", {style: style});
-                                        // Stripe injects an iframe into the DOM
-                                        card.mount("#card-element");
+                                            var card = elements.create("card", {style: style});
+                                            // Stripe injects an iframe into the DOM
+                                            card.mount("#card-element");
 
-                                        card.on("change", function (event) {
-                                            // Disable the Pay button if there are no card details in the Element
-                                            document.querySelector("button").disabled = event.empty;
-                                            document.querySelector("#card-error").textContent = event.error ? event.error.message : "";
-                                        });
+                                            card.on("change", function (event) {
+                                                // Disable the Pay button if there are no card details in the Element
+                                                document.querySelector("button").disabled = event.empty;
+                                                document.querySelector("#card-error").textContent = event.error ? event.error.message : "";
+                                            });
 
-                                        var form = document.getElementById("payment-form");
-                                        form.addEventListener("submit", function (event) {
-                                            event.preventDefault();
-                                            // Complete payment when the submit button is clicked
-                                            payWithCard(stripe, card, data.client_secret, data.paymentMethod);
-                                        });
+                                            var form = document.getElementById("payment-form");
+                                            form.addEventListener("submit", function (event) {
+                                                event.preventDefault();
+                                                console.log(data);
+                                                // Complete payment when the submit button is clicked
+                                                payWithCard(stripe, card, data.client_secret, data.payment_method);
+                                            });
+                                        }
                                     });
 
                                 // Calls stripe.confirmCardPayment
@@ -278,6 +292,7 @@
                                 // prompt the user to enter authentication details without leaving your page.
                                 var payWithCard = function (stripe, card, clientSecret, paymentMethod) {
                                     loading(true);
+                                    console.log(paymentMethod)
                                     if (!paymentMethod) {
                                         paymentMethod = {
                                             card: card
@@ -355,13 +370,15 @@
                                               error-key="order_id"
                                               fgroup-class="col-md-6" enable-old-support>
                             </x-adminlte-input>
-                            <x-adminlte-button onclick="event.preventDefault();paypal()" class="btn-flat" id="submit-paypal" type="submit"
+                            <x-adminlte-button onclick="event.preventDefault();paypal()" class="btn-flat"
+                                               id="submit-paypal" type="submit"
                                                label="Submit" theme="success"></x-adminlte-button>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-6">
-                            <a href="#" target="_blank" class="btn btn-primary btn-flat" style="display: none;" id="paypal-link">
+                            <a href="#" target="_blank" class="btn btn-primary btn-flat" style="display: none;"
+                               id="paypal-link">
                                 Enter the data
                             </a>
                         </div>
@@ -387,6 +404,10 @@
                                     return result.json();
                                 })
                                 .then(function (data) {
+                                    if (data.message) {
+                                        alert(data.message);
+                                        return;
+                                    }
                                     document.querySelector('#paypal-link').href = data.url;
                                     document.querySelector('#paypal-link').style.display = '';
                                     document.querySelector('#paypal-link').text = 'Pay ' + data.amount + '$';
