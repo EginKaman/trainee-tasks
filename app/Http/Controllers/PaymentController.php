@@ -66,7 +66,7 @@ class PaymentController extends Controller
             $provider->setRequestHeader('Authorization', 'Bearer ' . $token['access_token']);
             $provider->setRequestHeader('PayPal-Request-Id', Str::uuid()->toString());
 
-            $verify = $provider->verifyWebHook([
+            $provider->verifyWebHook([
                 'auth_algo' => $request->header('PAYPAL-AUTH-ALGO'),
                 'cert_url' => $request->header('PAYPAL-CERT-URL'),
                 'transmission_id' => $request->header('PAYPAL-TRANSMISSION-ID'),
@@ -75,30 +75,29 @@ class PaymentController extends Controller
                 'webhook_event' => $request->all(),
                 'webhook_id' => config('paypal.' . config('paypal.mode') . '.webhook_id'),
             ]);
-            if ($verify['verification_status'] === 'FAILURE') {
-                return response()->json($verify, 400);
-            }
 
-            if (Str::startsWith($request->type, 'BILLING.SUBSCRIPTION.')) {
-                $subscriptionUser = SubscriptionUser::where('method', 'paypal')->where(
-                    'method_id',
-                    $request->resource['id']
-                )->with('user')->first();
+            if (Str::startsWith($request->event_type, 'BILLING.SUBSCRIPTION.')) {
+                if ($request->resource['status'] === 'ACTIVE') {
+                    $subscriptionUser = SubscriptionUser::where('method', 'paypal')
+                        ->where('method_id', $request->resource['id'])->with('user')->first();
 
-                if ($subscriptionUser === null) {
-                    return response()->noContent();
+                    if ($subscriptionUser === null) {
+                        return response()->json([
+                            'user' => $subscriptionUser,
+                        ]);
+                    }
+
+                    $user = $subscriptionUser->user;
+                    $subscription = $subscriptionUser->subscription;
+
+                    $startTime = Carbon::createFromFormat('Y-m-d\TH:i:s\Z', $request->resource['start_time']);
+                    $user->subscriptions()->syncWithPivotValues($subscription, [
+                        'method_id' => $request->resource['id'],
+                        'status' => Str::lower($request->resource['status']),
+                        'started_at' => $startTime,
+                        'expired_at' => $startTime->addMonth(),
+                    ]);
                 }
-
-                $user = $subscriptionUser->user;
-                $subscription = $subscriptionUser->subscription;
-
-                $startTime = Carbon::createFromFormat('Y-m-d\T\H:i:s\Z', $request->resource['start_time']);
-                $user->subscriptions()->syncWithPivotValues($subscription, [
-                    'method_id' => $request->resource['id'],
-                    'status' => $request->resource['status'],
-                    'started_at' => $startTime,
-                    'expired_at' => $startTime->addMonth(),
-                ]);
 
                 return response()->noContent();
             }
@@ -225,6 +224,10 @@ class PaymentController extends Controller
                 'status' => $data->status,
                 'started_at' => Carbon::createFromTimestamp($data->start_date),
                 'expired_at' => Carbon::createFromTimestamp($data->current_period_end),
+            ]);
+
+            return response()->json([
+                'message' => 'success',
             ]);
         }
 

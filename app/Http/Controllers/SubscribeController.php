@@ -139,13 +139,10 @@ class SubscribeController extends Controller
                 ], $exception->getHttpStatus());
             }
 
-            $user->subscriptions()->syncWithPivotValues($subscription, [
-                'method_id' => $response->id,
-                'status' => $response->status,
-                'canceled_at' => now(),
-                'started_at' => Carbon::createFromTimestamp($response->start_date),
-                'expired_at' => Carbon::createFromTimestamp($response->current_period_end),
-            ]);
+            $subscription->pivot->status = 'canceled';
+            $subscription->pivot->canceled_at = now();
+
+            $subscription->pivot->save();
         }
 
         return response()->json([
