@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\DestroyCardRequest;
 use App\Http\Resources\CardCollection;
 use App\Models\Card;
 use Illuminate\Http\Response;
@@ -15,8 +16,9 @@ class CardController extends Controller
         return new CardCollection(auth('api')->user()->cards()->get());
     }
 
-    public function destroy(Card $card): Response
+    public function destroy(DestroyCardRequest $request, int $card): Response
     {
+        $card = Card::where('user_id', auth('api')->id())->findOrFail($card);
         if ($card->delete()) {
             return response(__('Deleted success'), 204);
         }
