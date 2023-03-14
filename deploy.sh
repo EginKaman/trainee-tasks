@@ -5,7 +5,7 @@ set -e
 ##################################################################################################
 # Variables
 ##################################################################################################
-MAX_RELEASES=3
+MAX_RELEASES=2
 DEPLOY_PATH="/var/www/$DOMAIN_NAME"
 RELEASES_PATH="$DEPLOY_PATH/releases"
 RELEASE_PATH="$DEPLOY_PATH/release"
