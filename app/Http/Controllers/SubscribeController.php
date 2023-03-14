@@ -19,9 +19,9 @@ class SubscribeController extends Controller
         $user = auth('api')->user();
         $subscription = Subscription::find($request->validated('subscription_id'));
 
-        if ($subscription->whereHas('users', function ($query) use ($user): void {
-            $query->where('users.id', $user->id);
-        })->exists()) {
+        if ($subscription->users()
+            ->wherePivot('user_id', $user->id)
+            ->wherePivot('status', '!=', 'canceled')->exists()) {
             return response()->json([
                 'message' => __('You already have the subscription'),
             ], 409);
@@ -50,12 +50,10 @@ class SubscribeController extends Controller
                 }
             }
 
-            $user->subscriptions()->attach($subscription, [
+            $user->subscriptions()->syncWithPivotValues($subscription, [
                 'method' => $request->type_payment,
                 'method_id' => $plan['id'],
                 'status' => 'pending',
-                'started_at' => now(),
-                'expired_at' => now()->addMonth(),
             ]);
 
             return response()->json([
@@ -104,13 +102,13 @@ class SubscribeController extends Controller
     {
         $user = auth('api')->user();
 
-        $subscription = $user->subscriptions()->wherePivot('status', '!=', 'canceled')->find(
+        $subscription = $user->subscriptions()->wherePivotNotIn('status', ['canceled', 'pending'])->find(
             $request->validated('subscription_id')
         );
 
         if (!$subscription) {
             return response()->json([
-                'message' => __("Your didn't subscribe to this subscription"),
+                'message' => __("You didn't subscribe to this subscription"),
             ], 404);
         }
 
@@ -144,7 +142,7 @@ class SubscribeController extends Controller
             $user->subscriptions()->syncWithPivotValues($subscription, [
                 'method_id' => $response->id,
                 'status' => $response->status,
-                'canceled_at' => Carbon::createFromTimestamp($response->canceled_at),
+                'canceled_at' => now(),
                 'started_at' => Carbon::createFromTimestamp($response->start_date),
                 'expired_at' => Carbon::createFromTimestamp($response->current_period_end),
             ]);
