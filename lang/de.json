@@ -39,5 +39,9 @@
     "Success": "Erfolg",
     "You successfully logged out": "Sie haben sich erfolgreich abgemeldet",
     "Unauthenticated.": "Nicht authentifiziert",
-    "You are successfully first-step register, go by two-step register": "Sie sind erfolgreich im ersten Schritt registriert, gehen Sie durch zweistufige Registrierung"
+    "You are successfully first-step register, go by two-step register": "Sie sind erfolgreich im ersten Schritt registriert, gehen Sie durch zweistufige Registrierung",
+    "Card record not found.": "Kartendatensatz nicht gefunden.",
+    "Order has already refunded": "Bestellung wurde bereits erstattet",
+    "Order doesn't have payment": "Bestellung hat keine Zahlung",
+    "Refund success": "Erfolg erstatten"
 }

@@ -11,7 +11,7 @@ use App\Models\{Card, Order, Payment, PaymentHistory, User};
 use Illuminate\Http\{JsonResponse, Request, Response};
 use Illuminate\Support\{Str};
 use Srmklive\PayPal\Facades\PayPal;
-use Stripe\Webhook;
+use Stripe\{StripeClient, Webhook};
 
 class PaymentController extends Controller
 {
@@ -25,10 +25,30 @@ class PaymentController extends Controller
     public function refund(RefundPaymentRequest $request): JsonResponse
     {
         $order = Order::find($request->validated('order_id'));
+        if ($order->status === 'refunded') {
+            return response()->json([
+                'message' => __('Order has already refunded'),
+            ], 409);
+        }
+        if ($order->payments()->count() === 0) {
+            return response()->json([
+                'message' => __("Order doesn't have payment"),
+            ], 404);
+        }
+
         $payment = $order->payments()->latest()->first();
 
         $order->status = OrderStatus::Refunded;
         $order->save();
+
+        if ($payment->method === 'stripe') {
+            $stripe = new StripeClient(config('services.stripe.api_secret'));
+            $paymentIntent = $stripe->paymentIntents->retrieve($payment->method_id);
+            $stripe->refunds->create([
+                'charge' => $paymentIntent->latest_charge,
+            ]);
+        }
+
         $payment->status = 'refunded';
         $payment->save();
 
