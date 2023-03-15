@@ -7,17 +7,12 @@ import Redis from 'ioredis';
 
 dotenv.config({path: path.resolve(process.cwd(), '.env')});
 
-var redis = new Redis(process.env.REDIS_HOST, process.env.REDIS_PORT);
+var redis = new Redis(process.env.REDIS_HOST, process.env.REDIS_PORT, {
+    db: process.env.REDIS_DB || 0
+});
+var redisPublish = new Redis(process.env.REDIS_HOST, process.env.REDIS_PORT);
 var server = createServer(app)
 var io = new Server(server);
-
-redis.subscribe('test-channel', function (err, count) {
-});
-redis.on('message', function (channel, message) {
-    console.log('Message Recieved: ' + message);
-    message = JSON.parse(message);
-    io.emit(channel + ':' + message.event, message.data);
-});
 
 // io.use(
 //     authorize({
@@ -25,13 +20,42 @@ redis.on('message', function (channel, message) {
 //         algorithms: [process.env.JWT_ALGO]
 //     })
 // )
+
+redis.subscribe('laravel_database_users.add', function (err, count) {
+    if (err) {
+        // Just like other commands, subscribe() can fail for some reasons,
+        // ex network issues.
+        console.error("Failed to subscribe: %s", err.message);
+    } else {
+        // `count` represents the number of channels this client are currently subscribed to.
+        console.log(
+            `Subscribed successfully! This client is currently subscribed to ${count} channels.`
+        );
+    }
+});
+// redis.on("message", (channel, message) => {
+//     console.log(`Received ${message} from ${channel}`);
+// });
+redis.on("message", (channel, message) => {
+    console.log(`Received ${message} from ${channel}`);
+    let data = JSON.parse(message);
+    if (data.event === 'App\\Events\\ConnectedEvent') {
+        io.emit('users.add', message);
+    }
+});
+
 io.on('connection', async function (socket) {
+    let message = {
+        message: 'New user connected',
+        socket: socket.id
+    }
+    redisPublish.publish('laravel_database_connected', JSON.stringify(message));
     io.emit('message', {
         'message': 'You are connected'
     })
     socket.on('users.add', function (message) {
         console.log(message);
-        io.to().emit('users.add', message);
+        io.emit('users.add', message);
     });
     socket.on('users.update', function (message) {
         console.log(message);
