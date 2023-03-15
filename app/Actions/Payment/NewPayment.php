@@ -4,13 +4,18 @@ declare(strict_types=1);
 
 namespace App\Actions\Payment;
 
+use App\Exceptions\UnknownPaymentMethodException;
 use App\Models\{Card, Order, Payment, User};
-use Illuminate\Support\Str;
-use Srmklive\PayPal\Facades\PayPal;
-use Stripe\StripeClient;
+use App\Services\Payment\Objects\NewPaymentObject;
+use App\Services\Payment\Payment as PaymentClient;
+use Throwable;
 
 class NewPayment
 {
+    /**
+     * @throws Throwable
+     * @throws UnknownPaymentMethodException
+     */
     public function create(User $user, array $request): array
     {
         $order = Order::find($request['order_id']);
@@ -24,96 +29,41 @@ class NewPayment
         $payment->user()->associate($user);
         $payment->order()->associate($request['order_id']);
 
-        if ($request['type_payment'] === 'stripe') {
-            $stripe = new StripeClient(config('services.stripe.api_secret'));
-            if ($user->stripe_id === null) {
-                $customer = $stripe->customers->create([
-                    'email' => $user->email,
-                    'name' => $user->name,
-                    'phone' => $user->phone,
-                ]);
+        $paymentClient = new PaymentClient($payment->method);
 
-                $user->stripe_id = $customer->id;
-                $user->save();
-            }
-            if (isset($request['card_id'])) {
-                $card = Card::find($request['card_id']);
-                $paymentIntent = $stripe->paymentIntents->create([
-                    'customer' => $user->stripe_id,
-                    'payment_method' => $card->fingerprint,
-                    'amount' => $payment->amount * 100,
-                    'currency' => 'usd',
-                    'off_session' => true,
-                    'confirm' => true,
-                ]);
-            } elseif ($request['save_card'] === true) {
-                $paymentIntent = $stripe->paymentIntents->create([
-                    'customer' => $user->stripe_id,
-                    'setup_future_usage' => 'off_session',
-                    'amount' => $payment->amount * 100,
-                    'currency' => 'usd',
-                    'automatic_payment_methods' => [
-                        'enabled' => true,
-                    ],
-                ]);
-            } else {
-                $paymentIntent = $stripe->paymentIntents->create([
-                    'amount' => $payment->amount * 100,
-                    'currency' => 'usd',
-                    'automatic_payment_methods' => [
-                        'enabled' => true,
-                    ],
-                ]);
-            }
-
-            $payment->method_id = $paymentIntent->id;
-            $payment->client_secret = $paymentIntent->client_secret;
-
-            $payment->save();
-
-            return [
-                'type_payment' => 'stripe',
-                'payment_id' => $paymentIntent->id,
-                'client_secret' => $paymentIntent->client_secret,
-                'payment_method' => $paymentIntent->payment_method,
-            ];
+        if (isset($request['card_id'])) {
+            $card = Card::find($request['card_id']);
         }
-        $provider = Paypal::setProvider();
-        $provider->setApiCredentials(config('paypal'));
-        $token = $provider->getAccessToken();
-        $provider->setRequestHeader('Authorization', 'Bearer ' . $token['access_token']);
-        $provider->setRequestHeader('PayPal-Request-Id', Str::uuid()->toString());
-        $order = $provider->createOrder([
-            'intent' => 'CAPTURE',
-            'purchase_units' => [
-                [
-                    'amount' => [
-                        'currency_code' => 'USD',
-                        'value' => $payment->amount,
-                    ],
-                ],
-            ],
-            'application_context' => [
-                'return_url' => url('api/v1/payments/paypal'),
-                'cancel_url' => url('paypal/cancel'),
-            ],
-        ]);
-        $payment->method_id = $order['id'];
-        $payment->status = $order['status'];
+
+        $newPaymentObject = new NewPaymentObject(
+            amount: $payment->amount,
+            user: $user,
+            saveCard: $request['save_card'],
+            card: $card ?? null
+        );
+
+        $createdPaymentObject = $paymentClient->payment($newPaymentObject);
+
+        $response = [
+            'type_payment' => $createdPaymentObject->typePayment,
+            'payment_id' => $createdPaymentObject->paymentId,
+            'amount' => $createdPaymentObject->amount,
+        ];
+
+        if ($createdPaymentObject->paymentUrl !== null) {
+            $response['url'] = $createdPaymentObject->paymentUrl;
+        }
+
+        $payment->method_id = $createdPaymentObject->paymentId;
+
+        if ($createdPaymentObject->clientSecret !== null) {
+            $payment->client_secret = $createdPaymentObject->clientSecret;
+            $response['client_secret'] = $createdPaymentObject->clientSecret;
+        }
+
+        $payment->status = $createdPaymentObject->status;
         $payment->save();
 
-        $redirectUrl = '';
-        foreach ($order['links'] as $link) {
-            if ($link['rel'] === 'approve') {
-                $redirectUrl = $link['href'];
-            }
-        }
-
-        return [
-            'url' => $redirectUrl,
-            'type_payment' => $payment->method,
-            'payment_id' => $payment->method_id,
-            'amount' => $payment->amount,
-        ];
+        return $response;
     }
 }
