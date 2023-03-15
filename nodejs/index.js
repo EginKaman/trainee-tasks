@@ -33,26 +33,29 @@ redis.subscribe('laravel_database_users.add', function (err, count) {
         );
     }
 });
-// redis.on("message", (channel, message) => {
-//     console.log(`Received ${message} from ${channel}`);
-// });
 redis.on("message", (channel, message) => {
     console.log(`Received ${message} from ${channel}`);
     let data = JSON.parse(message);
     if (data.event === 'App\\Events\\ConnectedEvent') {
-        io.emit('users.add', message);
+        io.except(data.socket).emit('users.add', {
+            user: data.data.user
+        });
+        io.to(data.socket).emit('users.add', message)
+    }
+    if (data.event === 'App\\Events\\UserUpdateEvent') {
+        io.except(data.socket).emit('users.update', {
+            user: data.data.user
+        });
+        io.to(data.socket).emit('users.add', message)
     }
 });
 
 io.on('connection', async function (socket) {
     let message = {
-        message: 'New user connected',
         socket: socket.id
     }
     redisPublish.publish('laravel_database_connected', JSON.stringify(message));
-    io.emit('message', {
-        'message': 'You are connected'
-    })
+
     socket.on('users.add', function (message) {
         console.log(message);
         io.emit('users.add', message);
@@ -65,8 +68,13 @@ io.on('connection', async function (socket) {
         io.emit('users.add', message);
     });
     socket.on('disconnect', () => {
-        console.log('disconnected')
+        message = {
+            socket: socket.id
+        };
+        redisPublish.publish('laravel_database_disconnected', JSON.stringify(message));
+        io.emit('users.delete', message);
     });
+
 });
 
 server.listen(process.env.WEBSOCKET_PORT, function () {
