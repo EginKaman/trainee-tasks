@@ -66,7 +66,7 @@ class PaymentController extends Controller
             $provider->setRequestHeader('Authorization', 'Bearer ' . $token['access_token']);
             $provider->setRequestHeader('PayPal-Request-Id', Str::uuid()->toString());
 
-            $provider->verifyWebHook([
+            $verify = $provider->verifyWebHook([
                 'auth_algo' => $request->header('PAYPAL-AUTH-ALGO'),
                 'cert_url' => $request->header('PAYPAL-CERT-URL'),
                 'transmission_id' => $request->header('PAYPAL-TRANSMISSION-ID'),
@@ -75,6 +75,10 @@ class PaymentController extends Controller
                 'webhook_event' => $request->all(),
                 'webhook_id' => config('paypal.' . config('paypal.mode') . '.webhook_id'),
             ]);
+
+            if ($verify['verification_status'] === 'FAILURE') {
+                return response()->json($verify, 400);
+            }
 
             if (!isset($request->resource['supplementary_data'])) {
                 return response()->noContent();
