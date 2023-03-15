@@ -39,6 +39,7 @@ class Kernel extends ConsoleKernel
             });
         $schedule->command('backup:run')->daily()
             ->timezone('Europe/Kyiv');
+        $schedule->command('telescope:prune --hours=24')->daily();
     }
 
     /**

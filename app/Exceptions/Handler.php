@@ -46,7 +46,12 @@ class Handler extends ExceptionHandler
             }
             if ($request->is('api/v1/users/*')) {
                 return response()->json([
-                    'message' => __('CreateUser record not found.'),
+                    'message' => __('User record not found.'),
+                ], 404);
+            }
+            if ($request->is('api/v1/cards/*')) {
+                return response()->json([
+                    'message' => __('Card record not found.'),
                 ], 404);
             }
         });
