@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Payment;
 
 use App\Exceptions\UnknownPaymentMethodException;
-use App\Services\Payment\Objects\{CreatedPaymentObject, NewPaymentObject};
+use App\Services\Payment\Objects\{CreatedPaymentObject, NewPaymentObject, Refund};
 use App\Services\Payment\Paypal\Client as PaypalClient;
 use App\Services\Payment\Stripe\Client as StripeClient;
 
@@ -28,8 +28,9 @@ class Payment
         return $this->client->payment($paymentObject);
     }
 
-    public function refund(): void
+    public function refund(Refund $refund): void
     {
+        $this->client->refund($refund);
     }
 
     /**

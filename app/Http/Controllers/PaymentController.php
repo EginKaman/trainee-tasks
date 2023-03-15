@@ -6,18 +6,31 @@ namespace App\Http\Controllers;
 
 use App\Actions\Payment\NewPayment;
 use App\Enum\OrderStatus;
+use App\Exceptions\UnknownPaymentMethodException;
 use App\Http\Requests\{RefundPaymentRequest, StorePaymentRequest};
 use App\Models\{Card, Order, Payment, PaymentHistory, User};
+use App\Services\Payment\Objects\Refund;
+use App\Services\Payment\Payment as PaymentClient;
 use Illuminate\Http\{JsonResponse, Request, Response};
 use Illuminate\Support\{Str};
 use Srmklive\PayPal\Facades\PayPal;
-use Stripe\{StripeClient, Webhook};
+use Stripe\{Webhook};
 
 class PaymentController extends Controller
 {
     public function store(StorePaymentRequest $request, NewPayment $payment): JsonResponse
     {
-        $response = $payment->create(auth('api')->user(), $request->validated());
+        try {
+            $response = $payment->create(auth('api')->user(), $request->validated());
+        } catch (UnknownPaymentMethodException $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 500);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 500);
+        }
 
         return response()->json($response);
     }
@@ -25,29 +38,33 @@ class PaymentController extends Controller
     public function refund(RefundPaymentRequest $request): JsonResponse
     {
         $order = Order::find($request->validated('order_id'));
+
         if ($order->status === 'refunded') {
             return response()->json([
                 'message' => __('Order has already refunded'),
             ], 409);
         }
-        if ($order->payments()->count() === 0) {
+
+        if ($order->payments()->where('status', '!=', OrderStatus::Refunded)->count() === 0) {
             return response()->json([
                 'message' => __("Order doesn't have payment"),
             ], 404);
         }
 
-        $payment = $order->payments()->latest()->first();
+        $payment = $order->payments()->where('status', '!=', OrderStatus::Refunded)->latest()->first();
+
+        try {
+            $paymentClient = new PaymentClient($payment->method);
+        } catch (UnknownPaymentMethodException $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 500);
+        }
 
         $order->status = OrderStatus::Refunded;
         $order->save();
 
-        if ($payment->method === 'stripe') {
-            $stripe = new StripeClient(config('services.stripe.api_secret'));
-            $paymentIntent = $stripe->paymentIntents->retrieve($payment->method_id);
-            $stripe->refunds->create([
-                'charge' => $paymentIntent->latest_charge,
-            ]);
-        }
+        $paymentClient->refund(new Refund($payment->method_id, $payment->amount));
 
         $payment->status = 'refunded';
         $payment->save();

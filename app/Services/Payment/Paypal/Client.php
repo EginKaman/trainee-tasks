@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Payment\Paypal;
 
-use App\Services\Payment\Objects\{CreatedPaymentObject, NewPaymentObject};
+use App\Services\Payment\Objects\{CreatedPaymentObject, NewPaymentObject, Refund};
 use App\Services\Payment\PaymentClient;
 use Illuminate\Support\Str;
 use Srmklive\PayPal\Facades\PayPal;
@@ -56,7 +56,8 @@ class Client implements PaymentClient
         return new CreatedPaymentObject('paypal', $order['id'], $order['status'], $redirectUrl, $paymentObject->amount);
     }
 
-    public function refund(): void
+    public function refund(Refund $refund): void
     {
+        $this->client->refundCapturedPayment($refund->paymentId, '', $refund->amount, 'Refunded by client.');
     }
 }

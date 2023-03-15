@@ -8,16 +8,11 @@ use App\Models\{Card, User};
 
 class NewPaymentObject
 {
-    public int $amount;
-    public ?User $user;
-    public bool $saveCard;
-    public ?Card $card;
-
-    public function __construct(int $amount, ?User $user = null, bool $saveCard = false, ?Card $card = null)
-    {
-        $this->amount = $amount;
-        $this->user = $user;
-        $this->saveCard = $saveCard;
-        $this->card = $card;
+    public function __construct(
+        public int $amount,
+        public ?User $user = null,
+        public bool $saveCard = false,
+        public ?Card $card = null
+    ) {
     }
 }
