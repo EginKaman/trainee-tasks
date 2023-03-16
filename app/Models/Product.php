@@ -7,6 +7,7 @@ namespace App\Models;
 use Astrotomic\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\{Casts\Attribute, Model, SoftDeletes};
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -16,6 +17,8 @@ use Illuminate\Support\Facades\Storage;
  * @property string $image
  * @property int $quantity
  * @property float $price
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
  */
 class Product extends Model
 {

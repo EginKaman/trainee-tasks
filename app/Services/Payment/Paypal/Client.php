@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services\Payment\Paypal;
 
-use App\Services\Payment\Objects\{CreatedPaymentObject, NewPaymentObject};
+use App\DataTransferObjects\{CreatedPaymentObject, Refund};
+use App\DataTransferObjects\{NewPaymentObject};
 use App\Services\Payment\PaymentClient;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Srmklive\PayPal\Facades\PayPal;
 
@@ -22,10 +24,6 @@ class Client implements PaymentClient
         $provider->setRequestHeader('PayPal-Request-Id', Str::uuid()->toString());
 
         $this->client = $provider;
-    }
-
-    public function client(): void
-    {
     }
 
     public function payment(NewPaymentObject $paymentObject): CreatedPaymentObject
@@ -56,7 +54,21 @@ class Client implements PaymentClient
         return new CreatedPaymentObject('paypal', $order['id'], $order['status'], $redirectUrl, $paymentObject->amount);
     }
 
-    public function refund(): void
+    public function refund(Refund $refund): void
     {
+        $this->client->refundCapturedPayment($refund->paymentId, '', $refund->amount, 'Refunded by client.');
+    }
+
+    public function validateSignature(Request $request): void
+    {
+        $this->client->verifyWebHook([
+            'auth_algo' => $request->header('PAYPAL-AUTH-ALGO'),
+            'cert_url' => $request->header('PAYPAL-CERT-URL'),
+            'transmission_id' => $request->header('PAYPAL-TRANSMISSION-ID'),
+            'transmission_sig' => $request->header('PAYPAL-TRANSMISSION-SIG'),
+            'transmission_time' => $request->header('PAYPAL-TRANSMISSION-TIME'),
+            'webhook_event' => $request->all(),
+            'webhook_id' => config('paypal.' . config('paypal.mode') . '.webhook_id'),
+        ]);
     }
 }

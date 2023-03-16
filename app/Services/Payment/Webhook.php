@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace App\Services\Payment;
 
-class Webhook
-{
-    public function __construct()
-    {
-    }
+use Illuminate\Http\Request;
 
-    public function validateSignature(): void
+class Webhook extends Payment
+{
+    public function validateSignature(Request $request): void
     {
+        $this->client->validateSignature($request);
     }
 }

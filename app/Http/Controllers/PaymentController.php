@@ -4,53 +4,47 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Actions\Payment\NewPayment;
+use App\Actions\Payment\{NewPayment, NewRefund};
 use App\Enum\OrderStatus;
+use App\Exceptions\{OrderNotPayedException, OrderRefundedException, UnknownPaymentMethodException};
 use App\Http\Requests\{RefundPaymentRequest, StorePaymentRequest};
 use App\Models\{Card, Order, Payment, PaymentHistory, Subscription, SubscriptionUser, User};
+use App\Services\Payment\{Webhook};
 use Illuminate\Http\{JsonResponse, Request, Response};
 use Illuminate\Support\{Carbon, Str};
 use Srmklive\PayPal\Facades\PayPal;
-use Stripe\{StripeClient, Webhook};
+use Stripe\{Exception\SignatureVerificationException, Webhook as StripeWebhook};
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use UnexpectedValueException;
 
 class PaymentController extends Controller
 {
     public function store(StorePaymentRequest $request, NewPayment $payment): JsonResponse
     {
-        $response = $payment->create(auth('api')->user(), $request->validated());
+        try {
+            $response = $payment->create(auth('api')->user(), $request->validated());
+        } catch (UnknownPaymentMethodException $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 500);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 500);
+        }
 
         return response()->json($response);
     }
 
-    public function refund(RefundPaymentRequest $request): JsonResponse
+    public function refund(RefundPaymentRequest $request, NewRefund $refund): JsonResponse
     {
-        $order = Order::find($request->validated('order_id'));
-        if ($order->status === 'refunded') {
+        try {
+            $refund->refund($request->validated('order_id'));
+        } catch (HttpException $exception) {
             return response()->json([
-                'message' => __('Order has already refunded'),
-            ], 409);
+                'message' => $exception->getMessage(),
+            ], $exception->getCode());
         }
-        if ($order->payments()->count() === 0) {
-            return response()->json([
-                'message' => __("Order doesn't have payment"),
-            ], 404);
-        }
-
-        $payment = $order->payments()->latest()->first();
-
-        $order->status = OrderStatus::Refunded;
-        $order->save();
-
-        if ($payment->method === 'stripe') {
-            $stripe = new StripeClient(config('services.stripe.api_secret'));
-            $paymentIntent = $stripe->paymentIntents->retrieve($payment->method_id);
-            $stripe->refunds->create([
-                'charge' => $paymentIntent->latest_charge,
-            ]);
-        }
-
-        $payment->status = 'refunded';
-        $payment->save();
 
         return response()->json([
             'message' => __('Refund success'),
@@ -59,53 +53,16 @@ class PaymentController extends Controller
 
     public function webhook(Request $request, string $method): JsonResponse|Response
     {
+        try {
+            $webhook = new Webhook($method);
+        } catch (UnknownPaymentMethodException $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+        $webhook->validateSignature($request);
+
         if ($method === 'paypal') {
-            $provider = Paypal::setProvider();
-            $provider->setApiCredentials(config('paypal'));
-            $token = $provider->getAccessToken();
-            $provider->setRequestHeader('Authorization', 'Bearer ' . $token['access_token']);
-            $provider->setRequestHeader('PayPal-Request-Id', Str::uuid()->toString());
-
-            $verify = $provider->verifyWebHook([
-                'auth_algo' => $request->header('PAYPAL-AUTH-ALGO'),
-                'cert_url' => $request->header('PAYPAL-CERT-URL'),
-                'transmission_id' => $request->header('PAYPAL-TRANSMISSION-ID'),
-                'transmission_sig' => $request->header('PAYPAL-TRANSMISSION-SIG'),
-                'transmission_time' => $request->header('PAYPAL-TRANSMISSION-TIME'),
-                'webhook_event' => $request->all(),
-                'webhook_id' => config('paypal.' . config('paypal.mode') . '.webhook_id'),
-            ]);
-
-            if ($verify['verification_status'] === 'FAILURE') {
-                return response()->json($verify, 400);
-            }
-
-            if (Str::startsWith($request->event_type, 'BILLING.SUBSCRIPTION.')) {
-                if ($request->resource['status'] === 'ACTIVE') {
-                    $subscriptionUser = SubscriptionUser::where('method', 'paypal')
-                        ->where('method_id', $request->resource['id'])->with('user')->first();
-
-                    if ($subscriptionUser === null) {
-                        return response()->json([
-                            'user' => $subscriptionUser,
-                        ]);
-                    }
-
-                    $user = $subscriptionUser->user;
-                    $subscription = $subscriptionUser->subscription;
-
-                    $startTime = Carbon::createFromFormat('Y-m-d\TH:i:s\Z', $request->resource['start_time']);
-                    $user->subscriptions()->syncWithPivotValues($subscription, [
-                        'method_id' => $request->resource['id'],
-                        'status' => Str::lower($request->resource['status']),
-                        'started_at' => $startTime,
-                        'expired_at' => $startTime->addMonth(),
-                    ]);
-                }
-
-                return response()->noContent();
-            }
-
             if (!isset($request->resource['supplementary_data'])) {
                 return response()->noContent();
             }
@@ -129,7 +86,7 @@ class PaymentController extends Controller
         }
 
         try {
-            $event = Webhook::constructEvent(
+            $event = StripeWebhook::constructEvent(
                 file_get_contents('php://input'),
                 $request->server('HTTP_STRIPE_SIGNATURE'),
                 config
@@ -137,11 +94,7 @@ class PaymentController extends Controller
                     'services.stripe.webhook_secret'
                 )
             );
-        } catch (\UnexpectedValueException $e) {
-            return response()->json([
-                'message' => $e->getMessage(),
-            ], 400);
-        } catch (\Stripe\Exception\SignatureVerificationException $e) {
+        } catch (UnexpectedValueException|SignatureVerificationException $e) {
             return response()->json([
                 'message' => $e->getMessage(),
             ], 400);
@@ -183,13 +136,13 @@ class PaymentController extends Controller
             $payment = Payment::where('method_id', $refund->payment_intent)
                 ->where('method', 'stripe')->first();
 
-            $payment->status = 'refunded';
+            $payment->status = OrderStatus::Refunded;
             $payment->client_secret = $refund->client_secret;
 
             $payment->save();
 
             $payment->history()->save(new PaymentHistory([
-                'status' => 'refunded',
+                'status' => OrderStatus::Refunded,
             ]));
 
             return response()->json([

@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Services\Payment\Stripe;
 
+use App\DataTransferObjects\{CreatedPaymentObject, Refund};
+use App\DataTransferObjects\{NewPaymentObject};
 use App\Models\User;
-use App\Services\Payment\Objects\{CreatedPaymentObject, NewPaymentObject};
 use App\Services\Payment\PaymentClient;
+use Illuminate\Http\Request;
 use Stripe\StripeClient;
 
 class Client implements PaymentClient
@@ -63,8 +65,12 @@ class Client implements PaymentClient
         );
     }
 
-    public function refund(): void
+    public function refund(Refund $refund): void
     {
+        $paymentIntent = $this->client->paymentIntents->retrieve($refund->paymentId);
+        $this->client->refunds->create([
+            'charge' => $paymentIntent->latest_charge,
+        ]);
     }
 
     public function createCustomer(User $user): User
@@ -79,5 +85,9 @@ class Client implements PaymentClient
         $user->save();
 
         return $user;
+    }
+
+    public function validateSignature(Request $request): void
+    {
     }
 }

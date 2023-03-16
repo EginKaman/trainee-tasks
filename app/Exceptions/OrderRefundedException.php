@@ -6,7 +6,7 @@ namespace App\Exceptions;
 
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class UnknownPaymentMethodException extends HttpException
+class OrderRefundedException extends HttpException
 {
     public function __construct(
         ?string $message = null,
@@ -14,6 +14,6 @@ class UnknownPaymentMethodException extends HttpException
         array $headers = [],
         int $code = 0
     ) {
-        parent::__construct(500, $message ?? 'Unknown payment method.', $previous, $headers, $code);
+        parent::__construct(409, $message, $previous, $headers, $code);
     }
 }
