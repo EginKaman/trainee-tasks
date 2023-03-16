@@ -52,9 +52,15 @@ redis.on("message", (channel, message) => {
         io.except(data.socket).emit('users.delete', {
             user: data.data.user
         });
-        usersList = usersList.filter(function (value, index, arr) {
-            return value.id === data.data.user;
-        });
+
+        for (let i = 0; i < usersList.length; i++) {
+
+            if (usersList[i]['id'] === data.data.user.id) {
+
+                usersList.splice(i, 1);
+            }
+
+        }
         io.emit('users.list', message);
     }
 });
@@ -71,14 +77,14 @@ io.on('connection', async function (socket) {
     });
     socket.on('users.update', function (message) {
         console.log(message);
-        io.emit('users.add', message);
+        io.emit('users.update', message);
     });
     socket.on('users.update', function (message) {
         console.log(message);
-        io.emit('users.add', message);
+        io.emit('users.update', message);
     });
     socket.on('users.delete', function (message) {
-        io.emit('users.add', message);
+        io.emit('users.delete', message);
     });
     socket.on('disconnect', () => {
         message = {
