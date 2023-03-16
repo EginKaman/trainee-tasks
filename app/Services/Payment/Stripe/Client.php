@@ -7,6 +7,7 @@ namespace App\Services\Payment\Stripe;
 use App\Models\User;
 use App\Services\Payment\Objects\{CreatedPaymentObject, NewPaymentObject, Refund};
 use App\Services\Payment\PaymentClient;
+use Illuminate\Http\Request;
 use Stripe\StripeClient;
 
 class Client implements PaymentClient
@@ -83,5 +84,9 @@ class Client implements PaymentClient
         $user->save();
 
         return $user;
+    }
+
+    public function validateSignature(Request $request): void
+    {
     }
 }

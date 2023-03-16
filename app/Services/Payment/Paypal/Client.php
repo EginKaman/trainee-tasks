@@ -6,6 +6,7 @@ namespace App\Services\Payment\Paypal;
 
 use App\Services\Payment\Objects\{CreatedPaymentObject, NewPaymentObject, Refund};
 use App\Services\Payment\PaymentClient;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Srmklive\PayPal\Facades\PayPal;
 
@@ -22,10 +23,6 @@ class Client implements PaymentClient
         $provider->setRequestHeader('PayPal-Request-Id', Str::uuid()->toString());
 
         $this->client = $provider;
-    }
-
-    public function client(): void
-    {
     }
 
     public function payment(NewPaymentObject $paymentObject): CreatedPaymentObject
@@ -59,5 +56,20 @@ class Client implements PaymentClient
     public function refund(Refund $refund): void
     {
         $this->client->refundCapturedPayment($refund->paymentId, '', $refund->amount, 'Refunded by client.');
+    }
+
+    public function validateSignature(Request $request): bool
+    {
+        $verify = $this->client->verifyWebHook([
+            'auth_algo' => $request->header('PAYPAL-AUTH-ALGO'),
+            'cert_url' => $request->header('PAYPAL-CERT-URL'),
+            'transmission_id' => $request->header('PAYPAL-TRANSMISSION-ID'),
+            'transmission_sig' => $request->header('PAYPAL-TRANSMISSION-SIG'),
+            'transmission_time' => $request->header('PAYPAL-TRANSMISSION-TIME'),
+            'webhook_event' => $request->all(),
+            'webhook_id' => config('paypal.' . config('paypal.mode') . '.webhook_id'),
+        ]);
+
+        return !($verify['verification_status'] === 'FAILURE');
     }
 }

@@ -11,8 +11,8 @@ use App\Services\Payment\Stripe\Client as StripeClient;
 
 class Payment
 {
-    private PaymentClient $client;
-    private string $paymentMethod;
+    protected PaymentClient $client;
+    protected string $paymentMethod;
 
     /**
      * @throws UnknownPaymentMethodException
@@ -36,7 +36,7 @@ class Payment
     /**
      * @throws UnknownPaymentMethodException
      */
-    private function selectPaymentClient(): void
+    protected function selectPaymentClient(): void
     {
         $this->client = match ($this->paymentMethod) {
             'paypal' => new PaypalClient(),

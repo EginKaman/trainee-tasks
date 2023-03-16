@@ -10,11 +10,12 @@ use App\Exceptions\UnknownPaymentMethodException;
 use App\Http\Requests\{RefundPaymentRequest, StorePaymentRequest};
 use App\Models\{Card, Order, Payment, PaymentHistory, User};
 use App\Services\Payment\Objects\Refund;
-use App\Services\Payment\Payment as PaymentClient;
+use App\Services\Payment\{Payment as PaymentClient, Webhook};
 use Illuminate\Http\{JsonResponse, Request, Response};
 use Illuminate\Support\{Str};
 use Srmklive\PayPal\Facades\PayPal;
-use Stripe\{Webhook};
+use Stripe\{Exception\SignatureVerificationException, Webhook as StripeWebhook};
+use UnexpectedValueException;
 
 class PaymentController extends Controller
 {
@@ -76,27 +77,19 @@ class PaymentController extends Controller
 
     public function webhook(Request $request, string $method): JsonResponse|Response
     {
+        try {
+            $webhook = new Webhook($method);
+        } catch (UnknownPaymentMethodException $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+        if (!$webhook->validateSignature($request)) {
+            return response()->json([
+                'status' => 'failure',
+            ], 400);
+        }
         if ($method === 'paypal') {
-            $provider = Paypal::setProvider();
-            $provider->setApiCredentials(config('paypal'));
-            $token = $provider->getAccessToken();
-            $provider->setRequestHeader('Authorization', 'Bearer ' . $token['access_token']);
-            $provider->setRequestHeader('PayPal-Request-Id', Str::uuid()->toString());
-
-            $verify = $provider->verifyWebHook([
-                'auth_algo' => $request->header('PAYPAL-AUTH-ALGO'),
-                'cert_url' => $request->header('PAYPAL-CERT-URL'),
-                'transmission_id' => $request->header('PAYPAL-TRANSMISSION-ID'),
-                'transmission_sig' => $request->header('PAYPAL-TRANSMISSION-SIG'),
-                'transmission_time' => $request->header('PAYPAL-TRANSMISSION-TIME'),
-                'webhook_event' => $request->all(),
-                'webhook_id' => config('paypal.' . config('paypal.mode') . '.webhook_id'),
-            ]);
-
-            if ($verify['verification_status'] === 'FAILURE') {
-                return response()->json($verify, 400);
-            }
-
             if (!isset($request->resource['supplementary_data'])) {
                 return response()->noContent();
             }
@@ -120,7 +113,7 @@ class PaymentController extends Controller
         }
 
         try {
-            $event = Webhook::constructEvent(
+            $event = StripeWebhook::constructEvent(
                 file_get_contents('php://input'),
                 $request->server('HTTP_STRIPE_SIGNATURE'),
                 config
@@ -128,11 +121,7 @@ class PaymentController extends Controller
                     'services.stripe.webhook_secret'
                 )
             );
-        } catch (\UnexpectedValueException $e) {
-            return response()->json([
-                'message' => $e->getMessage(),
-            ], 400);
-        } catch (\Stripe\Exception\SignatureVerificationException $e) {
+        } catch (UnexpectedValueException|SignatureVerificationException $e) {
             return response()->json([
                 'message' => $e->getMessage(),
             ], 400);
