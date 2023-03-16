@@ -51,7 +51,7 @@ class UserFactory extends Factory
     private function imageSmall(\Intervention\Image\Image $image): string
     {
         $path = 'public/users/' . $image->filename . '_small.' . $image->extension;
-        $image->resize(38, 38);
+        $image->resize(50, 50);
         $image->save(storage_path('app/' . $path));
 
         return $path;
