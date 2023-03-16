@@ -6,11 +6,27 @@ namespace App\Services\Payment;
 
 use App\DataTransferObjects\EventObject;
 use App\Enum\OrderStatus;
-use App\Models\{Card, Payment as PaymentModel, PaymentHistory, User};
+use App\Models\{Card, Payment, Payment as PaymentModel, PaymentHistory, User};
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class WebhookEvent
 {
+    public static function handle(Webhook $webhook, EventObject $eventObject): void
+    {
+        $payment = Payment::where(
+            'method_id',
+            $eventObject->orderId
+        )->where('method', $webhook->paymentMethod)->first();
+
+        if ($payment === null) {
+            return;
+        }
+
+        $event = Str::studly(Str::replace('.', '_', $eventObject->event));
+
+        self::{$event}();
+    }
     public static function paymentIntentCreated(PaymentModel $payment, EventObject $eventObject): void
     {
         $payment->order->status = OrderStatus::PaymentPending;

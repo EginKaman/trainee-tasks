@@ -76,22 +76,8 @@ class PaymentController extends Controller
             return response()->noContent();
         }
 
-        $payment = Payment::where(
-            'method_id',
-            $eventObject->orderId
-        )->where('method', $webhook->paymentMethod)->first();
+        WebhookEvent::handle($webhook, $eventObject);
 
-        if ($payment === null) {
-            return response()->noContent();
-        }
-
-        $event = Str::studly(Str::replace('.', '_', $eventObject->event));
-
-        WebhookEvent::{$event}();
-
-        return response()->json([
-            'message' => 'Received unknown event type',
-            'type' => $eventObject->event,
-        ], 400);
+        return response()->noContent();
     }
 }
