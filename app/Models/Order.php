@@ -6,12 +6,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasMany};
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
  * @property int $payment_id
  * @property float $amount
  * @property string $status
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
  */
 class Order extends Model
 {
