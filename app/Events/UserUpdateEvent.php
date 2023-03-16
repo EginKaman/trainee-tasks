@@ -6,11 +6,11 @@ namespace App\Events;
 
 use App\Http\Resources\SocketUserResource;
 use Illuminate\Broadcasting\{Channel, InteractsWithSockets};
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class UserUpdateEvent implements ShouldBroadcast
+class UserUpdateEvent implements ShouldBroadcastNow
 {
     use Dispatchable;
     use InteractsWithSockets;
