@@ -15,7 +15,7 @@ servers:
 defaultContentType: application/json
 channels:
   users.add:
-    description: Update information about online users
+    description: User was connected and receives their data.
     publish:
       summary: Join new user
       operationId: add
@@ -40,7 +40,7 @@ channels:
             name:
               type: string
               description: User name
-            status:
+            online:
               type: boolean
               description: User status
   users.update:
@@ -58,7 +58,7 @@ channels:
             id: 2
             name: Joe
             avatar: https://test2023-backend-ivan-t.abztrainee.com/storage/users/dzsfd32NJdpsdvDJcko9dssdc.jpg
-            status: true
+            online: true
           properties:
             id:
               type: integer
@@ -69,9 +69,22 @@ channels:
             name:
               type: string
               description: User name
-            status:
+            online:
               type: boolean
               description: User status
+  users.list:
+    description: Update information about all of online users
+    publish:
+      summary: List users
+      operationId: list
+      message:
+        name: addUser
+        title: 'The user updated'
+        contentType: application/json
+        payload:
+          type: array
+          items:
+            $ref: '#/components/schemas/userPayload'
   users.delete:
     description: Remove information about online users
     publish:
@@ -105,7 +118,7 @@ components:
           id: 2
           name: Joe
           avatar: https://test2023-backend-ivan-t.abztrainee.com/storage/users/dzsfd32NJdpsdvDJcko9dssdc.jpg
-          status: true
+          online: true
         properties:
           id:
             type: integer
@@ -116,7 +129,7 @@ components:
           avatar:
             type: string
             description: User avatar
-          status:
+          online:
             type: boolean
             description: User status
   schemas:
@@ -125,6 +138,8 @@ components:
       example:
         id: 2
         name: Joe
+        avatar: https://test2023-backend-ivan-t.abztrainee.com/storage/users/dzsfd32NJdpsdvDJcko9dssdc.jpg
+        online: true
       properties:
         id:
           type: integer
@@ -144,7 +159,7 @@ components:
     userId:
       type: integer
       description: Unique user ID
-    status:
+    online:
       type: boolean
       description: User status
 
