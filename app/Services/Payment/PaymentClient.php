@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Payment;
 
 use App\DataTransferObjects\{CreatedPaymentObject, Refund};
-use App\DataTransferObjects\{NewPaymentObject};
+use App\DataTransferObjects\{EventObject, NewPaymentObject};
 use Illuminate\Http\Request;
 
 interface PaymentClient
@@ -14,5 +14,5 @@ interface PaymentClient
 
     public function refund(Refund $refund): void;
 
-    public function validateSignature(Request $request): void;
+    public function createEvent(Request $request): EventObject;
 }
