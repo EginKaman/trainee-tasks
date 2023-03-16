@@ -35,7 +35,6 @@ redis.on("message", (channel, message) => {
     console.log(`Received ${message} from ${channel}`);
     let data = JSON.parse(message);
     if (data.event === 'App\\Events\\ConnectedEvent') {
-        io.to(data.socket).emit('users.add', message);
         console.log(data);
         usersList.push(data.data.user)
         io.emit('users.list', JSON.stringify({
@@ -63,7 +62,9 @@ redis.on("message", (channel, message) => {
             }
 
         }
-        io.emit('users.list', message);
+        io.emit('users.list', {
+            users: usersList
+        });
     }
 });
 
