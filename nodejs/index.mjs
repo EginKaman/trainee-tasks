@@ -46,10 +46,12 @@ redis.on("message", (channel, message) => {
         io.except(data.socket).emit('users.update', {
             user: data.data.user
         });
-        io.to(data.socket).emit('users.add', message);
+        io.to(data.socket).emit('users.update', {
+            user: data.data.user
+        });
     }
     if (data.event === 'App\\Events\\DisconnectedEvent') {
-        io.except(data.socket).emit('users.delete', {
+        io.emit('users.delete', {
             user: data.data.user
         });
 
