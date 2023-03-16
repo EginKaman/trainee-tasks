@@ -23,11 +23,10 @@ use Illuminate\Support\Carbon;
 class OrderProduct extends Model
 {
     use Translatable;
+
     public array $translatedAttributes = ['title', 'description'];
     protected string $translationForeignKey = 'product_id';
-
     protected $fillable = ['image', 'quantity', 'price'];
-
     protected $casts = [
         'quantity' => 'integer',
         'price' => 'float',

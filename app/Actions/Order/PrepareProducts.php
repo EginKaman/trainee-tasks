@@ -26,7 +26,6 @@ class PrepareProducts
                 'price' => $product->price,
             ]);
             $orderProduct->fill($product->getTranslationsArray());
-            $orderProduct->order()->associate($order);
             $orderProducts->push($orderProduct);
         }
 

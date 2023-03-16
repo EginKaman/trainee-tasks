@@ -54,13 +54,12 @@ class NewPayment
             $response['url'] = $createdPaymentObject->paymentUrl;
         }
 
-        $payment->method_id = $createdPaymentObject->paymentId;
-
         if ($createdPaymentObject->clientSecret !== null) {
             $payment->client_secret = $createdPaymentObject->clientSecret;
             $response['client_secret'] = $createdPaymentObject->clientSecret;
         }
 
+        $payment->method_id = $createdPaymentObject->paymentId;
         $payment->status = $createdPaymentObject->status;
         $payment->save();
 
