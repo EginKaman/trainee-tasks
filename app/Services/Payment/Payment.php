@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace App\Services\Payment;
 
+use App\DataTransferObjects\{CreatedPaymentObject, Refund};
+use App\DataTransferObjects\{NewPaymentObject};
 use App\Exceptions\UnknownPaymentMethodException;
-use App\Services\Payment\Objects\{CreatedPaymentObject, NewPaymentObject, Refund};
 use App\Services\Payment\Paypal\Client as PaypalClient;
 use App\Services\Payment\Stripe\Client as StripeClient;
 

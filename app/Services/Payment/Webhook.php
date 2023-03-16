@@ -8,8 +8,8 @@ use Illuminate\Http\Request;
 
 class Webhook extends Payment
 {
-    public function validateSignature(Request $request): bool
+    public function validateSignature(Request $request): void
     {
-        return $this->client->validateSignature($request);
+        $this->client->validateSignature($request);
     }
 }

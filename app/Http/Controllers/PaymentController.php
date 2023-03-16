@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Actions\Payment\NewPayment;
+use App\DataTransferObjects\Refund;
 use App\Enum\OrderStatus;
 use App\Exceptions\UnknownPaymentMethodException;
 use App\Http\Requests\{RefundPaymentRequest, StorePaymentRequest};
 use App\Models\{Card, Order, Payment, PaymentHistory, User};
-use App\Services\Payment\Objects\Refund;
 use App\Services\Payment\{Payment as PaymentClient, Webhook};
 use Illuminate\Http\{JsonResponse, Request, Response};
 use Illuminate\Support\{Str};
@@ -84,11 +84,8 @@ class PaymentController extends Controller
                 'message' => $e->getMessage(),
             ], 500);
         }
-        if (!$webhook->validateSignature($request)) {
-            return response()->json([
-                'status' => 'failure',
-            ], 400);
-        }
+        $webhook->validateSignature($request);
+
         if ($method === 'paypal') {
             if (!isset($request->resource['supplementary_data'])) {
                 return response()->noContent();

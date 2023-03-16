@@ -18,9 +18,9 @@ class CardController extends Controller
 
     public function destroy(DestroyCardRequest $request, int $card): Response
     {
-        $card = Card::where('user_id', auth('api')->id())->findOrFail($card);
+        $card = Card::where('user_id', $request->user('api')->id)->findOrFail($card);
         if ($card->delete()) {
-            return response(__('Deleted success'), 204);
+            return response()->noContent();
         }
 
         return response(__('Something went wrong'), 503);

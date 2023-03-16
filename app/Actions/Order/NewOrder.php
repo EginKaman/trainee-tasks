@@ -5,32 +5,48 @@ declare(strict_types=1);
 namespace App\Actions\Order;
 
 use App\Enum\OrderStatus;
-use App\Models\{Order, OrderProduct, Product, User};
+use App\Exceptions\OrderCreateException;
+use App\Models\{Order, OrderProduct, User};
+use Exception;
+use Illuminate\Support\Facades\DB;
 
 class NewOrder
 {
+    public function __construct(
+        private PrepareProducts $prepareProducts
+    ) {
+    }
+
+    /**
+     * @throws OrderCreateException
+     */
     public function create(User $user, array $data): Order
     {
         $order = new Order([
             'status' => OrderStatus::Created,
         ]);
         $order->user()->associate($user);
-        $order->save();
-        foreach ($data['products'] as $product) {
-            $productModel = Product::query()->find($product['id']);
-            $orderProduct = new OrderProduct([
-                'quantity' => $product['quantity'],
-                'image' => $productModel->image,
-                'price' => $productModel->price,
-            ]);
-            $orderProduct->fill($productModel->getTranslationsArray());
-            $orderProduct->order()->associate($order);
 
-            $orderProduct->save();
+        $orderProducts = $this->prepareProducts->prepare($order, $data['products']);
+
+        $order->amount = round(
+            $orderProducts->sum(fn (OrderProduct $orderProduct) => $orderProduct->quantity * $orderProduct->price),
+            2
+        );
+
+        DB::beginTransaction();
+
+        try {
+            $order->save();
+
+            $order->products()->saveMany($orderProducts);
+        } catch (Exception $e) {
+            DB::rollBack();
+
+            throw new OrderCreateException();
         }
 
-        $order->amount = round($order->products()->sum('price'), 2);
-        $order->save();
+        DB::commit();
 
         return $order;
     }

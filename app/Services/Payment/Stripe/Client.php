@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace App\Services\Payment\Stripe;
 
+use App\DataTransferObjects\{CreatedPaymentObject, Refund};
+use App\DataTransferObjects\{NewPaymentObject};
 use App\Models\User;
-use App\Services\Payment\Objects\{CreatedPaymentObject, NewPaymentObject, Refund};
 use App\Services\Payment\PaymentClient;
 use Illuminate\Http\Request;
 use Stripe\StripeClient;

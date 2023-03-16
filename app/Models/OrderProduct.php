@@ -7,6 +7,7 @@ namespace App\Models;
 use Astrotomic\Translatable\Translatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -16,6 +17,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $image
  * @property int $quantity
  * @property float $price
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
  */
 class OrderProduct extends Model
 {

@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services\Payment\Paypal;
 
-use App\Services\Payment\Objects\{CreatedPaymentObject, NewPaymentObject, Refund};
+use App\DataTransferObjects\{CreatedPaymentObject, Refund};
+use App\DataTransferObjects\{NewPaymentObject};
 use App\Services\Payment\PaymentClient;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -58,9 +59,9 @@ class Client implements PaymentClient
         $this->client->refundCapturedPayment($refund->paymentId, '', $refund->amount, 'Refunded by client.');
     }
 
-    public function validateSignature(Request $request): bool
+    public function validateSignature(Request $request): void
     {
-        $verify = $this->client->verifyWebHook([
+        $this->client->verifyWebHook([
             'auth_algo' => $request->header('PAYPAL-AUTH-ALGO'),
             'cert_url' => $request->header('PAYPAL-CERT-URL'),
             'transmission_id' => $request->header('PAYPAL-TRANSMISSION-ID'),
@@ -69,7 +70,5 @@ class Client implements PaymentClient
             'webhook_event' => $request->all(),
             'webhook_id' => config('paypal.' . config('paypal.mode') . '.webhook_id'),
         ]);
-
-        return !($verify['verification_status'] === 'FAILURE');
     }
 }
