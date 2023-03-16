@@ -16,7 +16,6 @@ class UserUpdateEvent implements ShouldBroadcastNow
     use InteractsWithSockets;
     use SerializesModels;
 
-    public object $data;
     public SocketUserResource $user;
 
     public function __construct(SocketUserResource $user, string $socket)
