@@ -14,6 +14,7 @@ var redisPublish = new Redis(process.env.REDIS_HOST, process.env.REDIS_PORT);
 var server = createServer(app)
 var io = new Server(server);
 
+var prefix = process.env.REDIS_PREFIX || ((process.env.APP_NAME.toLowerCase() || 'laravel') + '_database_');
 // io.use(
 //     authorize({
 //         secret: process.env.JWT_SECRET,
@@ -21,7 +22,8 @@ var io = new Server(server);
 //     })
 // )
 
-redis.subscribe('laravel_database_users.add', function (err, count) {
+console.log(prefix);
+redis.subscribe(prefix + 'users.add', function (err, count) {
     if (err) {
         // Just like other commands, subscribe() can fail for some reasons,
         // ex network issues.
@@ -54,7 +56,7 @@ io.on('connection', async function (socket) {
     let message = {
         socket: socket.id
     }
-    redisPublish.publish('laravel_database_connected', JSON.stringify(message));
+    redisPublish.publish(prefix + 'connected', JSON.stringify(message));
 
     socket.on('users.add', function (message) {
         console.log(message);
@@ -71,7 +73,7 @@ io.on('connection', async function (socket) {
         message = {
             socket: socket.id
         };
-        redisPublish.publish('laravel_database_disconnected', JSON.stringify(message));
+        redisPublish.publish(prefix + 'disconnected', JSON.stringify(message));
         io.emit('users.delete', message);
     });
 

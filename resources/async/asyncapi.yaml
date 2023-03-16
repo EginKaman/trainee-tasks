@@ -7,11 +7,11 @@ info:
     email: ivan.tiutiunnyk@abz.agency
 servers:
   local:
-    url: 'task.localhost:6001'
-    protocol: ws
+    url: 'http://localhost:3000/'
+    protocol: socket.io
   dev:
-    url: 'test2023-backend-ivan-t.abztrainee.com:6001'
-    protocol: wss
+    url: 'https://test2023-backend-ivan-t.abztrainee.com/'
+    protocol: socket.io
 defaultContentType: application/json
 channels:
   users.add:
