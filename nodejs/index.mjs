@@ -37,22 +37,17 @@ redis.on("message", (channel, message) => {
     if (data.event === 'App\\Events\\ConnectedEvent') {
         console.log(data);
         usersList.push(data.data.user)
+        io.emit('users.add', data.data.user);
         io.emit('users.list', JSON.stringify({
             users: usersList
         }));
     }
     if (data.event === 'App\\Events\\UserUpdateEvent') {
-        io.except(data.socket).emit('users.update', {
-            user: data.data.user
-        });
-        io.to(data.socket).emit('users.update', {
-            user: data.data.user
-        });
+        io.except(data.socket).emit('users.update', data.data.user);
+        io.to(data.socket).emit('users.update', data.data.user);
     }
     if (data.event === 'App\\Events\\DisconnectedEvent') {
-        io.emit('users.delete', {
-            user: data.data.user
-        });
+        io.emit('users.delete', data.data.user);
 
         for (let i = 0; i < usersList.length; i++) {
 
