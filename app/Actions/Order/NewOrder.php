@@ -7,7 +7,6 @@ namespace App\Actions\Order;
 use App\Enum\OrderStatus;
 use App\Exceptions\OrderCreateException;
 use App\Models\{Order, OrderProduct, User};
-use Exception;
 use Illuminate\Support\Facades\DB;
 
 class NewOrder
@@ -34,19 +33,11 @@ class NewOrder
             2
         );
 
-        DB::beginTransaction();
-
-        try {
+        DB::transaction(function () use ($order, $orderProducts): void {
             $order->save();
 
             $order->products()->saveMany($orderProducts);
-        } catch (Exception $e) {
-            DB::rollBack();
-
-            throw new OrderCreateException();
-        }
-
-        DB::commit();
+        });
 
         return $order;
     }

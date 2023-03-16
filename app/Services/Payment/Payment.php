@@ -12,8 +12,8 @@ use App\Services\Payment\Stripe\Client as StripeClient;
 
 class Payment
 {
+    public string $paymentMethod;
     protected PaymentClient $client;
-    protected string $paymentMethod;
 
     /**
      * @throws UnknownPaymentMethodException

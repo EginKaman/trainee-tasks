@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace App\Services\Payment\Stripe;
 
 use App\DataTransferObjects\{CreatedPaymentObject, Refund};
-use App\DataTransferObjects\{NewPaymentObject};
+use App\DataTransferObjects\{EventObject, NewPaymentObject};
 use App\Models\User;
 use App\Services\Payment\PaymentClient;
 use Illuminate\Http\Request;
-use Stripe\StripeClient;
+use Stripe\Exception\SignatureVerificationException;
+use Stripe\{StripeClient, Webhook as StripeWebhook};
 
 class Client implements PaymentClient
 {
@@ -87,7 +88,28 @@ class Client implements PaymentClient
         return $user;
     }
 
-    public function validateSignature(Request $request): void
+    /**
+     * @throws SignatureVerificationException
+     */
+    public function createEvent(Request $request): EventObject
     {
+        $event = StripeWebhook::constructEvent(
+            file_get_contents('php://input'),
+            $request->server('HTTP_STRIPE_SIGNATURE'),
+            config
+            (
+                'services.stripe.webhook_secret'
+            )
+        );
+        /** @phpstan-ignore-next-line */
+        $dataObject = $event->data->object;
+
+        return new EventObject(
+            event: $event->type,
+            orderId: $dataObject->id,
+            status: $dataObject->status,
+            clientSecret: $dataObject->client_secret,
+            customer: $dataObject->customer
+        );
     }
 }

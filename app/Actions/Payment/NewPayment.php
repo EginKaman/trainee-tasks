@@ -8,6 +8,7 @@ use App\DataTransferObjects\NewPaymentObject;
 use App\Exceptions\UnknownPaymentMethodException;
 use App\Models\{Card, Order, Payment, User};
 use App\Services\Payment\Payment as PaymentClient;
+use Illuminate\Support\Facades\DB;
 use Throwable;
 
 class NewPayment
@@ -61,7 +62,10 @@ class NewPayment
 
         $payment->method_id = $createdPaymentObject->paymentId;
         $payment->status = $createdPaymentObject->status;
-        $payment->save();
+
+        DB::transaction(function () use ($payment): void {
+            $payment->save();
+        });
 
         return $response;
     }
