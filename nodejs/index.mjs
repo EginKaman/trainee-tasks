@@ -15,15 +15,9 @@ var server = createServer(app)
 var io = new Server(server);
 
 var prefix = process.env.REDIS_PREFIX || ((process.env.APP_NAME.toLowerCase() || 'laravel') + '_database_');
-// io.use(
-//     authorize({
-//         secret: process.env.JWT_SECRET,
-//         algorithms: [process.env.JWT_ALGO]
-//     })
-// )
 
 console.log(prefix);
-redis.subscribe(prefix + 'users.add', function (err, count) {
+redis.subscribe(prefix + 'users', function (err, count) {
     if (err) {
         // Just like other commands, subscribe() can fail for some reasons,
         // ex network issues.
@@ -35,20 +29,33 @@ redis.subscribe(prefix + 'users.add', function (err, count) {
         );
     }
 });
+
+let usersList = [];
 redis.on("message", (channel, message) => {
     console.log(`Received ${message} from ${channel}`);
     let data = JSON.parse(message);
     if (data.event === 'App\\Events\\ConnectedEvent') {
-        io.except(data.socket).emit('users.add', {
-            user: data.data.user
-        });
-        io.to(data.socket).emit('users.add', message)
+        io.to(data.socket).emit('users.add', message);
+        console.log(data);
+        usersList.push(data.data.user)
+        io.emit('users.list', JSON.stringify({
+            users: usersList
+        }));
     }
     if (data.event === 'App\\Events\\UserUpdateEvent') {
         io.except(data.socket).emit('users.update', {
             user: data.data.user
         });
-        io.to(data.socket).emit('users.add', message)
+        io.to(data.socket).emit('users.add', message);
+    }
+    if (data.event === 'App\\Events\\DisconnectedEvent') {
+        io.except(data.socket).emit('users.delete', {
+            user: data.data.user
+        });
+        usersList = usersList.filter(function (value, index, arr) {
+            return value.id === data.data.user;
+        });
+        io.emit('users.list', message);
     }
 });
 
@@ -66,6 +73,10 @@ io.on('connection', async function (socket) {
         console.log(message);
         io.emit('users.add', message);
     });
+    socket.on('users.update', function (message) {
+        console.log(message);
+        io.emit('users.add', message);
+    });
     socket.on('users.delete', function (message) {
         io.emit('users.add', message);
     });
@@ -74,7 +85,6 @@ io.on('connection', async function (socket) {
             socket: socket.id
         };
         redisPublish.publish(prefix + 'disconnected', JSON.stringify(message));
-        io.emit('users.delete', message);
     });
 
 });

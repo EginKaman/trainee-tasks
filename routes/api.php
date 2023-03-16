@@ -9,6 +9,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\Sockets\SocketUserController;
 use App\Http\Controllers\SubscribeController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\UserController;
@@ -57,4 +58,6 @@ Route::prefix('v1')->middleware(['localization'])->group(function () {
     Route::get('payments/{method}', [PaymentController::class, 'paymentSuccess']);
 
     Route::get('subscriptions', [SubscriptionController::class, 'index']);
+
+    Route::patch('sockets/users/{user}', [SocketUserController::class, 'update']);
 });

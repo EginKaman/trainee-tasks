@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use App\Events\ConnectedEvent;
+use App\Events\{ConnectedEvent, DisconnectedEvent};
+use App\Http\Resources\SocketUserResource;
 use App\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Redis;
@@ -19,18 +20,36 @@ class RedisSubscribeCommand extends Command
     {
         $this->info('redis subscribe started');
         $redis = Redis::connection('subscriber');
-        $redis->subscribe(['connected'], function (string $message, string $channel): void {
+        $redis->subscribe(['connected', 'disconnected'], function (string $message, string $channel): void {
             $this->info('New user connected');
             $this->info("{$channel}: {$message}");
-            $this->createUser($message);
+            if ($channel === config('database.redis.options.prefix') . 'connected') {
+                $this->createUser($message);
+            }
+            if ($channel === config('database.redis.options.prefix') . 'disconnected') {
+                $this->disconnectedUser($message);
+            }
         });
     }
 
-    public function createUser(string $message): void
+    private function createUser(string $message): void
     {
-        $user = User::factory()->create();
         $data = json_decode($message);
+        $user = User::factory()->create([
+            'online' => true,
+            'socket_id' => $data->socket,
+        ]);
         $this->info($message);
-        broadcast(new ConnectedEvent($data, $user));
+
+        broadcast(new ConnectedEvent($data, new SocketUserResource($user)));
+    }
+
+    private function disconnectedUser(string $message): void
+    {
+        $data = json_decode($message);
+        $user = User::where('socket_id', $data->socket);
+        $this->info($message);
+
+        broadcast(new DisconnectedEvent($data, new SocketUserResource($user)));
     }
 }

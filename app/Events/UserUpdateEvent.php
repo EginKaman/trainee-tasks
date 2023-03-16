@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Events;
 
-use App\Models\User;
+use App\Http\Resources\SocketUserResource;
 use Illuminate\Broadcasting\{Channel, InteractsWithSockets};
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
@@ -16,13 +16,17 @@ class UserUpdateEvent implements ShouldBroadcast
     use InteractsWithSockets;
     use SerializesModels;
 
-    public function __construct(
-        public User $user
-    ) {
+    public object $data;
+    public SocketUserResource $user;
+
+    public function __construct(SocketUserResource $user, string $socket)
+    {
+        $this->user = $user;
+        $this->socket = $socket;
     }
 
     public function broadcastOn(): array
     {
-        return [new Channel('users.update')];
+        return [new Channel('users')];
     }
 }
