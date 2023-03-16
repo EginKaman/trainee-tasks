@@ -9,6 +9,7 @@ use App\Enum\OrderStatus;
 use App\Exceptions\{OrderNotPayedException, OrderRefundedException};
 use App\Models\Order;
 use App\Services\Payment\Payment as PaymentClient;
+use Illuminate\Support\Facades\DB;
 
 class NewRefund
 {
@@ -30,10 +31,12 @@ class NewRefund
 
         $paymentClient->refund(new Refund($payment->method_id, $payment->amount));
 
-        $order->status = OrderStatus::Refunded;
-        $order->save();
+        DB::transaction(function () use ($order, $payment): void {
+            $order->status = OrderStatus::Refunded;
+            $order->save();
 
-        $payment->status = OrderStatus::Refunded;
-        $payment->save();
+            $payment->status = OrderStatus::Refunded;
+            $payment->save();
+        });
     }
 }
