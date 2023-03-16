@@ -50,6 +50,8 @@ class RedisSubscribeCommand extends Command
         $user = User::where('socket_id', $data->socket)->first();
         $user->socket_id = null;
         $user->online = false;
+        $user->save();
+
         $this->info($message);
 
         broadcast(new DisconnectedEvent($data, new SocketUserResource($user)));
