@@ -43,8 +43,7 @@ redis.on("message", (channel, message) => {
         }));
     }
     if (data.event === 'App\\Events\\UserUpdateEvent') {
-        io.except(data.socket).emit('users.update', data.data.user);
-        io.to(data.socket).emit('users.update', data.data.user);
+        io.emit('users.update', data.data.user);
     }
     if (data.event === 'App\\Events\\DisconnectedEvent') {
         io.emit('users.delete', data.data.user);
