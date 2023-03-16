@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use App\Events\{ConnectedEvent, DisconnectedEvent};
+use App\Events\{ConnectedEvent, DisconnectedEvent, UserListEvent};
 use App\Http\Resources\SocketUserResource;
 use App\Models\User;
 use Illuminate\Console\Command;
@@ -42,6 +42,7 @@ class RedisSubscribeCommand extends Command
         $this->info($message);
 
         broadcast(new ConnectedEvent($data, new SocketUserResource($user)));
+        $this->userList();
     }
 
     private function disconnectedUser(string $message): void
@@ -53,7 +54,13 @@ class RedisSubscribeCommand extends Command
         $user->save();
 
         $this->info($message);
-
         broadcast(new DisconnectedEvent($data, new SocketUserResource($user)));
+        $this->userList();
+    }
+
+    private function userList(): void
+    {
+        $users = User::whereNotNull('socket_id')->orderByDesc('online')->get();
+        broadcast(new UserListEvent(SocketUserResource::collection($users)));
     }
 }

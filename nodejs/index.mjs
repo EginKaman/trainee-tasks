@@ -30,35 +30,22 @@ redis.subscribe(prefix + 'users', function (err, count) {
     }
 });
 
-let usersList = [];
 redis.on("message", (channel, message) => {
     console.log(`Received ${message} from ${channel}`);
     let data = JSON.parse(message);
     if (data.event === 'App\\Events\\ConnectedEvent') {
         console.log(data);
-        usersList.push(data.data.user)
         io.emit('users.add', data.data.user);
-        io.emit('users.list', JSON.stringify({
-            users: usersList
-        }));
+    }
+
+    if (data.event === 'App\\Events\\UserListEvent') {
+        io.emit('users.list', data.data.users);
     }
     if (data.event === 'App\\Events\\UserUpdateEvent') {
         io.emit('users.update', data.data.user);
     }
     if (data.event === 'App\\Events\\DisconnectedEvent') {
         io.emit('users.delete', data.data.user);
-
-        for (let i = 0; i < usersList.length; i++) {
-
-            if (usersList[i]['id'] === data.data.user.id) {
-
-                usersList.splice(i, 1);
-            }
-
-        }
-        io.emit('users.list', {
-            users: usersList
-        });
     }
 });
 

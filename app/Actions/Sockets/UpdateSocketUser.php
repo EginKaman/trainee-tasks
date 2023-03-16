@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Actions\Sockets;
 
 use App\Actions\User\ResizePhoto;
-use App\Events\UserUpdateEvent;
+use App\Events\{UserListEvent, UserUpdateEvent};
 use App\Http\Resources\SocketUserResource;
 use App\Models\User;
 
@@ -30,6 +30,8 @@ class UpdateSocketUser
             $user->save();
 
             broadcast(new UserUpdateEvent(new SocketUserResource($user), $user->socket_id));
+            $users = User::whereNotNull('socket_id')->orderByDesc('online')->get();
+            broadcast(new UserListEvent(SocketUserResource::collection($users)));
         }
 
         return $user;
