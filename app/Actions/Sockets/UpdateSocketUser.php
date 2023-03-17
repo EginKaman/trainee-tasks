@@ -30,7 +30,7 @@ class UpdateSocketUser
             $user->save();
 
             broadcast(new UserUpdateEvent(new SocketUserResource($user), $user->socket_id));
-            $users = User::whereNotNull('socket_id')->orderByDesc('online')->get();
+            $users = User::where('online', true)->latest()->get();
             broadcast(new UserListEvent(SocketUserResource::collection($users)));
         }
 
