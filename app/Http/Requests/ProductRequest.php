@@ -6,6 +6,10 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * @property int $page
+ * @property int $per_page
+ */
 class ProductRequest extends FormRequest
 {
     public function rules(): array

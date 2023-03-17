@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Actions\Order;
 
 use App\Enum\OrderStatus;
-use App\Exceptions\OrderCreateException;
 use App\Models\{Order, OrderProduct, User};
 use Illuminate\Support\Facades\DB;
 
@@ -16,9 +15,6 @@ class NewOrder
     ) {
     }
 
-    /**
-     * @throws OrderCreateException
-     */
     public function create(User $user, array $data): Order
     {
         $order = new Order([
@@ -26,7 +22,7 @@ class NewOrder
         ]);
         $order->user()->associate($user);
 
-        $orderProducts = $this->prepareProducts->prepare($order, $data['products']);
+        $orderProducts = $this->prepareProducts->prepare($data['products']);
 
         $order->amount = round(
             $orderProducts->sum(fn (OrderProduct $orderProduct) => $orderProduct->quantity * $orderProduct->price),

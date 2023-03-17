@@ -8,6 +8,9 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
+/**
+ * @property int $order_id
+ */
 class RefundPaymentRequest extends FormRequest
 {
     public function rules(): array

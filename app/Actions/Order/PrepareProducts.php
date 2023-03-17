@@ -9,7 +9,7 @@ use Illuminate\Support\{Arr, Collection};
 
 class PrepareProducts
 {
-    public function prepare(Order $order, array $data): Collection
+    public function prepare(array $data): Collection
     {
         $data = Arr::keyBy($data, 'id');
 

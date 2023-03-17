@@ -14,6 +14,7 @@ class DestroyCardRequest extends FormRequest
             'card' => ['required', 'int', 'min:1'],
         ];
     }
+
     protected function prepareForValidation(): void
     {
         $this->merge([
