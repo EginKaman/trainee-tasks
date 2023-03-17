@@ -19,9 +19,4 @@ class StoreOrderRequest extends FormRequest
             'products.*.quantity' => ['required', 'integer', 'min:1', 'max:99'],
         ];
     }
-
-    public function authorize(): bool
-    {
-        return auth('api')->check();
-    }
 }

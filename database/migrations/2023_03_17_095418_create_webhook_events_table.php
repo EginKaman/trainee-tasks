@@ -9,16 +9,16 @@ use Illuminate\Support\Facades\Schema;
 return new class() extends Migration {
     public function up(): void
     {
-        Schema::create('payment_histories', function (Blueprint $table): void {
+        Schema::create('webhook_events', function (Blueprint $table): void {
             $table->id();
-            $table->foreignId('payment_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->enum('status', ['created', 'pending', 'canceled', 'failed', 'refunded', 'success']);
+            $table->foreignId('order_id')->nullable()->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->json('payload');
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('payment_histories');
+        Schema::dropIfExists('webhook_events');
     }
 };

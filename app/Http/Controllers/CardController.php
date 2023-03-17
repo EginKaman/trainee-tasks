@@ -4,17 +4,16 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Actions\Card\UserCard;
 use App\Http\Requests\DestroyCardRequest;
 use App\Http\Resources\CardCollection;
 use App\Repositories\CardRepository;
-use Illuminate\Http\Response;
+use Illuminate\Http\{Request, Response};
 
 class CardController extends Controller
 {
-    public function index(UserCard $userCard): CardCollection
+    public function index(Request $request): CardCollection
     {
-        return new CardCollection(CardRepository::getUserCards(auth('api')->user()));
+        return new CardCollection(CardRepository::getUserCards($request->user()));
     }
 
     public function destroy(DestroyCardRequest $request, int $card): Response

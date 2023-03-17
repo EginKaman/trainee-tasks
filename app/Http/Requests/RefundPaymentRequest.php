@@ -8,6 +8,9 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
+/**
+ * @property int $order_id
+ */
 class RefundPaymentRequest extends FormRequest
 {
     public function rules(): array
@@ -17,7 +20,7 @@ class RefundPaymentRequest extends FormRequest
                 'required',
                 'int',
                 'min:1',
-                Rule::exists('orders', 'id')->where(fn (Builder $query) => $query->where('user_id', auth('api')->id())),
+                Rule::exists('orders', 'id')->where(fn (Builder $query) => $query->where('user_id', $this->user()->id)),
             ],
         ];
     }

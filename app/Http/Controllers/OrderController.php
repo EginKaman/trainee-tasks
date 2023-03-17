@@ -5,27 +5,20 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Actions\Order\NewOrder;
-use App\Exceptions\OrderCreateException;
 use App\Http\Requests\Order\StoreOrderRequest;
 use App\Http\Resources\{OrderCollection, OrderResource};
 use App\Repositories\OrderRepository;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\{JsonResponse, Request};
 
 class OrderController extends Controller
 {
-    public function index(): OrderCollection
+    public function index(Request $request): OrderCollection
     {
-        return new OrderCollection(OrderRepository::getUserOrders(auth('api')->user()));
+        return new OrderCollection(OrderRepository::getUserOrders($request->user()));
     }
 
     public function store(StoreOrderRequest $request, NewOrder $newOrder): OrderResource|JsonResponse
     {
-        try {
-            return new OrderResource($newOrder->create($request->user(), $request->validated()));
-        } catch (OrderCreateException $exception) {
-            return response()->json([
-                'message' => $exception,
-            ], 500);
-        }
+        return new OrderResource($newOrder->create($request->user(), $request->validated()));
     }
 }

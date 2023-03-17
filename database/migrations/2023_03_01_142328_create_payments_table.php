@@ -18,7 +18,7 @@ return new class() extends Migration {
             $table->string('client_secret')->nullable();
             $table->integer('amount');
             $table->string('currency');
-            $table->string('status')->nullable();
+            $table->enum('status', ['created', 'pending', 'canceled', 'failed', 'refunded', 'success']);
             $table->timestamps();
         });
     }

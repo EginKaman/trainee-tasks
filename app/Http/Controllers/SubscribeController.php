@@ -7,7 +7,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\{CancelSubscribeRequest, SubscribeRequest};
 use App\Models\Subscription;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\{Carbon, Str};
+use Illuminate\Support\Str;
 use Srmklive\PayPal\Facades\PayPal;
 use Stripe\Exception\ApiErrorException;
 use Stripe\StripeClient;
@@ -16,7 +16,7 @@ class SubscribeController extends Controller
 {
     public function subscribe(SubscribeRequest $request): JsonResponse
     {
-        $user = auth('api')->user();
+        $user = $request->user();
         $subscription = Subscription::find($request->validated('subscription_id'));
 
         if ($subscription->users()
@@ -100,7 +100,7 @@ class SubscribeController extends Controller
 
     public function cancel(CancelSubscribeRequest $request): JsonResponse
     {
-        $user = auth('api')->user();
+        $user = $request->user();
 
         $subscription = $user->subscriptions()->wherePivotNotIn('status', ['canceled', 'pending'])->find(
             $request->validated('subscription_id')

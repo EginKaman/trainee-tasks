@@ -36,8 +36,8 @@ class Subscription extends Model
         return $this->belongsToMany(User::class)->using(SubscriptionUser::class);
     }
 
-    public function payments(): MorphMany
+    public function events(): MorphMany
     {
-        return $this->morphMany(Payment::class, 'payable');
+        return $this->morphMany(WebhookEvent::class, 'eventable');
     }
 }
