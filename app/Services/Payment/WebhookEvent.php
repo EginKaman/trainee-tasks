@@ -6,7 +6,7 @@ namespace App\Services\Payment;
 
 use App\DataTransferObjects\EventObject;
 use App\Enum\{OrderStatus, PaymentStatus, SubscriptionStatus};
-use App\Models\{Card, Order, Payment, Payment as PaymentModel, PaymentHistory, Subscription, User};
+use App\Models\{Card, Payment, Payment as PaymentModel, PaymentHistory, Subscription, User};
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -149,6 +149,21 @@ class WebhookEvent
             'started_at' => Carbon::createFromTimestamp($this->eventObject->startDate),
             'expired_at' => Carbon::createFromTimestamp($this->eventObject->endDate),
         ]);
+    }
+
+    private function billingSubscriptionCreated(): void
+    {
+        $this->customerSubscriptionCreated();
+    }
+
+    private function billingSubscriptionCancelled(): void
+    {
+        $this->customerSubscriptionCanceled();
+    }
+
+    private function billingSubscriptionUpdated(): void
+    {
+        $this->customerSubscriptionUpdated();
     }
 
     private function storeEvent(Model $model): void
