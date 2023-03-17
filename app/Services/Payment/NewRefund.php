@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Actions\Payment;
+namespace App\Services\Payment;
 
 use App\DataTransferObjects\Refund;
 use App\Enum\OrderStatus;
@@ -25,17 +25,22 @@ class NewRefund
             throw new OrderNotPayedException(__("Order doesn't have payment"));
         }
 
-        $payment = $order->payments()->where('status', '!=', OrderStatus::Refunded)->latest()->first();
+        $this->payment($order);
+    }
+
+    private function payment(Order $order): void
+    {
+        $payment = $order->payments()->where('status', '!=', OrderStatus::Refunded->value)->latest()->first();
 
         $paymentClient = new PaymentClient($payment->method);
 
         $paymentClient->refund(new Refund($payment->method_id, $payment->amount));
 
         DB::transaction(function () use ($order, $payment): void {
-            $order->status = OrderStatus::Refunded;
+            $order->status = OrderStatus::Refunded->value;
             $order->save();
 
-            $payment->status = OrderStatus::Refunded;
+            $payment->status = OrderStatus::Refunded->value;
             $payment->save();
         });
     }
