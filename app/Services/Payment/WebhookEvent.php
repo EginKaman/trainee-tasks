@@ -33,7 +33,9 @@ class WebhookEvent
         $this->storeEvent($payment->order);
 
         $event = Str::studly(Str::replace('.', '_', $this->eventObject->event));
-
+        if (!method_exists($this, $event)) {
+            return;
+        }
         $this->{$event}($payment);
     }
 
@@ -95,6 +97,26 @@ class WebhookEvent
             $card->user()->associate($user);
             $card->save();
         }
+    }
+
+    private function paymentCapturePending(PaymentModel $payment): void
+    {
+        $this->paymentIntentCreated($payment);
+    }
+
+    private function checkoutOrderApproved(PaymentModel $payment): void
+    {
+        $this->paymentIntentSucceeded($payment);
+    }
+
+    private function paymentCaptureRefunded(PaymentModel $payment): void
+    {
+        $this->chargeRefunded($payment);
+    }
+
+    private function paymentCaptureReversed(PaymentModel $payment): void
+    {
+        $this->paymentIntentCanceled($payment);
     }
 
     private function storeEvent(Order $order): void
