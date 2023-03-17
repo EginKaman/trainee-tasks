@@ -94,7 +94,7 @@ class Client implements PaymentClient
     public function createEvent(Request $request): EventObject
     {
         $event = StripeWebhook::constructEvent(
-            file_get_contents('php://input'),
+            $request->getContent(),
             $request->server('HTTP_STRIPE_SIGNATURE'),
             config
             (

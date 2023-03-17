@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Actions\Payment\{NewPayment, NewRefund};
+use App\Actions\Payment\{NewRefund};
 use App\Exceptions\{UnknownPaymentMethodException};
 use App\Http\Requests\{RefundPaymentRequest, StorePaymentRequest};
-use App\Models\{Card, Payment, PaymentHistory, User};
-use App\Services\Payment\{Webhook, WebhookEvent};
+use App\Services\Payment\{NewPayment, Webhook, WebhookEvent};
 use Illuminate\Http\{JsonResponse, Request, Response};
-use Illuminate\Support\{Str};
 use Stripe\{Exception\SignatureVerificationException};
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
@@ -21,7 +19,7 @@ class PaymentController extends Controller
     public function store(StorePaymentRequest $request, NewPayment $payment): JsonResponse
     {
         try {
-            $response = $payment->create(auth('api')->user(), $request->validated());
+            $response = $payment->create($request->user(), $request->validated());
         } catch (UnknownPaymentMethodException $e) {
             return response()->json([
                 'message' => $e->getMessage(),
@@ -50,7 +48,7 @@ class PaymentController extends Controller
         ]);
     }
 
-    public function webhook(Request $request, string $method): JsonResponse|Response
+    public function webhook(Request $request, string $method, WebhookEvent $webhookEvent): JsonResponse|Response
     {
         try {
             $webhook = new Webhook($method);
@@ -76,7 +74,7 @@ class PaymentController extends Controller
             return response()->noContent();
         }
 
-        WebhookEvent::handle($webhook, $eventObject);
+        $webhookEvent->handle($webhook, $eventObject, $request);
 
         return response()->noContent();
     }

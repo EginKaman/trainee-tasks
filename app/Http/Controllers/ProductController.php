@@ -6,7 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ProductRequest;
 use App\Http\Resources\ProductCollection;
-use App\Models\Product;
+use App\Repositories\ProductRepository;
 
 class ProductController extends Controller
 {
@@ -15,6 +15,6 @@ class ProductController extends Controller
         $per_page = $request->validated('per_page', 6) ?? 6;
         $page = $request->validated('page', 1) ?? 1;
 
-        return new ProductCollection(Product::query()->withTranslation()->paginate(perPage: $per_page, page: $page));
+        return new ProductCollection(ProductRepository::getProductsWithPagination($per_page, $page));
     }
 }

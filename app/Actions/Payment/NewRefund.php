@@ -17,7 +17,7 @@ class NewRefund
     {
         $order = Order::find($orderId);
 
-        if ($order->status === 'refunded') {
+        if ($order->status === OrderStatus::Refunded->value) {
             throw new OrderRefundedException(__('Order has already refunded'));
         }
 
