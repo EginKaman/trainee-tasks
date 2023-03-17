@@ -6,9 +6,15 @@ namespace App\Http\Requests;
 
 use App\Rules\BrokenImageRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\File;
 
+/**
+ * @property string $name
+ * @property UploadedFile $photo
+ * @property bool $online
+ */
 class UpdateSocketUserRequest extends FormRequest
 {
     public function rules(): array
@@ -29,7 +35,7 @@ class UpdateSocketUserRequest extends FormRequest
                             ->maxHeight(5000)
                     ),
             ],
-            'status' => ['required', 'boolean'],
+            'online' => ['required', 'boolean'],
         ];
     }
 }
