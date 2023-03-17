@@ -12,7 +12,7 @@ return new class() extends Migration {
         Schema::create('payment_histories', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('payment_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->string('status');
+            $table->enum('status', ['created', 'pending', 'canceled', 'failed', 'refunded', 'success']);
             $table->timestamps();
         });
     }
