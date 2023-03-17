@@ -538,6 +538,333 @@ paths:
               schema:
                 $ref: '#/components/schemas/SomethingWentWrong'
 
+  /orders:
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - orders
+      description: Method for creating an order before payment
+      parameters:
+        - in: header
+          name: Accept-Language
+          description: Set interface language (en, de)
+          schema:
+            type: string
+            example: en
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewOrder'
+      responses:
+        201:
+          description: Create order success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        422:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+              example:
+                message: The token must be a valid
+                errors:
+                  email:
+                    - "The token format is invalid."
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - orders
+      description: Method for getting users orders information
+      parameters:
+        - in: header
+          name: Accept-Language
+          description: Set interface language (en, de)
+          schema:
+            type: string
+            example: en
+      responses:
+        200:
+          description: Getting order success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Orders'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
+
+  /payments:
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - payments
+      description: Method for payment an order via Stripe or PayPal
+      parameters:
+        - in: header
+          name: Accept-Language
+          description: Set interface language (en, de)
+          schema:
+            type: string
+            example: en
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NewPayment'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewPayment'
+      responses:
+        200:
+          description: Payment success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        422:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+              example:
+                message: The token must be a valid
+                errors:
+                  email:
+                    - "The token format is invalid."
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
+
+  /payments/refund:
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - payments
+      description: Method for charge refund
+      parameters:
+        - in: header
+          name: Accept-Language
+          description: Set interface language (en, de)
+          schema:
+            type: string
+            example: en
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NewRefund'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewRefund'
+      responses:
+        200:
+          description: Refund success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Refund'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        422:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+              example:
+                message: The token must be a valid
+                errors:
+                  email:
+                    - "The token format is invalid."
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
+
+  /products:
+    get:
+      tags:
+        - products
+      description: Method to get all products
+      parameters:
+        - in: header
+          name: Accept-Language
+          description: Set interface language (en, de)
+          schema:
+            type: string
+            example: en
+        - name: page
+          in: query
+          description: Number page for getting products
+          style: form
+          schema:
+            type: integer
+        - name: per_page
+          in: query
+          description: Size page for getting products
+          style: form
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Products
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Products'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
+
+  /cards/{card}:
+    delete:
+
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - cards
+      description: This method deleting saved card.
+      parameters:
+        - in: header
+          name: Accept-Language
+          description: Set interface language (en, de)
+          schema:
+            type: string
+            example: en
+        - name: card
+          in: path
+          required: true
+          description: Card id
+          schema:
+            type: integer
+      responses:
+        204:
+          description: Successfully deleted saved card
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deleted'
+
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+              example:
+                message: Not found card id
+        422:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+              example:
+                message: The token must be a valid
+                errors:
+                  email:
+                    - "The token format is invalid."
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
+
+  /cards:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - cards
+      description: This method for getting users saved card.
+      parameters:
+        - in: header
+          name: Accept-Language
+          description: Set interface language (en, de)
+          schema:
+            type: string
+            example: en
+      responses:
+        200:
+          description: Successfully getting saved card
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserCards'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -618,6 +945,11 @@ components:
       example: 1
       description: User id
       minLength: 1
+    StripeCutomerId:
+      type: string
+      example: 24jrdKPe43fk
+      description: Stripe customer id
+      minLength: 1
 
     # Role properties
     RoleId:
@@ -679,6 +1011,307 @@ components:
     To:
       type: integer
       example: 15
+
+    # Order properties
+    OrderId:
+      type: integer
+      example: 1
+      description: Order id
+      minLength: 1
+    OrderPaymentId:
+      type: string
+      example: pi_1DsvVk2eZvKYlo2CPTkujDWC
+      description: Unique identifier for the object PaymentIntent
+      minLength: 1
+    OrderClientSecret:
+      type: string
+      example: pi_1DsvVk2eZvKYlo2CPTkujDWC_secret_2UgUfLIr4eJehOFEAkxq59zCn
+      description: Client secret key
+      minLength: 1
+    OrderPaymentMethod:
+      type: string
+      example: pm_card_visa
+      description: ID of the payment method (a PaymentMethod, Card, or compatible Source object)
+      minLength: 1
+    OrderTypePayment:
+      type: string
+      $ref: '#/components/schemas/OrderTypePaymentEnum'
+
+    # PaymentStatus properties
+    PaymentStatusId:
+      type: integer
+      example: 1
+      description: Status Payment id
+      minLength: 1
+    PaymentStatusCreatedAt:
+      type: string
+      example: 2022-12-12 12:30:33
+      description: Status Payment created at
+
+    # Product properties
+    ProductId:
+      type: integer
+      example: 1
+      description: Product id
+      minLength: 1
+    ProductUniqueNumber:
+      type: string
+      example: 20230802110922
+      description: Unique number of Product
+      minLength: 1
+    ProductTitle:
+      type: string
+      example: White mug with a cat
+      description: Product title
+      minLength: 1
+    ProductDescription:
+      type: string
+      example: Porcelain mug with a diameter of 10 cm is made of sturdy glass
+      description: Product description
+      minLength: 1
+    ProductImg:
+      type: string
+      format: binary
+      description: Product image, must be a jpg, jpeg format. Size image smaller 5Mb
+    ProductImgOutput:
+      type: string
+      example: https://test2022-backend-andrey-l2.abztrainee.com/storage/products/bhjdBJHViud9384bv2223mdnc.jpg
+      description: Link to product image
+    ProductQuantity:
+      type: integer
+      example: 100
+      description: Quantity products
+    ProductPrice:
+      type: number
+      multipleOf: 0.01
+      example: 23.45
+      description: Price product
+
+    #OrderItems properties
+    OrderItemId:
+      type: integer
+      example: 1
+      description: Product id
+      minLength: 1
+    OrderItemTitle:
+      type: string
+      example: White mug with a cat
+      description: Product title
+      minLength: 1
+    OrderItemDescription:
+      type: string
+      example: Porcelain mug with a diameter of 10 cm is made of sturdy glass
+      description: Product description
+      minLength: 1
+    OrderItemImg:
+      type: string
+      format: binary
+      description: Product image, must be a jpg, jpeg format. Size image smaller 5Mb
+    OrderItemQuantity:
+      type: integer
+      example: 10
+      description: The number of products you want to order
+      maximum: 99
+    OrderItemPrice:
+      type: number
+      multipleOf: 0.01
+      example: 23
+      description: Price product
+
+    #Payment properties
+    LabelSaveCard:
+      type: boolean
+      example: false
+      description: Label for saving the card for a specific payment id
+
+    #UserCard properties
+    UserCardId:
+      type: integer
+      example: 1
+      description: Id user card
+    UserCardNumber:
+      type: string
+      example: 1234
+      description: last for number card
+    UserCardType:
+      type: string
+      example: visa
+      description: Type card
+    ChooseCardId:
+      nullable: true
+      example: 1
+      type: integer
+      description: Id of the selected saved card. Can be null when the card is not selected or there is no given functionality
+    UserCardPaymentMethod:
+      nullable: true
+      type: string
+      example: null
+      description: Payment method choose card
+
+    # Enums
+    OrderTypePaymentEnum:
+      nullable: false
+      type: string
+      enum:
+        - stripe
+        - paypal
+      example: stripe
+      description: Type of payment
+    OrderStatusPaymentEnum:
+      type: string
+      enum:
+        - refund
+        - success
+        - pending
+        - failed
+      example: success
+      description: Status of payment
+
+    # Refund  responses or requestBody
+    NewRefund:
+      properties:
+        order_id:
+          $ref: '#/components/schemas/PaymentStatusId'
+    Refund:
+      properties:
+        message:
+          type: string
+          example: 'Refund success'
+
+    # PaymentStatus responses or requestBody
+    PaymentStatuses:
+      type: array
+      items:
+        properties:
+          id:
+            $ref: '#/components/schemas/PaymentStatusId'
+          status:
+            $ref: '#/components/schemas/OrderStatusPaymentEnum'
+          created_at:
+            $ref: '#/components/schemas/PaymentStatusCreatedAt'
+
+    # OrderItem Responses and RequestBody
+    OrderItem:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/OrderItemId'
+        title:
+          $ref: '#/components/schemas/OrderItemTitle'
+        description:
+          $ref: '#/components/schemas/OrderItemDescription'
+        img:
+          $ref: '#/components/schemas/OrderItemImg'
+        quantity:
+          $ref: '#/components/schemas/OrderItemQuantity'
+        price:
+          $ref: '#/components/schemas/OrderItemPrice'
+        product_id:
+          $ref: '#/components/schemas/ProductUniqueNumber'
+
+    # UserCard Responses and RequestBody
+    UserCard:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/UserCardId'
+        last_number:
+          $ref: '#/components/schemas/UserCardNumber'
+        type_card:
+          $ref: '#/components/schemas/UserCardType'
+    UserCards:
+      type: array
+      items:
+        $ref: '#/components/schemas/UserCard'
+
+    # Payment Responses and RequestBody
+    NewPayment:
+      required:
+        - type_payment
+        - order_id
+      type: object
+      properties:
+        order_id:
+          $ref: '#/components/schemas/OrderId'
+        type_payment:
+          $ref: '#/components/schemas/OrderTypePayment'
+        save_card:
+          $ref: '#/components/schemas/LabelSaveCard'
+        card_id:
+          $ref: '#/components/schemas/UserCardId'
+
+    Payment:
+      type: object
+      properties:
+        type_payment:
+          $ref: '#/components/schemas/OrderTypePayment'
+        payment_id:
+          $ref: '#/components/schemas/OrderPaymentId'
+        client_secret:
+          $ref: '#/components/schemas/OrderClientSecret'
+        payment_method:
+          $ref: '#/components/schemas/UserCardPaymentMethod'
+
+
+    # Product Responses and RequestBody
+    Product:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/ProductId'
+        product_id:
+          $ref: '#/components/schemas/ProductUniqueNumber'
+        title:
+          $ref: '#/components/schemas/ProductTitle'
+        description:
+          $ref: '#/components/schemas/ProductDescription'
+        img:
+          $ref: '#/components/schemas/ProductImgOutput'
+        quantity:
+          $ref: '#/components/schemas/ProductQuantity'
+        price:
+          $ref: '#/components/schemas/ProductPrice'
+    Products:
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Product'
+        meta:
+          $ref: '#/components/schemas/Paginate'
+
+    # Order Responses and RequestBody
+    NewOrder:
+      required:
+        - id
+        - quantity
+        - products
+      properties:
+        products:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                $ref: '#/components/schemas/ProductId'
+              quantity:
+                $ref: '#/components/schemas/OrderItemQuantity'
+
+    Order:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/OrderId'
+        statuses:
+          $ref: '#/components/schemas/PaymentStatuses'
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+    Orders:
+      type: array
+      items:
+        $ref: '#/components/schemas/Order'
 
     # Users Responses and RequestBody
     Users:
@@ -819,14 +1452,16 @@ components:
         message:
           type: string
           example: You successfully logged out
-
     Social:
       type: object
       required:
         - driver
+        - code
       properties:
         driver:
           $ref: '#/components/schemas/SocialDriver'
+        code:
+          $ref: '#/components/schemas/SocialToken'
 
     SocialCallback:
       type: object
@@ -926,9 +1561,9 @@ components:
     Verify:
       type: object
       required:
-        - hash
+        - token
       properties:
-        hash:
+        token:
           $ref: '#/components/schemas/LoginHash'
 
     # Errors

@@ -5,7 +5,7 @@ set -e
 ##################################################################################################
 # Variables
 ##################################################################################################
-MAX_RELEASES=3
+MAX_RELEASES=2
 DEPLOY_PATH="/var/www/$DOMAIN_NAME"
 RELEASES_PATH="$DEPLOY_PATH/releases"
 RELEASE_PATH="$DEPLOY_PATH/release"
@@ -32,6 +32,7 @@ CUSTOM_COMMANDS=(
   "php artisan view:cache"
   "php artisan adminlte:install"
   "php artisan storage:link"
+  "php artisan telescope:publish"
 )
 AFTER_LINK_COMMANDS=(
   "sudo systemctl restart supervisord"

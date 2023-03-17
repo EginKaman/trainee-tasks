@@ -4,7 +4,15 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use App\Models\{LoginToken, User, UserProvider};
+use App\Models\{Card,
+    LoginToken,
+    Order,
+    OrderProduct,
+    OrderProductTranslation,
+    Payment,
+    PaymentHistory,
+    User,
+    UserProvider};
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\{Schema, Storage};
@@ -26,6 +34,12 @@ class UsersRemoveCommand extends Command
 
         LoginToken::truncate();
         UserProvider::truncate();
+        Card::truncate();
+        PaymentHistory::truncate();
+        Payment::truncate();
+        OrderProductTranslation::truncate();
+        OrderProduct::truncate();
+        Order::truncate();
         User::truncate();
 
         Schema::enableForeignKeyConstraints();
