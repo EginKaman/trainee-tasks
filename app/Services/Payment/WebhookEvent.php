@@ -28,6 +28,11 @@ class WebhookEvent
         )->where('method', $webhook->paymentMethod)->first();
 
         $event = Str::studly(Str::replace('.', '_', $this->eventObject->event));
+
+        if (!method_exists($this, $event)) {
+            return;
+        }
+
         if ($this->eventObject->plan !== null) {
             $subscription = Subscription::where('stripe_id', $this->eventObject->plan->id)->first();
             $this->storeEvent($subscription);
@@ -40,6 +45,7 @@ class WebhookEvent
         }
 
         $this->storeEvent($payment->order);
+
         $this->{$event}($payment);
     }
 
