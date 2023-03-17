@@ -72,25 +72,6 @@ class PaymentController extends Controller
             ], 400);
         }
 
-        if (Str::startsWith($eventObject->event, 'customer.subscription.')) {
-            /** @phpstan-ignore-next-line */
-            $data = $eventObject->data->object;
-            $user = User::where('stripe_id', $data->customer)->first();
-
-            $subscription = Subscription::where('stripe_id', $data->plan->id)->first();
-
-            $user->subscriptions()->syncWithPivotValues($subscription, [
-                'method_id' => $data->id,
-                'status' => $data->status,
-                'started_at' => Carbon::createFromTimestamp($data->start_date),
-                'expired_at' => Carbon::createFromTimestamp($data->current_period_end),
-            ]);
-        }
-
-        if (!isset($eventObject->orderId)) {
-            return response()->noContent();
-        }
-
         $webhookEvent->handle($webhook, $eventObject, $request);
 
         return response()->noContent();

@@ -109,7 +109,10 @@ class Client implements PaymentClient
             orderId: $dataObject->id,
             status: $dataObject->status,
             clientSecret: $dataObject->client_secret,
-            customer: $dataObject->customer
+            customer: $dataObject->customer,
+            plan: $dataObject->plan ?? null,
+            startDate: $dataObject->start_date,
+            endDate: $dataObject->current_period_end
         );
     }
 }

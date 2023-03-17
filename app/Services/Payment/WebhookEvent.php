@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace App\Services\Payment;
 
 use App\DataTransferObjects\EventObject;
-use App\Enum\{OrderStatus, PaymentStatus};
-use App\Models\{Card, Order, Payment, Payment as PaymentModel, PaymentHistory, User};
+use App\Enum\{OrderStatus, PaymentStatus, SubscriptionStatus};
+use App\Models\{Card, Order, Payment, Payment as PaymentModel, PaymentHistory, Subscription, User};
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
+use Illuminate\Support\{Carbon, Str};
 
 class WebhookEvent
 {
@@ -26,14 +27,19 @@ class WebhookEvent
             $this->eventObject->orderId
         )->where('method', $webhook->paymentMethod)->first();
 
+        $event = Str::studly(Str::replace('.', '_', $this->eventObject->event));
+        if ($this->eventObject->plan !== null) {
+            $subscription = Subscription::where('stripe_id', $this->eventObject->plan->id)->first();
+            $this->storeEvent($subscription);
+            $this->{$event}();
+
+            return;
+        }
         if ($payment === null) {
             return;
         }
 
         $this->storeEvent($payment->order);
-
-        $event = Str::studly(Str::replace('.', '_', $this->eventObject->event));
-
         $this->{$event}($payment);
     }
 
@@ -97,12 +103,54 @@ class WebhookEvent
         }
     }
 
-    private function storeEvent(Order $order): void
+    private function customerSubscriptionCreated(): void
+    {
+        $user = User::where('stripe_id', $this->eventObject->customer)->first();
+
+        $subscription = Subscription::where('stripe_id', $this->eventObject->plan->id)->first();
+
+        $user->subscriptions()->syncWithPivotValues($subscription, [
+            'method_id' => $this->eventObject->paymentMethodId,
+            'status' => SubscriptionStatus::Created->value,
+            'started_at' => Carbon::createFromTimestamp($this->eventObject->startDate),
+            'expired_at' => Carbon::createFromTimestamp($this->eventObject->endDate),
+        ]);
+    }
+
+    private function customerSubscriptionUpdated(): void
+    {
+        $user = User::where('stripe_id', $this->eventObject->customer)->first();
+
+        $subscription = Subscription::where('stripe_id', $this->eventObject->plan->id)->first();
+
+        $user->subscriptions()->syncWithPivotValues($subscription, [
+            'method_id' => $this->eventObject->paymentMethodId,
+            'status' => SubscriptionStatus::Created->value,
+            'started_at' => Carbon::createFromTimestamp($this->eventObject->startDate),
+            'expired_at' => Carbon::createFromTimestamp($this->eventObject->endDate),
+        ]);
+    }
+
+    private function customerSubscriptionCanceled(): void
+    {
+        $user = User::where('stripe_id', $this->eventObject->customer)->first();
+
+        $subscription = Subscription::where('stripe_id', $this->eventObject->plan->id)->first();
+
+        $user->subscriptions()->syncWithPivotValues($subscription, [
+            'method_id' => $this->eventObject->paymentMethodId,
+            'status' => SubscriptionStatus::Canceled->value,
+            'started_at' => Carbon::createFromTimestamp($this->eventObject->startDate),
+            'expired_at' => Carbon::createFromTimestamp($this->eventObject->endDate),
+        ]);
+    }
+
+    private function storeEvent(Model $model): void
     {
         $webHookEventModel = new \App\Models\WebhookEvent([
             'payload' => $this->request->getContent(),
         ]);
-        $webHookEventModel->order()->associate($order);
+        $webHookEventModel->eventable()->associate($model);
         $webHookEventModel->save();
     }
 
