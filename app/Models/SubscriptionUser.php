@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Relations\{BelongsTo, Pivot};
 use Illuminate\Support\Carbon;
 
 /**
+ * @property int $user_id
+ * @property int $subscription_id
  * @property string $method
  * @property string $method_id
  * @property string $status
