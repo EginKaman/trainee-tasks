@@ -4,145 +4,44 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Actions\Subscribe\{CancelSubscribe, Subscribe};
+use App\Exceptions\{AlreadySubscribedException, NotSubscribedException};
 use App\Http\Requests\{CancelSubscribeRequest, SubscribeRequest};
-use App\Models\Subscription;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Str;
-use Srmklive\PayPal\Facades\PayPal;
 use Stripe\Exception\ApiErrorException;
-use Stripe\StripeClient;
+use Throwable;
 
 class SubscribeController extends Controller
 {
-    public function subscribe(SubscribeRequest $request): JsonResponse
+    public function subscribe(SubscribeRequest $request, Subscribe $subscribe): JsonResponse
     {
         $user = $request->user();
-        $subscription = Subscription::find($request->validated('subscription_id'));
 
-        if ($subscription->users()
-            ->wherePivot('user_id', $user->id)
-            ->wherePivot('status', '!=', 'canceled')->exists()) {
+        try {
+            $url = $subscribe->subscribe(
+                $request->user(),
+                $request->validated('subscription_id'),
+                $request->validated('type_payment')
+            );
+        } catch (AlreadySubscribedException $exception) {
             return response()->json([
-                'message' => __('You already have the subscription'),
+                'message' => $exception->getMessage(),
             ], 409);
         }
 
-        if ($request->type_payment === 'paypal') {
-            $provider = Paypal::setProvider();
-            $provider->setApiCredentials(config('paypal'));
-            $token = $provider->getAccessToken();
-            $provider->setRequestHeader('Authorization', 'Bearer ' . $token['access_token']);
-            $provider->setRequestHeader('PayPal-Request-Id', Str::uuid()->toString());
-
-            $plan = $provider->createSubscription([
-                'plan_id' => $subscription->paypal_id,
-                'quantity' => 1,
-                'application_context' => [
-                    'return_url' => url('payments/paypal/success'),
-                    'cancel_url' => url('payments/paypal/cancel'),
-                ],
-            ]);
-
-            $redirectUrl = '';
-            foreach ($plan['links'] as $link) {
-                if ($link['rel'] === 'approve') {
-                    $redirectUrl = $link['href'];
-                }
-            }
-
-            $user->subscriptions()->syncWithPivotValues($subscription, [
-                'method' => $request->type_payment,
-                'method_id' => $plan['id'],
-                'status' => 'pending',
-            ]);
-
-            return response()->json([
-                'url' => $redirectUrl,
-            ]);
-        }
-        $stripe = new StripeClient(config('services.stripe.api_secret'));
-
-        if ($user->stripe_id === null) {
-            $customer = $stripe->customers->create([
-                'email' => $user->email,
-                'name' => $user->name,
-                'phone' => $user->phone,
-            ]);
-
-            $user->stripe_id = $customer->id;
-            $user->save();
-        }
-
-        $product = $stripe->prices->retrieve($subscription->stripe_id);
-
-        $user->subscriptions()->syncWithPivotValues($subscription, [
-            'status' => 'pending',
-            'method' => 'stripe',
-        ]);
-
-        $checkout_session = $stripe->checkout->sessions->create([
-            'line_items' => [
-                [
-                    'price' => $product->id,
-                    'quantity' => 1,
-                ],
-            ],
-            'customer' => $user->stripe_id,
-            'mode' => 'subscription',
-            'success_url' => url('payments/stripe/success?session_id={CHECKOUT_SESSION_ID}'),
-            'cancel_url' => url('payments/stripe/cancel'),
-        ]);
-
         return response()->json([
-            'url' => $checkout_session->url,
+            'url' => $url,
         ]);
     }
 
-    public function cancel(CancelSubscribeRequest $request): JsonResponse
+    public function cancel(CancelSubscribeRequest $request, CancelSubscribe $cancelSubscribe): JsonResponse
     {
-        $user = $request->user();
-
-        $subscription = $user->subscriptions()->wherePivotNotIn('status', ['canceled', 'pending'])->find(
-            $request->validated('subscription_id')
-        );
-
-        if (!$subscription) {
+        try {
+            $cancelSubscribe->cancel($request->user(), $request->validated('subscription_id'));
+        } catch (Throwable|ApiErrorException $exception) {
             return response()->json([
-                'message' => __("You didn't subscribe to this subscription"),
-            ], 404);
-        }
-
-        if ($subscription->pivot->method === 'paypal') {
-            $provider = Paypal::setProvider();
-            $provider->setApiCredentials(config('paypal'));
-            $token = $provider->getAccessToken();
-            $provider->setRequestHeader('Authorization', 'Bearer ' . $token['access_token']);
-            $provider->setRequestHeader('PayPal-Request-Id', Str::uuid()->toString());
-
-            $provider->cancelSubscription($subscription->pivot->method_id, 'Canceled by user');
-
-            $subscription->pivot->status = 'canceled';
-            $subscription->pivot->canceled_at = now();
-
-            $subscription->pivot->save();
-        }
-
-        if ($subscription->pivot->method === 'stripe') {
-            $stripe = new StripeClient(config('services.stripe.api_secret'));
-
-            try {
-                $response = $stripe->subscriptions->cancel($subscription->pivot->method_id);
-            } catch (ApiErrorException $exception) {
-                return response()->json([
-                    'status' => __('Failure'),
-                    'message' => $exception->getMessage(),
-                ], $exception->getHttpStatus());
-            }
-
-            $subscription->pivot->status = 'canceled';
-            $subscription->pivot->canceled_at = now();
-
-            $subscription->pivot->save();
+                'message' => $exception->getMessage(),
+            ], $exception->getCode());
         }
 
         return response()->json([
