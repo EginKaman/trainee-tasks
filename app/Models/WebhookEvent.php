@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\{BelongsTo, MorphTo};
 
 /**
  * @property int $id
@@ -19,8 +19,8 @@ class WebhookEvent extends Model
         'payload' => 'json',
     ];
 
-    public function order(): BelongsTo
+    public function eventable(): MorphTo
     {
-        return $this->belongsTo(Order::class);
+        return $this->morphTo();
     }
 }

@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace App\Services\Payment\Stripe;
 
 use App\DataTransferObjects\{CreatedPaymentObject, Refund};
-use App\DataTransferObjects\{EventObject, NewPaymentObject};
+use App\DataTransferObjects\{CreatedSubscriptionObject, EventObject, NewPaymentObject, NewSubscribeObject};
 use App\Models\User;
 use App\Services\Payment\PaymentClient;
 use Illuminate\Http\Request;
 use Stripe\Exception\SignatureVerificationException;
-use Stripe\{StripeClient, Webhook as StripeWebhook};
+use Stripe\{Exception\ApiErrorException, StripeClient, Webhook as StripeWebhook};
 
 class Client implements PaymentClient
 {
@@ -109,7 +109,49 @@ class Client implements PaymentClient
             orderId: $dataObject->id,
             status: $dataObject->status,
             clientSecret: $dataObject->client_secret,
-            customer: $dataObject->customer
+            customer: $dataObject->customer,
+            plan: $dataObject->plan ?? null,
+            startDate: $dataObject->start_date,
+            endDate: $dataObject->current_period_end
         );
+    }
+
+    public function subscribe(NewSubscribeObject $newSubscriptionObject): CreatedSubscriptionObject
+    {
+        if ($newSubscriptionObject->user->stripe_id === null) {
+            $customer = $this->client->customers->create([
+                'email' => $newSubscriptionObject->user->email,
+                'name' => $newSubscriptionObject->user->name,
+                'phone' => $newSubscriptionObject->user->phone,
+            ]);
+
+            $newSubscriptionObject->user->stripe_id = $customer->id;
+            $newSubscriptionObject->user->save();
+        }
+
+        $product = $this->client->prices->retrieve($newSubscriptionObject->planId);
+
+        $checkout_session = $this->client->checkout->sessions->create([
+            'line_items' => [
+                [
+                    'price' => $product->id,
+                    'quantity' => 1,
+                ],
+            ],
+            'customer' => $newSubscriptionObject->user->stripe_id,
+            'mode' => 'subscription',
+            'success_url' => url('payments/stripe/success?session_id={CHECKOUT_SESSION_ID}'),
+            'cancel_url' => url('payments/stripe/cancel'),
+        ]);
+
+        return new CreatedSubscriptionObject($checkout_session->url);
+    }
+
+    /**
+     * @throws ApiErrorException
+     */
+    public function cancelSubscribe(string $subscribeId): void
+    {
+        $this->client->subscriptions->cancel($subscribeId);
     }
 }

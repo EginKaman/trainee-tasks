@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace App\Services\Payment;
 
 use App\DataTransferObjects\EventObject;
-use App\Enum\{OrderStatus, PaymentStatus};
-use App\Models\{Card, Order, Payment, Payment as PaymentModel, PaymentHistory, User};
+use App\Enum\{OrderStatus, PaymentStatus, SubscriptionStatus};
+use App\Models\{Card, Payment, Payment as PaymentModel, PaymentHistory, Subscription, User};
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
+use Illuminate\Support\{Carbon, Str};
 
 class WebhookEvent
 {
@@ -26,16 +27,25 @@ class WebhookEvent
             $this->eventObject->orderId
         )->where('method', $webhook->paymentMethod)->first();
 
+        $event = Str::studly(Str::replace('.', '_', $this->eventObject->event));
+
+        if (!method_exists($this, $event)) {
+            return;
+        }
+
+        if ($this->eventObject->plan !== null) {
+            $subscription = Subscription::where('stripe_id', $this->eventObject->plan->id)->first();
+            $this->storeEvent($subscription);
+            $this->{$event}();
+
+            return;
+        }
         if ($payment === null) {
             return;
         }
 
         $this->storeEvent($payment->order);
 
-        $event = Str::studly(Str::replace('.', '_', $this->eventObject->event));
-        if (!method_exists($this, $event)) {
-            return;
-        }
         $this->{$event}($payment);
     }
 
@@ -99,32 +109,69 @@ class WebhookEvent
         }
     }
 
-    private function paymentCapturePending(PaymentModel $payment): void
+    private function customerSubscriptionCreated(): void
     {
-        $this->paymentIntentCreated($payment);
+        $user = User::where('stripe_id', $this->eventObject->customer)->first();
+
+        $subscription = Subscription::where('stripe_id', $this->eventObject->plan->id)->first();
+
+        $user->subscriptions()->syncWithPivotValues($subscription, [
+            'method_id' => $this->eventObject->paymentMethodId,
+            'status' => SubscriptionStatus::Created->value,
+            'started_at' => Carbon::createFromTimestamp($this->eventObject->startDate),
+            'expired_at' => Carbon::createFromTimestamp($this->eventObject->endDate),
+        ]);
     }
 
-    private function checkoutOrderApproved(PaymentModel $payment): void
+    private function customerSubscriptionUpdated(): void
     {
-        $this->paymentIntentSucceeded($payment);
+        $user = User::where('stripe_id', $this->eventObject->customer)->first();
+
+        $subscription = Subscription::where('stripe_id', $this->eventObject->plan->id)->first();
+
+        $user->subscriptions()->syncWithPivotValues($subscription, [
+            'method_id' => $this->eventObject->paymentMethodId,
+            'status' => SubscriptionStatus::Created->value,
+            'started_at' => Carbon::createFromTimestamp($this->eventObject->startDate),
+            'expired_at' => Carbon::createFromTimestamp($this->eventObject->endDate),
+        ]);
     }
 
-    private function paymentCaptureRefunded(PaymentModel $payment): void
+    private function customerSubscriptionCanceled(): void
     {
-        $this->chargeRefunded($payment);
+        $user = User::where('stripe_id', $this->eventObject->customer)->first();
+
+        $subscription = Subscription::where('stripe_id', $this->eventObject->plan->id)->first();
+
+        $user->subscriptions()->syncWithPivotValues($subscription, [
+            'method_id' => $this->eventObject->paymentMethodId,
+            'status' => SubscriptionStatus::Canceled->value,
+            'started_at' => Carbon::createFromTimestamp($this->eventObject->startDate),
+            'expired_at' => Carbon::createFromTimestamp($this->eventObject->endDate),
+        ]);
     }
 
-    private function paymentCaptureReversed(PaymentModel $payment): void
+    private function billingSubscriptionCreated(): void
     {
-        $this->paymentIntentCanceled($payment);
+        $this->customerSubscriptionCreated();
     }
 
-    private function storeEvent(Order $order): void
+    private function billingSubscriptionCancelled(): void
+    {
+        $this->customerSubscriptionCanceled();
+    }
+
+    private function billingSubscriptionUpdated(): void
+    {
+        $this->customerSubscriptionUpdated();
+    }
+
+    private function storeEvent(Model $model): void
     {
         $webHookEventModel = new \App\Models\WebhookEvent([
             'payload' => $this->request->getContent(),
         ]);
-        $webHookEventModel->order()->associate($order);
+        $webHookEventModel->eventable()->associate($model);
         $webHookEventModel->save();
     }
 

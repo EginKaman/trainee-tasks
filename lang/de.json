@@ -43,5 +43,8 @@
     "Card record not found.": "Kartendatensatz nicht gefunden.",
     "Order has already refunded": "Bestellung wurde bereits erstattet",
     "Order doesn't have payment": "Bestellung hat keine Zahlung",
-    "Refund success": "Erfolg erstatten"
+    "Refund success": "Erfolg erstatten",
+    "You already have the subscription": "Sie haben bereits das Abonnement",
+    "You didn't subscribe to this subscription": "Sie haben dieses Abonnement nicht abonniert",
+    "Your subscription was canceled. Updating subscription information will be soon.": "Ihr Abonnement wurde gekündigt. Die Aktualisierung der Abonnementinformationen erfolgt in Kürze."
 }

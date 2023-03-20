@@ -865,6 +865,147 @@ paths:
               schema:
                 $ref: '#/components/schemas/SomethingWentWrong'
 
+  /subscriptions:
+    get:
+      tags:
+        - subscriptions
+      description: This method for getting subscriptions
+      parameters:
+        - in: header
+          name: Accept-Language
+          description: Set interface language (en, de)
+          schema:
+            type: string
+            example: en
+      responses:
+        200:
+          description: Successfully getting subscriptions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscriptions'
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
+  /subscribe:
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - subscriptions
+      description: This method subscribe user with selected subscription
+      parameters:
+        - in: header
+          name: Accept-Language
+          description: Set interface language (en, de)
+          schema:
+            type: string
+            example: en
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NewSubscribe'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewSubscribe'
+      responses:
+        200:
+          description: Successfully created subscribe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NewSubscription'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        409:
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                title: Conflict
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'You already have the subscription'
+        422:
+          description: Unprocessable Content
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableContent'
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
+  /subscribe/cancel:
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - subscriptions
+      description: This method subscribe user with selected subscription
+      parameters:
+        - in: header
+          name: Accept-Language
+          description: Set interface language (en, de)
+          schema:
+            type: string
+            example: en
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CancelSubscribe'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CancelSubscribe'
+      responses:
+        200:
+          description: Successfully canceled subscription
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CanceledSubscription'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        404:
+          description: Not found
+          content:
+            application/json:
+              schema:
+                title: Not found
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Your didn't subscribe to this subscription
+        422:
+          description: Unprocessable Content
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnprocessableContent'
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
 components:
   securitySchemes:
     bearerAuth:
@@ -1445,6 +1586,88 @@ components:
         total:
           $ref: '#/components/schemas/Total'
 
+    SubscriptionId:
+      type: integer
+      example: 1
+      description: Subscription ID
+    SubscriptionTitle:
+      type: string
+      example: Online techno conference subscription
+      description: Subscription title
+    SubscriptionPrice:
+      type: integer
+      example: 100
+      description: Subscription Price
+    SubscriptionImage:
+      type: string
+      example: https://test2022-backend-andrey-l2.abztrainee.com/storage/subscriptions/bhjdBJHViud9384bv2223mdnc.jpg
+      description: Subscription image url
+    SubscriptionDescription:
+      type: string
+      example: Subscription includes lectures on IT, robotics, nanotechnology, science, engineering.
+      description: Subscription description
+    SubscriptionPeriod:
+      type: string
+      example: 1 month
+      description: Subscription period
+    Subscription:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/SubscriptionId'
+        title:
+          $ref: '#/components/schemas/SubscriptionTitle'
+        price:
+          $ref: '#/components/schemas/SubscriptionPrice'
+        image:
+          $ref: '#/components/schemas/SubscriptionImage'
+        description:
+          $ref: '#/components/schemas/SubscriptionDescription'
+        period:
+          $ref: '#/components/schemas/SubscriptionPeriod'
+    Subscriptions:
+      type: array
+      items:
+        $ref: '#/components/schemas/Subscription'
+
+    NewSubscribe:
+      required:
+        - type_payment
+        - subscription_id
+      type: object
+      properties:
+        subscription_id:
+          $ref: '#/components/schemas/SubscriptionId'
+        type_payment:
+          $ref: '#/components/schemas/OrderTypePayment'
+
+    NewSubscription:
+      type: object
+      properties:
+        url:
+          $ref: '#/components/schemas/SubscriptionUrl'
+
+    SubscriptionUrl:
+      type: string
+      example: https://checkout.stripe.com/c/pay/...
+
+    CancelSubscribe:
+      required:
+        - subscription_id
+      type: object
+      properties:
+        subscription_id:
+          $ref: '#/components/schemas/SubscriptionId'
+    CanceledSubscription:
+      type: object
+      properties:
+        status:
+          type: string
+          example: Success
+          description: status to send mail
+        message:
+          type: string
+          example: Your subscription was canceled. Updating subscription information will be soon.
     # Auth Responses an RequestBody
     SuccessLogout:
       type: object
@@ -1602,6 +1825,20 @@ components:
               type: array
               items:
                 example: "The phone format is invalid."
+    UnprocessableContent:
+      type: object
+      title: Unprocessable Content
+      properties:
+        message:
+          type: string
+          example: 'The selected subscription id is invalid.'
+        errors:
+          type: object
+          properties:
+            subscription_id:
+              type: array
+              items:
+                example: "The selected subscription id is invalid."
     Conflict:
       type: object
       title: Conflict

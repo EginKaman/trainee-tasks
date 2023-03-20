@@ -11,6 +11,7 @@ use App\Models\{Card,
     OrderProductTranslation,
     Payment,
     PaymentHistory,
+    SubscriptionUser,
     User,
     UserProvider};
 use Illuminate\Console\Command;
@@ -36,6 +37,7 @@ class UsersRemoveCommand extends Command
         UserProvider::truncate();
         Card::truncate();
         PaymentHistory::truncate();
+        SubscriptionUser::truncate();
         Payment::truncate();
         OrderProductTranslation::truncate();
         OrderProduct::truncate();

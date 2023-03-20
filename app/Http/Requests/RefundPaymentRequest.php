@@ -20,7 +20,7 @@ class RefundPaymentRequest extends FormRequest
                 'required',
                 'int',
                 'min:1',
-                Rule::exists('orders', 'id')->where(fn (Builder $query) => $query->where('user_id', auth('api')->id())),
+                Rule::exists('orders', 'id')->where(fn (Builder $query) => $query->where('user_id', $this->user()->id)),
             ],
         ];
     }

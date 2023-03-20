@@ -6,9 +6,11 @@ namespace App\Http\Controllers;
 
 use App\Exceptions\{UnknownPaymentMethodException};
 use App\Http\Requests\{RefundPaymentRequest, StorePaymentRequest};
+use App\Models\{Subscription, User};
 use App\Services\Payment\{NewPayment, Webhook, WebhookEvent};
 use App\Services\Payment\{NewRefund};
 use Illuminate\Http\{JsonResponse, Request, Response};
+use Illuminate\Support\{Carbon, Str};
 use Stripe\{Exception\SignatureVerificationException};
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
@@ -68,10 +70,6 @@ class PaymentController extends Controller
             return response()->json([
                 'message' => $e->getMessage(),
             ], 400);
-        }
-
-        if (!isset($eventObject->orderId)) {
-            return response()->noContent();
         }
 
         $webhookEvent->handle($webhook, $eventObject, $request);

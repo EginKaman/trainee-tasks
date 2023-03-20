@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Payment\Paypal;
 
 use App\DataTransferObjects\{CreatedPaymentObject, Refund};
-use App\DataTransferObjects\{EventObject, NewPaymentObject};
+use App\DataTransferObjects\{CreatedSubscriptionObject, EventObject, NewPaymentObject, NewSubscribeObject};
 use App\Exceptions\PaypalSignatureVerificationException;
 use App\Services\Payment\PaymentClient;
 use Illuminate\Http\Request;
@@ -73,6 +73,38 @@ class Client implements PaymentClient
             orderId: $request->resource['supplementary_data']['related_ids']['order_id'] ?? null,
             status: $request->resource['status']
         );
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function subscribe(NewSubscribeObject $newSubscriptionObject): CreatedSubscriptionObject
+    {
+        $plan = $this->client->createSubscription([
+            'plan_id' => $newSubscriptionObject->planId,
+            'quantity' => 1,
+            'application_context' => [
+                'return_url' => url('payments/paypal/success'),
+                'cancel_url' => url('payments/paypal/cancel'),
+            ],
+        ]);
+
+        $redirectUrl = '';
+        foreach ($plan['links'] as $link) {
+            if ($link['rel'] === 'approve') {
+                $redirectUrl = $link['href'];
+            }
+        }
+
+        return new CreatedSubscriptionObject($redirectUrl, $plan['id']);
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function cancelSubscribe(string $subscribeId): void
+    {
+        $this->client->cancelSubscription($subscribeId, 'Canceled by user');
     }
 
     /**

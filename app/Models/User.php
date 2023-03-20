@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasMany};
+use Illuminate\Database\Eloquent\Relations\{BelongsTo, BelongsToMany, HasMany};
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -20,6 +20,7 @@ use Propaganistas\LaravelPhone\Casts\E164PhoneNumberCast;
  * @property E164PhoneNumberCast $phone
  * @property string $photo_small
  * @property string $photo_big
+ * @property string $stripe_id
  */
 class User extends Authenticatable implements JWTSubject
 {
@@ -40,7 +41,7 @@ class User extends Authenticatable implements JWTSubject
      *
      * @var array<int, string>
      */
-    protected $hidden = [];
+    protected $hidden = ['stripe_id'];
 
     /**
      * The attributes that should be cast.
@@ -102,6 +103,13 @@ class User extends Authenticatable implements JWTSubject
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
+    }
+
+    public function subscriptions(): BelongsToMany
+    {
+        return $this->belongsToMany(Subscription::class)->using(SubscriptionUser::class)->withPivot(
+            ['method', 'method_id', 'canceled_at', 'started_at', 'expired_at', 'status']
+        )->withTimestamps();
     }
 
     public function cards(): HasMany

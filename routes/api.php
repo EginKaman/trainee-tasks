@@ -9,6 +9,8 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\SubscribeController;
+use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -42,6 +44,9 @@ Route::prefix('v1')->middleware(['localization'])->group(function () {
 
         Route::get('cards', [CardController::class, 'index']);
         Route::delete('cards/{card}', [CardController::class, 'destroy']);
+
+        Route::post('subscribe', [SubscribeController::class, 'subscribe']);
+        Route::post('subscribe/cancel', [SubscribeController::class, 'cancel']);
     });
 
     Route::apiResource('users', UserController::class);
@@ -49,5 +54,6 @@ Route::prefix('v1')->middleware(['localization'])->group(function () {
     Route::get('products', ProductController::class);
 
     Route::post('payments/{method}/webhook', [PaymentController::class, 'webhook']);
-});
 
+    Route::get('subscriptions', [SubscriptionController::class, 'index']);
+});
