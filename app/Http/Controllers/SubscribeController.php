@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Actions\Subscribe\{CancelSubscribe, Subscribe};
+use App\Actions\Subscribe\{CancelSubscription, Subscribe};
 use App\Exceptions\{AlreadySubscribedException, NotSubscribedException};
 use App\Http\Requests\{CancelSubscribeRequest, SubscribeRequest};
 use Illuminate\Http\JsonResponse;
@@ -34,7 +34,7 @@ class SubscribeController extends Controller
         ]);
     }
 
-    public function cancel(CancelSubscribeRequest $request, CancelSubscribe $cancelSubscribe): JsonResponse
+    public function cancel(CancelSubscribeRequest $request, CancelSubscription $cancelSubscribe): JsonResponse
     {
         try {
             $cancelSubscribe->cancel($request->user(), $request->validated('subscription_id'));
