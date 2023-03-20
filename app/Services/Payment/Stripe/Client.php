@@ -152,8 +152,6 @@ class Client implements PaymentClient
      */
     public function cancelSubscribe(string $subscribeId): void
     {
-        $stripe = new StripeClient(config('services.stripe.api_secret'));
-
-        $stripe->subscriptions->cancel($subscribeId);
+        $this->client->subscriptions->cancel($subscribeId);
     }
 }

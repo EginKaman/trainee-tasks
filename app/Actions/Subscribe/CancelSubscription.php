@@ -9,7 +9,7 @@ use App\Exceptions\NotSubscribedException;
 use App\Models\User;
 use App\Services\Payment\Payment;
 
-class CancelSubscribe
+class CancelSubscription
 {
     public function cancel(User $user, int $subscriptionId): void
     {
