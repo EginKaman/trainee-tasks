@@ -24,7 +24,7 @@ return new class() extends Migration {
             $table->foreignId('subscription_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('method_id')->nullable();
             $table->string('method')->nullable();
-            $table->string('status')->nullable();
+            $table->enum('status', ['created', 'pending', 'expired', 'active', 'canceled'])->nullable();
             $table->timestamp('canceled_at')->nullable();
             $table->timestamp('started_at')->nullable();
             $table->timestamp('expired_at')->nullable();

@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\Services\Payment;
 
 use App\DataTransferObjects\{CreatedPaymentObject, Refund};
-use App\DataTransferObjects\{NewPaymentObject};
+use App\DataTransferObjects\{CreatedSubscriptionObject, NewPaymentObject, NewSubscribeObject};
 use App\Exceptions\UnknownPaymentMethodException;
 use App\Services\Payment\Paypal\Client as PaypalClient;
 use App\Services\Payment\Stripe\Client as StripeClient;
+use Stripe\Exception\ApiErrorException;
+use Throwable;
 
 class Payment
 {
@@ -32,6 +34,20 @@ class Payment
     public function refund(Refund $refund): void
     {
         $this->client->refund($refund);
+    }
+
+    public function subscribe(NewSubscribeObject $newSubscriptionObject): CreatedSubscriptionObject
+    {
+        return $this->client->subscribe($newSubscriptionObject);
+    }
+
+    /**
+     * @throws ApiErrorException
+     * @throws Throwable
+     */
+    public function cancelSubscribe(string $subscribeId): void
+    {
+        $this->client->cancelSubscribe($subscribeId);
     }
 
     /**
