@@ -15,6 +15,8 @@ use Propaganistas\LaravelPhone\Casts\E164PhoneNumberCast;
 
 /**
  * @property int $id
+ * @property string $socket_id
+ * @property bool $online
  * @property string $name
  * @property string $email
  * @property E164PhoneNumberCast $phone
@@ -34,7 +36,7 @@ class User extends Authenticatable implements JWTSubject
      *
      * @var array<int, string>
      */
-    protected $fillable = ['stripe_id', 'name', 'email', 'phone', 'photo_small', 'photo_big'];
+    protected $fillable = ['socket_id', 'online', 'stripe_id', 'name', 'email', 'phone', 'photo_small', 'photo_big'];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -50,6 +52,7 @@ class User extends Authenticatable implements JWTSubject
      */
     protected $casts = [
         'phone' => E164PhoneNumberCast::class . ':UA',
+        'online' => 'bool',
     ];
 
     /**

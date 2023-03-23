@@ -1,0 +1,165 @@
+asyncapi: 2.4.0
+info:
+  title: '[Task 11] Backend_Ivan_T'
+  version: 1.0.0
+  contact:
+    name: Backend_Ivan_T
+    email: ivan.tiutiunnyk@abz.agency
+servers:
+  local:
+    url: 'http://localhost:3000/'
+    protocol: socket.io
+  dev:
+    url: 'https://test2023-backend-ivan-t.abztrainee.com/'
+    protocol: socket.io
+defaultContentType: application/json
+channels:
+  users.add:
+    description: User was connected and receives their data.
+    publish:
+      summary: Join new user
+      operationId: add
+      message:
+        name: addUser
+        title: 'The user joined test --- 18.02.2023 14:42'
+        contentType: application/json
+        payload:
+          type: object
+          example:
+            id: 2
+            name: Joe
+            avatar: https://test2023-backend-ivan-t.abztrainee.com/storage/users/dzsfd32NJdpsdvDJcko9dssdc.jpg
+            status: true
+          properties:
+            id:
+              type: integer
+              description: Unique user ID
+            avatar:
+              type: string
+              description: User avatar
+            name:
+              type: string
+              description: User name
+            online:
+              type: boolean
+              description: User status
+  users.update:
+    description: Update information about online user
+    publish:
+      summary: Update user
+      operationId: update
+      message:
+        name: addUser
+        title: 'The user updated'
+        contentType: application/json
+        payload:
+          type: object
+          example:
+            id: 2
+            name: Joe
+            avatar: https://test2023-backend-ivan-t.abztrainee.com/storage/users/dzsfd32NJdpsdvDJcko9dssdc.jpg
+            online: true
+          properties:
+            id:
+              type: integer
+              description: Unique user ID
+            avatar:
+              type: string
+              description: User avatar
+            name:
+              type: string
+              description: User name
+            online:
+              type: boolean
+              description: User status
+  users.list:
+    description: Update information about all of online users
+    publish:
+      summary: List users
+      operationId: list
+      message:
+        name: addUser
+        title: 'The user updated'
+        contentType: application/json
+        payload:
+          type: array
+          items:
+            $ref: '#/components/schemas/userPayload'
+  users.delete:
+    description: Remove information about online users
+    publish:
+      summary: Remove user
+      operationId: delete
+      message:
+        name: addUser
+        title: 'The user has left'
+        contentType: application/json
+        payload:
+          type: object
+          example:
+            id: 2
+            name: Joe
+          properties:
+            id:
+              type: integer
+              description: Unique user ID
+            name:
+              type: string
+              description: User name
+components:
+  messages:
+    addUser:
+      name: addUser
+      title: 'The user joined test --- 18.02.2023 14:42'
+      contentType: application/json
+      payload:
+        type: object
+        example:
+          id: 2
+          name: Joe
+          avatar: https://test2023-backend-ivan-t.abztrainee.com/storage/users/dzsfd32NJdpsdvDJcko9dssdc.jpg
+          online: true
+        properties:
+          id:
+            type: integer
+            description: Unique user ID
+          name:
+            type: string
+            description: User name
+          avatar:
+            type: string
+            description: User avatar
+          online:
+            type: boolean
+            description: User status
+  schemas:
+    userPayload:
+      type: object
+      example:
+        id: 2
+        name: Joe
+        avatar: https://test2023-backend-ivan-t.abztrainee.com/storage/users/dzsfd32NJdpsdvDJcko9dssdc.jpg
+        online: true
+      properties:
+        id:
+          type: integer
+          description: Unique user ID
+        name:
+          type: string
+          description: Name of user
+        avatar:
+          type: string
+          description: User avatar
+    avatar:
+      type: string
+      description: User avatar
+    name:
+      type: string
+      description: User name
+    userId:
+      type: integer
+      description: Unique user ID
+    online:
+      type: boolean
+      description: User status
+

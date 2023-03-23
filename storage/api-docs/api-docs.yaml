@@ -1006,6 +1006,57 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SomethingWentWrong'
+
+  /sockets/users/{user}:
+    patch:
+      tags:
+        - sockets
+      description: Method for update user data after connect to socket server.
+      parameters:
+        - name: user
+          in: path
+          required: true
+          description: Id this user
+          schema:
+            type: integer
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SocketUserUpdate'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SocketUserUpdate'
+      responses:
+        200:
+          description: Updated success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocketUser'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        422:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+              example:
+                message: The token must be a valid
+                errors:
+                  email:
+                    - "The token format is invalid."
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+          $ref: '#/components/schemas/SomethingWentWrong'
 components:
   securitySchemes:
     bearerAuth:
@@ -1742,6 +1793,41 @@ components:
           $ref: '#/components/schemas/UserPhoto'
         role_id:
           $ref: '#/components/schemas/RoleId'
+
+    SocketUserUpdate:
+      type: object
+      required:
+        - name
+        - photo
+        - online
+        - time
+      properties:
+        name:
+          $ref: '#/components/schemas/UserName'
+        photo:
+          $ref: '#/components/schemas/UserPhoto'
+        online:
+          type: boolean
+          example: true
+
+    SocketUser:
+      type: object
+      required:
+        - name
+        - photo
+        - status
+        - time
+      properties:
+        name:
+          $ref: '#/components/schemas/UserName'
+        photo:
+          $ref: '#/components/schemas/UserPhoto'
+        status:
+          type: boolean
+          example: true
+        time:
+          type: string
+          example: '2023-03-15T19:03:45Z'
 
     SocialRedirectUrl:
       type: string
