@@ -7,16 +7,15 @@ import Redis from 'ioredis';
 
 dotenv.config({path: path.resolve(process.cwd(), '.env')});
 
-var redis = new Redis(process.env.REDIS_HOST, process.env.REDIS_PORT, {
+const redis = new Redis(process.env.REDIS_HOST, process.env.REDIS_PORT, {
     db: process.env.REDIS_DB || 0
 });
-var redisPublish = new Redis(process.env.REDIS_HOST, process.env.REDIS_PORT);
-var server = createServer(app)
-var io = new Server(server);
+const redisPublish = new Redis(process.env.REDIS_HOST, process.env.REDIS_PORT);
+const server = createServer(app)
+const io = new Server(server);
 
-var prefix = process.env.REDIS_PREFIX || ((process.env.APP_NAME.toLowerCase() || 'laravel') + '_database_');
+const prefix = process.env.REDIS_PREFIX || ((process.env.APP_NAME.toLowerCase() || 'laravel') + '_database_');
 
-console.log(prefix);
 redis.subscribe(prefix + 'users', function (err, count) {
     if (err) {
         // Just like other commands, subscribe() can fail for some reasons,
@@ -32,9 +31,10 @@ redis.subscribe(prefix + 'users', function (err, count) {
 
 redis.on("message", (channel, message) => {
     console.log(`Received ${message} from ${channel}`);
-    let data = JSON.parse(message);
+
+    const data = JSON.parse(message);
+
     if (data.event === 'App\\Events\\ConnectedEvent') {
-        console.log(data);
         io.emit('users.add', data.data.user);
     }
 
@@ -56,15 +56,12 @@ io.on('connection', async function (socket) {
     redisPublish.publish(prefix + 'connected', JSON.stringify(message));
 
     socket.on('users.add', function (message) {
-        console.log(message);
         io.emit('users.add', message);
     });
     socket.on('users.update', function (message) {
-        console.log(message);
         io.emit('users.update', message);
     });
     socket.on('users.update', function (message) {
-        console.log(message);
         io.emit('users.update', message);
     });
     socket.on('users.delete', function (message) {
