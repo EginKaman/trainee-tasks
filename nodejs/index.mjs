@@ -41,9 +41,11 @@ redis.on("message", (channel, message) => {
     if (data.event === 'App\\Events\\UserListEvent') {
         io.emit('users.list', data.data.users);
     }
+
     if (data.event === 'App\\Events\\UserUpdateEvent') {
         io.emit('users.update', data.data.user);
     }
+
     if (data.event === 'App\\Events\\DisconnectedEvent') {
         io.emit('users.delete', data.data.user);
     }
@@ -53,24 +55,30 @@ io.on('connection', async function (socket) {
     let message = {
         socket: socket.id
     }
+
     redisPublish.publish(prefix + 'connected', JSON.stringify(message));
 
     socket.on('users.add', function (message) {
         io.emit('users.add', message);
     });
+
     socket.on('users.update', function (message) {
         io.emit('users.update', message);
     });
+
     socket.on('users.update', function (message) {
         io.emit('users.update', message);
     });
+
     socket.on('users.delete', function (message) {
         io.emit('users.delete', message);
     });
+
     socket.on('disconnect', () => {
         message = {
             socket: socket.id
         };
+
         redisPublish.publish(prefix + 'disconnected', JSON.stringify(message));
     });
 
