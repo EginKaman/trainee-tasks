@@ -42,8 +42,8 @@ definitions:
         script:
           - apt-get update && apt-get install -y zip git ssh rsync
           - mkdir -p ~/.ssh
-          - (umask  077 ; echo $SSH_VARIABLE | base64 --decode > ~/.ssh/id_rsa)
           - ssh-keyscan -t rsa $SERVER_BASTION_IP > ~/.ssh/known_hosts
+          - (umask  077 ; echo $SSH_VARIABLE | base64 --decode > ~/.ssh/id_rsa)
           - bash deploy.sh
 pipelines:
   branches:
