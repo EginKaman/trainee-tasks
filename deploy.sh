@@ -75,7 +75,7 @@ print_row() {
 # Ssh functions
 ##################################################################################################
 execute_via_ssh() {
-    ssh -o ProxyCommand="ssh -i ~/.ssh/id_rsa $REMOTE_USER@$SERVER_BASTION_IP nc -w 300 %h %p" "$REMOTE_USER@$SERVER_IP" "$1"
+    ssh -i "~/.ssh/id_rsa" "$REMOTE_USER@$SERVER_IP" -J ""$REMOTE_USER@$SERVER_BASTION_IP"" "$1"
 }
 
 ##################################################################################################
