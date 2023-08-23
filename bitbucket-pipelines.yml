@@ -27,14 +27,23 @@ definitions:
           - composer
         artifacts:
           - vendor/**
-    - step: &deploy
+    - step: &deployDevelopment
         name: Deploy Application to the Development server
         deployment: Staging
         script:
           - apt-get update && apt-get install -y zip git ssh rsync
           - mkdir -p ~/.ssh
           - ssh-keyscan -t rsa $SERVER_IP > ~/.ssh/known_hosts
-          - (umask  077 ; echo $BITBUCKET_SSH_KEY_FILE > ~/.ssh/id_rsa)
+          - (umask  077 ; echo $SSH_VARIABLE | base64 --decode > ~/.ssh/id_rsa)
+          - bash deploy.sh
+    - step: &deployStaging
+        name: Deploy Application to the Development server
+        deployment: Production
+        script:
+          - apt-get update && apt-get install -y zip git ssh rsync
+          - mkdir -p ~/.ssh
+          - ssh-keyscan -t rsa $SERVER_IP > ~/.ssh/known_hosts
+          - (umask  077 ; echo $SSH_VARIABLE | base64 --decode > ~/.ssh/id_rsa)
           - bash deploy.sh
 pipelines:
   branches:
@@ -42,4 +51,9 @@ pipelines:
       - parallel:
           - step: *npmDev
           - step: *composer
-      - step: *deploy
+      - step: *deployDevelopment
+    staging:
+      - parallel:
+          - step: *npmDev
+          - step: *composer
+      - step: *deployStaging
