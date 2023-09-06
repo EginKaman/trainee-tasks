@@ -57,3 +57,4 @@ Route::get('payments', function () {
 Route::get('payments/{method}/success', [StripePaymentController::class, 'success'])->name('payments.stripe.success');
 Route::get('payments/{method}/cancel', [StripePaymentController::class, 'cancel'])->name('payments.stripe.cancel');
 Route::get('async-api', [\App\Http\Controllers\AsyncApiController::class, 'index']);
+Route::get('search', [\App\Http\Controllers\SearchController::class, 'elastic'])->name('search');

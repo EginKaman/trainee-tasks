@@ -5,16 +5,17 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Models\Country;
+use App\Services\MovieDbService;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Storage;
+use Throwable;
 
 class CountrySeeder extends Seeder
 {
     public function run(): void
     {
         try {
-            $countriesData = json_decode(Storage::get('countries.json'), true, 512, JSON_THROW_ON_ERROR);
-        } catch (\JsonException $e) {
+            $countriesData = (new MovieDbService())->countries();
+        } catch (Throwable $e) {
             $this->command->error($e->getMessage());
 
             return;
@@ -22,9 +23,10 @@ class CountrySeeder extends Seeder
 
         foreach ($countriesData as $countryData) {
             Country::updateOrCreate([
-                'iso_2_code' => $countryData['alpha-2'],
+                'iso_3166_1' => $countryData['iso_3166_1'],
             ], [
-                'title' => $countryData['name'],
+                'english_name' => $countryData['english_name'],
+                'native_name' => $countryData['native_name'],
             ]);
         }
     }

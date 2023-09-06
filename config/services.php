@@ -64,4 +64,7 @@ return [
         'api_secret' => env('STRIPE_SECRET'),
         'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
     ],
+    'themoviedb' => [
+        'api_key' => env('MOVIE_DB_API_KEY'),
+    ],
 ];
