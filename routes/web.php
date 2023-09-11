@@ -1,8 +1,19 @@
 <?php
 
+use App\Http\Controllers\AsyncApiController;
+use App\Http\Controllers\Book\BotController;
+use App\Http\Controllers\Book\BotDataController;
+use App\Http\Controllers\Book\CategoryController;
+use App\Http\Controllers\Book\JobController;
+use App\Http\Controllers\Book\JobDataController;
+use App\Http\Controllers\Book\SiteController;
+use App\Http\Controllers\Book\WorkerController;
+use App\Http\Controllers\Book\WorkerDataController;
 use App\Http\Controllers\ConvertorController;
 use App\Http\Controllers\FeedbackController;
+use App\Http\Controllers\FormController;
 use App\Http\Controllers\Images\OptimizerController;
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\Sendgrid\WebhookController;
 use App\Http\Controllers\StripePaymentController;
 use App\Http\Middleware\SignedWebhookMiddleware;
@@ -43,8 +54,8 @@ Route::prefix('images')->group(function () {
     Route::post('optimizer', [OptimizerController::class, 'store']);
 })->name('images');
 
-Route::get('form', [\App\Http\Controllers\FormController::class, 'index'])->name('form.index');
-Route::post('form', [\App\Http\Controllers\FormController::class, 'store'])->name('form.store');
+Route::get('form', [FormController::class, 'index'])->name('form.index');
+Route::post('form', [FormController::class, 'store'])->name('form.store');
 
 Route::get('{driver}/callback', function () {
     return view('socialite.callback');
@@ -56,5 +67,19 @@ Route::get('payments', function () {
 
 Route::get('payments/{method}/success', [StripePaymentController::class, 'success'])->name('payments.stripe.success');
 Route::get('payments/{method}/cancel', [StripePaymentController::class, 'cancel'])->name('payments.stripe.cancel');
-Route::get('async-api', [\App\Http\Controllers\AsyncApiController::class, 'index']);
-Route::get('search', [\App\Http\Controllers\SearchController::class, 'elastic'])->name('search');
+Route::get('async-api', [AsyncApiController::class, 'index']);
+Route::get('search', [SearchController::class, 'elastic'])->name('search');
+
+
+Route::resource('sites', SiteController::class)->whereUuid(['site']);
+Route::resource('sites.categories', CategoryController::class)->shallow()->whereUuid(['site', 'category']);
+Route::get('sites/{site}/categories/{category}/bots/data', BotDataController::class)->name('bots.data');
+Route::resource('sites.categories.bots', BotController::class)
+    ->shallow()
+    ->only(['index', 'destroy'])
+    ->whereUuid(['site', 'category', 'bot']);
+Route::get('bots/{bot}/jobs/data', JobDataController::class)->name('bots.jobs.data')->whereUuid(['bot']);
+Route::resource('bots.jobs', JobController::class)
+    ->shallow()->except(['show'])->whereUuid(['bot', 'job']);
+Route::get('jobs/{job}/workers/data', WorkerDataController::class)->name('jobs.workers.data')->whereUuid(['job']);
+Route::resource('jobs.workers', WorkerController::class)->shallow()->whereUuid(['job', 'worker']);

@@ -19,10 +19,10 @@ class Country extends Model
 
     public function iso2Code(): Attribute
     {
-        return Attribute::make(get: fn (string $value, array $attributes) => $attributes['iso_3166_1']);
+        return Attribute::make(get: fn ($value, $attributes) => $attributes['iso_3166_1']);
     }
     public function title(): Attribute
     {
-        return Attribute::make(get: fn (string $value, array $attributes) => $attributes['english_name']);
+        return Attribute::make(get: fn ($value, $attributes) => $attributes['english_name']);
     }
 }

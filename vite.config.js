@@ -12,7 +12,13 @@ export default defineConfig({
     },
     plugins: [
         laravel({
-            input: ['resources/scss/app.scss', 'resources/js/app.js', 'resources/js/form.js'],
+            input: [
+                'resources/scss/app.scss',
+                'resources/js/app.js',
+                'resources/js/form.js',
+                'resources/js/books/jobs/create.js',
+                'resources/js/books/bots/index.js'
+            ],
             refresh: true,
         }),
     ],
