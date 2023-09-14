@@ -49,7 +49,7 @@ definitions:
           - ssh-keyscan $SERVER_BASTION_IP > ~/.ssh/known_hosts
           - (umask  077 ; echo $SSH_VARIABLE | base64 --decode > ~/.ssh/id_rsa)
           - ssh -i "~/.ssh/id_rsa" $REMOTE_USER@$SERVER_BASTION_IP ssh-keyscan $SERVER_IP > ~/.ssh/known_hosts
-          - bash deploy.sh
+          - bash deploy_staging.sh
 pipelines:
   branches:
     develop:
