@@ -20,7 +20,10 @@ definitions:
         name: Install composer packages
         image: php:8.2
         script:
-          - apt-get update && apt-get install -y libfreetype6-dev libjpeg62-turbo-dev libpng-dev git zip php8.2-soap php8.2-gd php8.2-zip php8.2-imagick php8.2-bcmath
+          - apt-get update && apt-get install -y libfreetype6-dev libjpeg62-turbo-dev libpng-dev git zip
+          - docker-php-ext-configure gd --with-jpeg --with-webp
+          - docker-php-ext-install -j$(nproc) pdo_pgsql pcntl gd exif bcmath zip imagick zip soap
+          - pecl install -o -f redis && docker-php-ext-enable redis
           - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
           - composer install --optimize-autoloader
         caches:
