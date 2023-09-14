@@ -25,8 +25,7 @@ definitions:
           - docker-php-ext-configure gd --with-jpeg --with-webp
           - docker-php-ext-install -j$(nproc) pdo_pgsql pcntl gd exif bcmath zip imagick zip soap
           - pecl install -o -f redis && docker-php-ext-enable redis
-          - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-          - composer install --optimize-autoloader
+          - composer install --no-ansi --no-dev --no-interaction --no-plugins --no-progress --no-scripts --optimize-autoloader
         caches:
           - composer
         artifacts:
