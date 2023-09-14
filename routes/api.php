@@ -41,6 +41,7 @@ Route::prefix('v1')->middleware(['localization'])->group(function () {
             'store',
             'index'
         ]);
+        Route::patch('orders/{order}', [OrderController::class, 'refund']);
         Route::post('payments', [PaymentController::class, 'store']);
         Route::post('payments/refund', [PaymentController::class, 'refund']);
 

@@ -6,5 +6,7 @@
     "email": "Email*",
     "email_rfc": "Email RFC",
     "pincode": "Pin code*",
-    "description": "Description"
+    "description": "Description",
+    "Your order #:order is ordered. Thank you!": "Your order #:order is ordered. Thank you!",
+    "Your order #:order is refunded. Thank you!": "Your order #:order is refunded. Thank you!"
 }

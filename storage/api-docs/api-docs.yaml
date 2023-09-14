@@ -619,7 +619,73 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SomethingWentWrong'
-
+  /orders/{order}:
+    patch:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - orders
+      description: Refund order
+      parameters:
+        - in: header
+          name: Accept-Language
+          description: Set interface language (en, de)
+          schema:
+            type: string
+            example: en
+        - name: order
+          in: path
+          required: true
+          description: Order id
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Refund success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Refund'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        404:
+          description: Not found response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        409:
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                title: Conflict
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'You already have the subscription'
+        422:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+              example:
+                message: The token must be a valid
+                errors:
+                  email:
+                    - "The token format is invalid."
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
   /payments:
     post:
       security:

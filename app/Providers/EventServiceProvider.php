@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Listeners\{BuildingMenuListener, SuccessfulSentMessage};
-use App\Models\User;
-use App\Observers\UserObserver;
+use App\Listeners\{BuildingMenuListener,NotificationFailedListener,NotificationSendingListener,NotificationSentListener,SuccessfulSentMessage};
+use App\Models\{Order, User};
+use App\Observers\{OrderObserver, UserObserver};
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Mail\Events\MessageSent;
+use Illuminate\Notifications\Events\{NotificationFailed, NotificationSending, NotificationSent};
 use JeroenNoten\LaravelAdminLte\Events\BuildingMenu;
 
 class EventServiceProvider extends ServiceProvider
@@ -24,6 +25,9 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [SendEmailVerificationNotification::class],
         MessageSent::class => [SuccessfulSentMessage::class],
         BuildingMenu::class => [BuildingMenuListener::class],
+        NotificationSending::class => [NotificationSendingListener::class],
+        NotificationSent::class => [NotificationSentListener::class],
+        NotificationFailed::class => [NotificationFailedListener::class],
     ];
 
     /**
@@ -33,6 +37,7 @@ class EventServiceProvider extends ServiceProvider
      */
     protected $observers = [
         User::class => [UserObserver::class],
+        Order::class => [OrderObserver::class],
     ];
 
     /**
