@@ -33,7 +33,7 @@ definitions:
           - vendor/**
     - step: &deployDevelopment
         name: Deploy Application to the Development server
-        deployment: Staging
+        deployment: Development
         script:
           - apt-get update && apt-get install -y zip git ssh rsync
           - mkdir -p ~/.ssh
