@@ -17,7 +17,7 @@ class NewRefund
     {
         $order = Order::find($orderId);
 
-        if ($order->status === OrderStatus::Refunded->value) {
+        if ($order->status === OrderStatus::Refunded) {
             throw new OrderRefundedException(__('Order has already refunded'));
         }
 
@@ -37,7 +37,7 @@ class NewRefund
         $paymentClient->refund(new Refund($payment->method_id, $payment->amount));
 
         DB::transaction(function () use ($order, $payment): void {
-            $order->status = OrderStatus::Refunded->value;
+            $order->status = OrderStatus::Refunded;
             $order->save();
 
             $payment->status = OrderStatus::Refunded->value;

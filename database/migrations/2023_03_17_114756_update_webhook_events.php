@@ -15,7 +15,7 @@ return new class() extends Migration {
             });
         });
         DB::table('webhook_events')->update([
-            'eventable_id' => DB::raw('`order_id`'),
+            'eventable_id' => DB::raw('order_id'),
             'eventable_type' => 'App\Models\Order',
         ]);
         Schema::table('webhook_events', function (Blueprint $table): void {
@@ -31,7 +31,7 @@ return new class() extends Migration {
             });
         });
         DB::table('webhook_events')->update([
-            'order_id' => DB::raw('`eventable_id`'),
+            'order_id' => DB::raw('eventable_id'),
         ]);
         Schema::table('webhook_events', function (Blueprint $table): void {
             $table->dropMorphs('eventable');

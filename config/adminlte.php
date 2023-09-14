@@ -66,9 +66,9 @@ return [
 
     'logo' => 'HW PHP',
     'logo_img' => null,
-    'logo_img_class' => 'brand-image img-circle elevation-3',
+    'logo_img_class' => null,
     'logo_img_xl' => null,
-    'logo_img_xl_class' => 'brand-image-xs',
+    'logo_img_xl_class' => null,
     'logo_img_alt' => 'Admin Logo',
 
     /*
@@ -304,9 +304,8 @@ return [
 
         // Sidebar items:
         [
-            'text' => 'Task 2',
-            'url' => 'convertor',
-            'icon' => 'far fa-fw fa-file',
+            'header' => 'Book',
+            'classes' => 'text-uppercase',
         ],
         [
             'text' => 'Task 3',
@@ -320,7 +319,7 @@ return [
         ],
         [
             'text' => 'Task 7',
-            'url' => 'form',
+            'url' => 'payments',
             'icon' => 'far fa-fw fa-file',
         ],
     ],
@@ -361,7 +360,7 @@ return [
 
     'plugins' => [
         'Datatables' => [
-            'active' => false,
+            'active' => true,
             'files' => [
                 [
                     'type' => 'js',

@@ -1,12 +1,18 @@
 grumphp:
-  hooks_dir: ~
-  hooks_preset: local
+  environment:
+    variables:
+      GRUMPHP_PROJECT_DIR: "."
+      GRUMPHP_GIT_WORKING_DIR: "."
+      GRUMPHP_BIN_DIR: "vendor/bin/"
+      GRUMPHP_GIT_REPOSITORY_DIR: ".git/"
+  git_hook_variables:
+    EXEC_GRUMPHP_COMMAND: 'vendor/bin/sail php'
   stop_on_failure: false
   ignore_unstaged_changes: false
   hide_circumvention_tip: false
   process_timeout: 120
   parallel:
-    enabled: false
+    enabled: true
     max_workers: 32
   fixer:
     enabled: true

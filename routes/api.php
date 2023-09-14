@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\CardController;
+use App\Http\Controllers\DomainController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
@@ -40,6 +41,7 @@ Route::prefix('v1')->middleware(['localization'])->group(function () {
             'store',
             'index'
         ]);
+        Route::patch('orders/{order}', [OrderController::class, 'refund']);
         Route::post('payments', [PaymentController::class, 'store']);
         Route::post('payments/refund', [PaymentController::class, 'refund']);
 
@@ -59,4 +61,6 @@ Route::prefix('v1')->middleware(['localization'])->group(function () {
     Route::get('subscriptions', [SubscriptionController::class, 'index']);
 
     Route::patch('sockets/users/{user}', [SocketUserController::class, 'update']);
+
+    Route::get('domains', [DomainController::class, 'index']);
 });

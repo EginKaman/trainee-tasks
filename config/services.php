@@ -64,4 +64,15 @@ return [
         'api_secret' => env('STRIPE_SECRET'),
         'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
     ],
+    'themoviedb' => [
+        'api_key' => env('MOVIE_DB_API_KEY'),
+    ],
+    'turbosms' => [
+        'wsdlEndpoint' => env('TURBOSMS_WSDLENDPOINT', 'http://turbosms.in.ua/api/wsdl.html'),
+        'login' => env('TURBOSMS_LOGIN'),
+        'password' => env('TURBOSMS_PASSWORD'),
+        'sender' => env('TURBOSMS_SENDER'),
+        'debug' => env('TURBOSMS_DEBUG', false), //will log sending attempts and results
+        'sandboxMode' => env('TURBOSMS_SANDBOX_MODE', false), //will not invoke API call
+    ],
 ];
