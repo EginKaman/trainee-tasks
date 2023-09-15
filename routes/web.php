@@ -78,7 +78,8 @@ Route::resource('sites.categories.bots', BotController::class)
     ->shallow()
     ->only(['index', 'destroy'])
     ->whereUuid(['site', 'category', 'bot']);
-Route::get('bots/{bot}/jobs/data', JobDataController::class)->name('bots.jobs.data')->whereUuid(['bot']);
+Route::get('bots/{bot}/jobs/data', [JobDataController::class, 'jobs'])->name('bots.jobs.data')->whereUuid(['bot']);
+Route::get('bots/{bot}/jobs/data/cron', [JobDataController::class, 'cron'])->name('bots.jobs.data.cron')->whereUuid(['bot']);
 Route::resource('bots.jobs', JobController::class)
     ->shallow()->except(['show'])->whereUuid(['bot', 'job']);
 Route::get('jobs/{job}/workers/data', WorkerDataController::class)->name('jobs.workers.data')->whereUuid(['job']);
