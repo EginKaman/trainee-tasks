@@ -14,7 +14,7 @@ class JobController extends Controller
 {
     public function index(Bot $bot): View
     {
-        $config = [
+        $jobsConfig = [
             'order' => [[1, 'desc']],
             'columns' => [
                 [
@@ -45,9 +45,42 @@ class JobController extends Controller
             'lengthMenu' => [[10, 25, 50], [10, 25, 50]],
         ];
 
-        $heads = ['Title', 'Creation date and time', 'Total workers', 'Total failed workers', 'Loop', 'Actions'];
+        $jobsHeads = ['Title', 'Creation date and time', 'Total workers', 'Total failed workers', 'Loop', 'Actions'];
 
-        return view('books.jobs.index', compact(['bot', 'config', 'heads']));
+        $cronConfig = [
+            'order' => [[1, 'desc']],
+            'columns' => [
+                [
+                    'data' => 'name', 'name' => 'name', 'title' => 'Title',
+                ],
+                [
+                    'data' => 'created_at', 'name' => 'created_at', 'title' => 'Creation date and time',
+                ],
+                [
+                    'data' => 'cron', 'name' => 'cron', 'title' => 'Schedule',
+                ],
+                [
+                    'data' => 'workers_count', 'name' => 'workers_count', 'title' => 'Active jobs',
+                ],
+                [
+                    'data' => 'last_schedule', 'name' => 'last_schedule', 'title' => 'Last Schedule',
+                ],
+                [
+                    'data' => 'actions', 'name' => 'actions', 'title' => 'Actions', 'orderable' => false,
+                    'searchable' => false,
+                ],
+            ],
+            'serverSide' => true,
+            'ajax' => route('bots.jobs.data.cron', [
+                'bot' => $bot,
+            ]),
+            'paging' => true,
+            'lengthMenu' => [[10, 25, 50], [10, 25, 50]],
+        ];
+
+        $cronHeads = ['Title', 'Creation date and time', 'Schedule', 'Active jobs', 'Last Schedule', 'Actions'];
+
+        return view('books.jobs.index', compact(['bot', 'jobsConfig', 'jobsHeads', 'cronHeads', 'cronConfig']));
     }
 
     public function create(Bot $bot): View

@@ -6,7 +6,7 @@ namespace App\Http\Controllers\Book;
 
 use App\Enum\WorkerStatus;
 use App\Http\Controllers\Controller;
-use App\Models\{Category, Site};
+use App\Models\{Bot, Category, Site};
 use Illuminate\Http\JsonResponse;
 use Yajra\DataTables\DataTables;
 
@@ -20,6 +20,7 @@ class BotDataController extends Controller
                 $query->where('workers.status', WorkerStatus::Finished);
             },
         ]))
+            ->editColumn('created_at', fn (Bot $bot): string => $bot->created_at->format('d F Y'))
             ->addColumn('actions', 'books.bots.actions')
             ->rawColumns(['actions'])
             ->toJson();
