@@ -73,6 +73,16 @@ class User extends Authenticatable implements JWTSubject
         return [];
     }
 
+    public function routeNotificationForTurboSMS(): string
+    {
+        return $this->phone->formatInternational();
+    }
+
+    public function routeNotificationForTwilio(): string
+    {
+        return $this->phone->formatInternational();
+    }
+
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class);

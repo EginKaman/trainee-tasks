@@ -4,7 +4,7 @@ info:
   description: Swagger
   version: '0.1'
 servers:
-  - url: 'https://test2023-backend-ivan-t.abztrainee.com/api/v1'
+  - url: 'https://backend-ivan-t-pdp.abzdev2.com/api/v1'
   - url: 'http://localhost/api/v1'
 
 paths:
