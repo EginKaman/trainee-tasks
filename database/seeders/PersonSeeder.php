@@ -30,6 +30,10 @@ class PersonSeeder extends Seeder
         } catch (JsonException $e) {
             $this->command->error($e->getMessage());
 
+            if (empty($details['adult'])) {
+                $details['adult'] = false;
+            }
+
             return;
         }
 

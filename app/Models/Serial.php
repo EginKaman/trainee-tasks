@@ -46,6 +46,7 @@ class Serial extends Model
         'runtime' => 'integer',
         'vote_average' => 'float',
         'vote_count' => 'integer',
+        'in_production' => 'boolean',
     ];
 
     public function countries(): BelongsToMany
