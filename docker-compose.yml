@@ -29,6 +29,7 @@ services:
         depends_on:
             - pgsql
             - redis
+            - elastic
             - mailpit
     pgsql:
         container_name: '${APP_NAME}-pgsql'
@@ -61,7 +62,7 @@ services:
         networks:
             - sail
         healthcheck:
-            test: ["CMD", "redis-cli", "ping"]
+            test: [ "CMD", "redis-cli", "ping" ]
             retries: 3
             timeout: 5s
     mailpit:

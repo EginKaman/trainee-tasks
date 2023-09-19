@@ -57,7 +57,13 @@ class ImportSerialJob implements ShouldQueue
                 $details['adult'] = false;
             }
             if (empty($details['in_production'])) {
-                $details['adult'] = false;
+                $details['in_production'] = false;
+            }
+            if (empty($details['number_of_episodes'])) {
+                $details['number_of_episodes'] = 0;
+            }
+            if (empty($details['number_of_seasons'])) {
+                $details['number_of_seasons'] = 0;
             }
 
             $serial = Serial::updateOrCreate([
