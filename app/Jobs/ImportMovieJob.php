@@ -12,6 +12,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\{InteractsWithQueue, SerializesModels};
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 
 class ImportMovieJob implements ShouldQueue
 {
@@ -29,6 +30,7 @@ class ImportMovieJob implements ShouldQueue
     public function handle(): void
     {
         $type = MediaEnum::Tv;
+        DB::beginTransaction();
         foreach ($this->movieIds as $movieId) {
             try {
                 $details = $this->movieDbClient->details($type->value, $movieId['id']);
@@ -52,6 +54,9 @@ class ImportMovieJob implements ShouldQueue
             }
             if (empty($details['adult'])) {
                 $details['adult'] = false;
+            }
+            if (empty($details['imdb_id'])) {
+                $details['imdb_id'] = null;
             }
 
             $movie = Movie::updateOrCreate([
@@ -80,6 +85,14 @@ class ImportMovieJob implements ShouldQueue
                 'iso_3166_1',
                 Arr::map(Arr::get($details, 'production_countries'), fn ($country) => $country['iso_3166_1'])
             )->get());
+        }
+
+        try {
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            throw $e;
         }
     }
 }
