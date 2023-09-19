@@ -32,13 +32,24 @@ CUSTOM_COMMANDS=(
   "php artisan view:cache"
   "php artisan adminlte:install"
   "php artisan storage:link"
-  "php artisan telescope:publish"
+  "php artisan horizon:terminate"
+  "php artisan telescope:install --no-interaction"
+  "php artisan horizon:install --no-interaction"
 )
 AFTER_LINK_COMMANDS=(
   "sudo systemctl restart supervisord"
   "sudo supervisorctl restart all"
 )
 WRITABLE_DIRS=(
+  "bootstrap/cache"
+  "storage"
+  "storage/app"
+  "storage/app/public"
+  "storage/framework"
+  "storage/framework/cache"
+  "storage/framework/sessions"
+  "storage/framework/views"
+  "storage/logs"
   ".next"
   "build"
   "node_modules"
