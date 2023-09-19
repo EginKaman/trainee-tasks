@@ -1,4 +1,4 @@
 {
-    "Your order #:order is ordered. Thank you!": "رقم order: تم طلب الطلب. شكرًا لك!",
-    "Your order #:order is refunded. Thank you!": "رقم order: تم استرداد الطلب. شكرًا لك!"
+    "Your order #:order is ordered. Thank you!": "طلبك رقم:order تم رده. شكرًا لك!",
+    "Your order #:order is refunded. Thank you!": "تم رد مبلغ طلبك رقم:order. شكرًا لك!"
 }

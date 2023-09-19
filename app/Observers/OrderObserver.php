@@ -12,13 +12,13 @@ class OrderObserver
 {
     public function created(Order $order): void
     {
-        $order->user->notify(new CheckoutNotification($order));
+        $order->user->notify((new CheckoutNotification($order))->onQueue('checkout'));
     }
 
     public function updated(Order $order): void
     {
         if ($order->wasChanged('status') && $order->status === OrderStatus::Refunded) {
-            $order->user->notify(new RefundNotification($order));
+            $order->user->notify((new RefundNotification($order))->delay(now()->addHour())->onQueue('refund'));
         }
     }
 

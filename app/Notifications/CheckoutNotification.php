@@ -8,6 +8,7 @@ use App\Models\Order;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Arr;
 use NotificationChannels\Twilio\{TwilioChannel, TwilioSmsMessage};
 
 class CheckoutNotification extends Notification implements ShouldQueue
@@ -28,7 +29,9 @@ class CheckoutNotification extends Notification implements ShouldQueue
     public function toTwilio(mixed $notifiable): TwilioSmsMessage
     {
         return (new TwilioSmsMessage())
-            ->content("Your order #{$this->order->id} is ordered. Thank you!");
+            ->content(__('Your order #:order is ordered. Thank you!', [
+                'order' => $this->order->id,
+            ], Arr::random(['ar', 'en', 'ru'])));
     }
 
     public function toArray(mixed $notifiable): array
