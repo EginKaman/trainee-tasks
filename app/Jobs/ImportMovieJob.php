@@ -80,10 +80,13 @@ class ImportMovieJob implements ShouldQueue
                 'vote_count',
             ]));
 
-            $movie->genres()->sync(Arr::map(Arr::get($details, 'genres'), fn ($genre) => $genre['id']));
+            $movie->genres()->sync(Arr::map(Arr::get($details, 'genres', []), fn ($genre) => Arr::get($genre, 'id')));
             $movie->countries()->sync(Country::whereIn(
                 'iso_3166_1',
-                Arr::map(Arr::get($details, 'production_countries'), fn ($country) => $country['iso_3166_1'])
+                Arr::map(
+                    Arr::get($details, 'production_countries', []),
+                    fn ($country) => Arr::get($country, 'iso_3166_1')
+                )
             )->get());
         }
 

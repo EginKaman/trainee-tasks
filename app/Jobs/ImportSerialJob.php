@@ -90,7 +90,7 @@ class ImportSerialJob implements ShouldQueue
                 'vote_average',
                 'vote_count',
             ]));
-            $serial->genres()->sync(Arr::map(Arr::get($details, 'genres'), fn ($genre) => $genre['id']));
+            $serial->genres()->sync(Arr::map(Arr::get($details, 'genres', []), fn ($genre) => Arr::get($genre, 'id')));
             $serial->countries()->sync(
                 Country::query()
                     ->whereIn('iso_3166_1', Arr::get($details, 'origin_country', []))
