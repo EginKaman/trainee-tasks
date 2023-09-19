@@ -17,11 +17,21 @@ class NotificationSendingListener
     public function handle(NotificationSending $event): void
     {
         if ($event->notification instanceof CheckoutNotification || $event->notification instanceof RefundNotification) {
+            if(method_exists($event->notification, 'toTurboSMS')) {
+                $channel = 'turbosms';
+                $text = $event->notification->toTurboSMS($event->notifiable)->body;
+            } else {
+                $channel = 'twilio';
+                $text = $event->notification->toTwilio($event->notifiable)->content;
+            }
             $smsMessage = new SmsMessage([
+                'id' => $event->notification->id,
                 'phone' => $event->notifiable->phone,
-                'text' => $event->notification->toVonage($event->notifiable)->content,
-                'is_sent' => false,
+                'text' => $text,
+                'channel' => $channel,
+                'status' => 'pending',
             ]);
+            $smsMessage->save();
         }
     }
 }

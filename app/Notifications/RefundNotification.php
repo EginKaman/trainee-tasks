@@ -10,6 +10,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Channels\VonageSmsChannel;
 use Illuminate\Notifications\Messages\VonageMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Arr;
 use NotificationChannels\TurboSMS\TurboSMSMessage;
 
 class RefundNotification extends Notification implements ShouldQueue
@@ -37,7 +38,9 @@ class RefundNotification extends Notification implements ShouldQueue
 
     public function toTurboSMS(mixed $notifiable): TurboSmsMessage
     {
-        return new TurboSmsMessage("Your order #{$this->order->id} is refunded. Thank you!");
+        return new TurboSmsMessage(__('Your order #:order is refunded. Thank you!', [
+            'order' => $this->order->id,
+        ], Arr::random(['ar', 'en', 'ru'])));
     }
 
     public function toArray(mixed $notifiable): array

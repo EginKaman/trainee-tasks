@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Actions\Order;
 
 use App\Models\{Order, OrderProduct, Product};
-use Illuminate\Support\{Arr, Collection};
+use Illuminate\Support\{Arr, Collection, Facades\Log};
 
 class PrepareProducts
 {
@@ -13,10 +13,7 @@ class PrepareProducts
     {
         $data = Arr::keyBy($data, 'id');
 
-        $products = Product::query()->whereIn(
-            'id',
-            Arr::map($data['products'], fn (array $value) => $value['id'])
-        )->get();
+        $products = Product::query()->whereIn('id', Arr::map($data, fn (array $value) => $value['id']))->get();
 
         $orderProducts = collect();
         foreach ($products as $product) {
