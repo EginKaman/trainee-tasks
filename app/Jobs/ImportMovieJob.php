@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Jobs;
 
 use App\Enum\MediaEnum;
-use App\Models\{Country, Movie};
+use App\Models\{Country, Genre, Movie};
 use App\Services\MovieDbService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -30,7 +30,7 @@ class ImportMovieJob implements ShouldQueue
     public function handle(): void
     {
         $type = MediaEnum::Tv;
-        DB::beginTransaction();
+//        DB::beginTransaction();
         foreach ($this->movieIds as $movieId) {
             try {
                 $details = $this->movieDbClient->details($type->value, $movieId['id']);
@@ -80,7 +80,12 @@ class ImportMovieJob implements ShouldQueue
                 'vote_count',
             ]));
 
-            $movie->genres()->sync(Arr::map(Arr::get($details, 'genres', []), fn ($genre) => Arr::get($genre, 'id')));
+            $movie->genres()->sync(
+                Genre::whereIn(
+                    'id',
+                    Arr::map(Arr::get($details, 'genres', []), fn ($genre) => Arr::get($genre, 'id'))
+                )->get()
+            );
             $movie->countries()->sync(Country::whereIn(
                 'iso_3166_1',
                 Arr::map(
@@ -90,12 +95,12 @@ class ImportMovieJob implements ShouldQueue
             )->get());
         }
 
-        try {
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            throw $e;
-        }
+//        try {
+//            DB::commit();
+//        } catch (\Exception $e) {
+//            DB::rollBack();
+//
+//            throw $e;
+//        }
     }
 }

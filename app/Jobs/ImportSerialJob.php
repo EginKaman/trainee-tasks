@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Jobs;
 
 use App\Enum\MediaEnum;
-use App\Models\{Country, Serial};
+use App\Models\{Country, Genre, Serial};
 use App\Services\MovieDbService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -90,7 +90,12 @@ class ImportSerialJob implements ShouldQueue
                 'vote_average',
                 'vote_count',
             ]));
-            $serial->genres()->sync(Arr::map(Arr::get($details, 'genres', []), fn ($genre) => Arr::get($genre, 'id')));
+            $serial->genres()->sync(
+                Genre::whereIn(
+                    'id',
+                    Arr::map(Arr::get($details, 'genres', []), fn ($genre) => Arr::get($genre, 'id'))
+                )->get()
+            );
             $serial->countries()->sync(
                 Country::query()
                     ->whereIn('iso_3166_1', Arr::get($details, 'origin_country', []))
