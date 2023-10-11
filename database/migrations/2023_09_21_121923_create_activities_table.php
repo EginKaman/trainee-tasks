@@ -11,9 +11,9 @@ return new class() extends Migration {
     {
         Schema::create('activities', function (Blueprint $table): void {
             $table->uuid('id')->primary();
-            $table->string('name')->nullable()->index();
-            $table->text('description')->nullable();
-            $table->nullableUuidMorphs('subject');
+            $table->foreignUuid('tournament_id')->nullable()->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId('user_id')->nullable()->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+            $table->string('type')->nullable()->index();
             $table->json('properties')->nullable();
             $table->timestamps();
         });

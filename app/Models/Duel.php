@@ -11,12 +11,14 @@ use Illuminate\Database\Eloquent\Relations\{BelongsTo, BelongsToMany};
 
 class Duel extends Model
 {
-    use HasFactory; use HasUuids;
+    use HasFactory;
+    use HasUuids;
 
-    protected $fillable = ['status', 'finished_at', ];
+    protected $fillable = ['status', 'finished_at', 'started_at'];
 
     protected $casts = [
         'finished_at' => 'datetime',
+        'started_at' => 'datetime',
     ];
 
     public function tournament(): BelongsTo
@@ -31,6 +33,6 @@ class Duel extends Model
 
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class);
+        return $this->belongsToMany(User::class)->using(DuelUser::class);
     }
 }

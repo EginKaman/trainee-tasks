@@ -204,6 +204,19 @@ return [
             'timeout' => 600,
             'nice' => 0,
         ],
+        'supervisor-3' => [
+            'connection' => 'redis',
+            'queue' => ['tournaments'],
+            'balance' => 'auto',
+            'autoScalingStrategy' => 'time',
+            'maxProcesses' => 1,
+            'maxTime' => 0,
+            'maxJobs' => 0,
+            'memory' => 128,
+            'tries' => 1,
+            'timeout' => 60,
+            'nice' => 0,
+        ],
     ],
 
     'environments' => [
@@ -234,10 +247,13 @@ return [
 
         'local' => [
             'supervisor-1' => [
-                'maxProcesses' => 4,
+                'maxProcesses' => 12,
             ],
             'supervisor-2' => [
-                'maxProcesses' => 4,
+                'maxProcesses' => 12,
+            ],
+            'supervisor-3' => [
+                'maxProcesses' => 12,
             ],
         ],
     ],

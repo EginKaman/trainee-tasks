@@ -8,6 +8,8 @@ if [ ! -d /.composer ]; then
     mkdir /.composer
 fi
 
+service cron start
+
 chmod -R ugo+rw /.composer
 
 if [ $# -gt 0 ]; then

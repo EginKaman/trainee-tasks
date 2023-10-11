@@ -10,11 +10,12 @@ return new class() extends Migration {
     public function up(): void
     {
         Schema::create('duels', function (Blueprint $table): void {
-            $table->uuid('id');
+            $table->uuid('id')->primary();
             $table->foreignUuid('tournament_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->string('status')->index();
             $table->foreignId('winner_id')->nullable()
                 ->constrained('users')->cascadeOnDelete()->cascadeOnUpdate();
+            $table->timestamp('started_at')->nullable();
             $table->timestamp('finished_at')->nullable();
             $table->timestamps();
         });
@@ -30,6 +31,7 @@ return new class() extends Migration {
 
     public function down(): void
     {
+        Schema::dropIfExists('duel_user');
         Schema::dropIfExists('duels');
     }
 };

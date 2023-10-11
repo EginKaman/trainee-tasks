@@ -8,4 +8,7 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class TournamentUser extends Pivot
 {
+    public $timestamps = true;
+
+    protected $fillable = ['score'];
 }

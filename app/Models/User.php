@@ -130,4 +130,17 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(Card::class);
     }
+
+    public function tournaments(): BelongsToMany
+    {
+        return $this->belongsToMany(Tournament::class)
+            ->using(TournamentUser::class)
+            ->withPivot('score')
+            ->withTimestamps();
+    }
+
+    public function duels(): BelongsToMany
+    {
+        return $this->belongsToMany(Duel::class)->using(DuelUser::class);
+    }
 }

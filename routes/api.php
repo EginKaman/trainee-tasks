@@ -13,6 +13,9 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\Sockets\SocketUserController;
 use App\Http\Controllers\SubscribeController;
 use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\Tournament\DuelController;
+use App\Http\Controllers\Tournament\TournamentController;
+use App\Http\Controllers\Tournament\UserController as TournamentUserController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -63,4 +66,8 @@ Route::prefix('v1')->middleware(['localization'])->group(function () {
     Route::patch('sockets/users/{user}', [SocketUserController::class, 'update']);
 
     Route::get('domains', [DomainController::class, 'index']);
+
+    Route::get('tournaments', TournamentController::class);
+    Route::get('tournaments/{tournament}/duels', DuelController::class);
+    Route::get('tournaments/{tournament}/users', TournamentUserController::class);
 });

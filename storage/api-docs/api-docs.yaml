@@ -1123,6 +1123,110 @@ paths:
             application/json:
               schema:
           $ref: '#/components/schemas/SomethingWentWrong'
+
+  /tournaments:
+    get:
+      tags:
+        - tournaments
+      description: Method to get all tournaments
+      parameters:
+        - name: page
+          in: query
+          description: Number page for getting tournaments
+          style: form
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Tournaments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tournaments'
+        404:
+          description: Not found response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
+  /tournaments/{tournament}/users:
+    get:
+      tags:
+        - tournaments
+      description: Method to get all users of tournament
+      parameters:
+        - name: tournament
+          in: path
+          required: true
+          description: Tournament id
+          schema:
+            type: string
+            format: uuid
+        - name: page
+          in: query
+          description: Number page for getting users of tournament
+          style: form
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Tournament Users
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TournamentUsers'
+        404:
+          description: Not found response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
+  /tournaments/{tournament}/duels:
+    get:
+      tags:
+        - tournaments
+      description: Method to get all duels of tournament
+      parameters:
+        - name: tournament
+          in: path
+          required: true
+          description: Tournament id
+          schema:
+            type: string
+            format: uuid
+        - name: page
+          in: query
+          description: Number page for getting duels of tournament
+          style: form
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Tournaments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TournamentDuels'
+
+        503:
+          description: Something Went Wrong
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SomethingWentWrong'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -1208,6 +1312,10 @@ components:
       example: 24jrdKPe43fk
       description: Stripe customer id
       minLength: 1
+    UserScore:
+      type: integer
+      example: 100
+      description: User score
 
     # Role properties
     RoleId:
@@ -1333,7 +1441,7 @@ components:
       description: Product image, must be a jpg, jpeg format. Size image smaller 5Mb
     ProductImgOutput:
       type: string
-      example: https://test2022-backend-andrey-l2.abztrainee.com/storage/products/bhjdBJHViud9384bv2223mdnc.jpg
+      example: https://backend-ivan-t-pdp.abzdev2.com/storage/products/bhjdBJHViud9384bv2223mdnc.jpg
       description: Link to product image
     ProductQuantity:
       type: integer
@@ -1344,6 +1452,88 @@ components:
       multipleOf: 0.01
       example: 23.45
       description: Price product
+
+    # Tournament properties
+    TournamentId:
+      type: string
+      format: uuid
+      description: Tournament id
+    TournamentTitle:
+      type: string
+      example: Aqua Tournament
+      description: Tournament title
+      minLength: 1
+
+    TournamentStatus:
+      type: string
+      enum:
+        - created
+        - started
+        - finished
+      example: created
+      description: Status of tournament
+
+    TournamentStartedAt:
+      type: string
+      example: 2022-12-12 12:30:33
+      description: Tournament started at
+
+    TournamentFinishedAt:
+      type: string
+      example: 2022-12-12 12:30:33
+      description: Tournament finished at
+
+    TournamentCreatedAt:
+      type: string
+      example: 2022-12-12 12:30:33
+      description: Tournament created at
+
+    TournamentUpdatedAt:
+      type: string
+      example: 2022-12-12 12:30:33
+      description: Tournament updated at
+
+
+    DuelId:
+      type: string
+      format: uuid
+      description: Duel id
+    DuelStatus:
+      type: string
+      enum:
+        - created
+        - canceled
+        - started
+        - finished
+      example: created
+      description: Status of duel
+    DuelStartedAt:
+      type: string
+      example: 2022-12-12 12:30:33
+      description: Duel started at
+    DuelFinishedAt:
+      type: string
+      example: 2022-12-12 12:30:33
+      description: Duel finished at
+    DuelCreatedAt:
+      type: string
+      example: 2022-12-12 12:30:33
+      description: Duel created at
+    DuelUpdatedAt:
+      type: string
+      example: 2022-12-12 12:30:33
+      description: Duel updated at
+    DuelWinner:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/UserId'
+        name:
+          $ref: '#/components/schemas/UserName'
+        email:
+          $ref: '#/components/schemas/UserEmail'
+        score:
+          $ref: '#/components/schemas/UserScore'
 
     #OrderItems properties
     OrderItemId:
@@ -1529,12 +1719,91 @@ components:
           $ref: '#/components/schemas/ProductQuantity'
         price:
           $ref: '#/components/schemas/ProductPrice'
+    Tournament:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/TournamentId'
+        title:
+          $ref: '#/components/schemas/TournamentTitle'
+        status:
+          $ref: '#/components/schemas/TournamentStatus'
+        startedAt:
+          $ref: '#/components/schemas/TournamentStartedAt'
+        finishedAt:
+          $ref: '#/components/schemas/TournamentFinishedAt'
+        createdAt:
+          $ref: '#/components/schemas/TournamentCreatedAt'
+        updatedAt:
+          $ref: '#/components/schemas/TournamentUpdatedAt'
+
+    TournamentUser:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/UserId'
+        name:
+          $ref: '#/components/schemas/UserName'
+        email:
+          $ref: '#/components/schemas/UserEmail'
+        score:
+          $ref: '#/components/schemas/UserScore'
+
+    TournamentDuel:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/DuelId'
+        status:
+          $ref: '#/components/schemas/DuelStatus'
+        startedAt:
+          $ref: '#/components/schemas/DuelStartedAt'
+        finishedAt:
+          $ref: '#/components/schemas/DuelFinishedAt'
+        createdAt:
+          $ref: '#/components/schemas/DuelCreatedAt'
+        updatedAt:
+          $ref: '#/components/schemas/DuelUpdatedAt'
+        winner:
+          $ref: '#/components/schemas/DuelWinner'
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/TournamentUser'
+
     Products:
       properties:
         data:
           type: array
           items:
             $ref: '#/components/schemas/Product'
+        meta:
+          $ref: '#/components/schemas/Paginate'
+
+    Tournaments:
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tournament'
+        meta:
+          $ref: '#/components/schemas/Paginate'
+
+    TournamentUsers:
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TournamentUser'
+        meta:
+          $ref: '#/components/schemas/Paginate'
+
+    TournamentDuels:
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TournamentDuel'
         meta:
           $ref: '#/components/schemas/Paginate'
 

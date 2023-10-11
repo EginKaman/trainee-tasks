@@ -42,6 +42,13 @@ class Kernel extends ConsoleKernel
         $schedule->command('telescope:prune --hours=24')->daily();
 
         $schedule->command('horizon:snapshot')->everyFiveMinutes();
+
+//        $schedule->command('tournaments:users')->everyMinute()
+//            ->withoutOverlapping(2);
+        $schedule->command('tournaments:finish')->dailyAt('23:59')
+            ->after(function (): void {
+                Artisan::call('db:seed  --class=TournamentSeeder');
+            });
     }
 
     /**
