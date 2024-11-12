@@ -16,7 +16,7 @@
         "vite": "^4.4.9"
     },
     "dependencies": {
-        "@asyncapi/generator": "^1.13.0",
+        "@asyncapi/generator": "^1.17.25",
         "@popperjs/core": "^2.11.8",
         "bootstrap": "^5.3.2",
         "dotenv": "^16.3.1",
